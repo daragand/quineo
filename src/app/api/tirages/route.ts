@@ -1,0 +1,53 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { withAuth, withRole, apiError } from '@/lib/auth'
+import { db } from '@/lib/db'
+
+// ─────────────────────────────────────────
+// POST /api/tirages — démarrer un tirage
+// ─────────────────────────────────────────
+
+const StartSchema = z.object({
+  session_id: z.string().uuid(),
+  lot_id:     z.string().uuid(),
+})
+
+export const POST = withAuth(
+  withRole(['admin', 'operator'], async (req: NextRequest, { user }) => {
+    const body   = await req.json()
+    const parsed = StartSchema.safeParse(body)
+    if (!parsed.success) return apiError(parsed.error.issues[0].message)
+
+    const { session_id, lot_id } = parsed.data
+
+    // Vérifier session
+    const session = await db.Session.findOne({
+      where: { id: session_id, association_id: user.association_id },
+    })
+    if (!session) return apiError('Session introuvable', 404)
+
+    // Vérifier lot
+    const lot = await db.Lot.findOne({ where: { id: lot_id, session_id } })
+    if (!lot) return apiError('Lot introuvable', 404)
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((lot.toJSON() as any).status !== 'pending') {
+      return apiError('Ce lot est déjà en tirage ou terminé')
+    }
+
+    // Vérifier qu'aucun autre tirage n'est en cours sur cette session
+    const active = await db.Tirage.findOne({ where: { session_id, status: 'running' } })
+    if (active) return apiError('Un tirage est déjà en cours sur cette session')
+
+    const tirage = await db.sequelize.transaction(async (t: import('sequelize').Transaction) => {
+      await lot.update({ status: 'drawn' }, { transaction: t })
+      await session.update({ status: 'running' }, { transaction: t })
+      return db.Tirage.create(
+        { session_id, lot_id, status: 'running', started_at: new Date() },
+        { transaction: t }
+      )
+    })
+
+    return NextResponse.json({ tirage }, { status: 201 })
+  })
+)

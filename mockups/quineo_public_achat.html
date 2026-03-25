@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quineo — Achat de cartons en ligne</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5/700.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins','Segoe UI',sans-serif;background:#e8eaf0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+:root{
+  --bg:#f0f2f7;--card:#fff;--sep:rgba(0,0,0,.07);--cb:rgba(0,0,0,.09);
+  --t1:#0b1220;--t2:#4a5568;--t3:#8a95a3;--t4:#b0bcc8;
+  --amber:#EF9F27;--ab:#FFF8EE;
+  --blue:#185FA5;--bb:#EEF4FC;--bt:#0C447C;
+  --green:#3B6D11;--gb:#EAF3DE;--gt:#27500A;
+  --red:#A32D2D;--rb:#FCEBEB;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fade-up{animation:fadeUp .3s ease both}
+
+.shell{background:var(--bg);width:100%;max-width:900px;border-radius:14px;overflow:hidden;border:.5px solid var(--cb);box-shadow:0 4px 32px rgba(0,0,0,.10);}
+.nav{background:var(--card);border-bottom:.5px solid var(--sep);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:8px;}
+.nav-box{width:26px;height:26px;border-radius:5px;background:#EF9F27;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#412402;}
+.nav-nm{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t1);letter-spacing:.04em;}
+.btn-nav{padding:6px 14px;border:.5px solid var(--cb);border-radius:6px;background:transparent;font-family:'Poppins',sans-serif;font-size:12px;color:var(--t2);cursor:pointer;}
+.btn-cta{padding:6px 14px;border:none;border-radius:6px;background:#EF9F27;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;color:#2C1500;cursor:pointer;}
+
+.view{display:none;padding:28px 24px 36px;}
+.view.active{display:block;}
+
+/* HERO SEARCH */
+.hero{text-align:center;padding:32px 20px 24px;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--t1);letter-spacing:.03em;line-height:1.05;margin-bottom:8px;}
+.hero-sub{font-size:14px;color:var(--t3);margin-bottom:28px;}
+.search-box{background:var(--card);border-radius:12px;border:.5px solid var(--sep);padding:22px 24px;max-width:480px;margin:0 auto 22px;}
+.sb-label{font-size:12px;font-weight:700;color:var(--t2);margin-bottom:8px;text-align:left;}
+.code-row{display:flex;gap:8px;}
+.code-input-big{flex:1;padding:10px 14px;border:.5px solid var(--cb);border-radius:8px;font-family:'Poppins',sans-serif;font-size:18px;font-weight:700;color:var(--t1);text-align:center;letter-spacing:.18em;text-transform:uppercase;outline:none;background:var(--bg);}
+.code-input-big:focus{border-color:var(--blue);background:var(--card);}
+.code-input-big::placeholder{font-size:14px;letter-spacing:.05em;font-weight:400;color:var(--t4);}
+.btn-search{padding:10px 20px;border:none;border-radius:8px;background:#0b1220;color:#EF9F27;font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:opacity .15s;}
+.btn-search:hover{opacity:.85;}
+.divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--t4);font-size:11px;}
+.divider::before,.divider::after{content:'';flex:1;height:.5px;background:var(--sep);}
+.url-row{display:flex;gap:8px;}
+.url-input{flex:1;padding:8px 12px;border:.5px solid var(--cb);border-radius:7px;font-family:'Poppins',sans-serif;font-size:12px;color:var(--t1);outline:none;background:var(--bg);}
+.url-input:focus{border-color:var(--blue);background:var(--card);}
+.btn-url{padding:8px 14px;border:none;border-radius:7px;background:var(--blue);color:white;font-family:'Poppins',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+.rs-item{background:var(--card);border:.5px solid var(--sep);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:6px;transition:border-color .15s;}
+.rs-item:hover{border-color:rgba(0,0,0,.18);}
+.rs-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.err-msg{background:var(--rb);color:var(--red);padding:8px 12px;border-radius:6px;font-size:12px;font-weight:700;margin-top:8px;display:none;}
+.err-msg.vis{display:block;}
+
+/* SESSION */
+.s-banner{background:#0b1220;border-radius:10px;padding:18px 20px;margin-bottom:18px;display:flex;align-items:center;gap:16px;}
+.s-badge{background:#EF9F27;color:#2C1500;font-size:9px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;display:inline-block;}
+.s-code-pill{background:rgba(239,159,39,.15);border:1px solid rgba(239,159,39,.3);border-radius:6px;padding:6px 14px;text-align:center;flex-shrink:0;}
+.s-code-lbl{font-size:9px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.s-code-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#EF9F27;letter-spacing:.1em;line-height:1;}
+.s-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+.stat-card{background:var(--card);border:.5px solid var(--sep);border-radius:8px;padding:10px 12px;text-align:center;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--t1);}
+.stat-lbl{font-size:10px;color:var(--t3);margin-top:1px;}
+.section-title{font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.09em;text-transform:uppercase;margin-bottom:10px;}
+.pack-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.pack{background:var(--card);border:.5px solid var(--sep);border-radius:10px;padding:14px 12px;cursor:pointer;transition:border-color .15s;position:relative;}
+.pack:hover{border-color:rgba(0,0,0,.18);}
+.pack.selected{border:2px solid var(--blue);background:var(--bb);}
+.pack.featured{border:2px solid var(--amber);}
+.pack-badge{position:absolute;top:-1px;right:10px;background:#EF9F27;color:#2C1500;font-size:9px;font-weight:700;padding:2px 8px;border-radius:0 0 5px 5px;letter-spacing:.07em;}
+.pack-qty{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--t1);line-height:1;}
+.pack-lbl{font-size:11px;color:var(--t2);margin-bottom:6px;}
+.pack-price{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--amber);}
+.pack-unit{font-size:10px;color:var(--t3);}
+.pack-eco{display:inline-block;background:var(--gb);color:var(--gt);font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-top:4px;}
+.pack-radio{width:15px;height:15px;border-radius:50%;border:.5px solid var(--cb);background:var(--bg);position:absolute;top:10px;right:10px;display:flex;align-items:center;justify-content:center;}
+.pack.selected .pack-radio{background:var(--blue);border-color:var(--blue);}
+.cart-bar{background:var(--card);border:.5px solid var(--sep);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;}
+.btn-buy{background:#EF9F27;color:#2C1500;border:none;border-radius:8px;padding:10px 24px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.btn-buy:hover{opacity:.9;}
+.btn-back{background:transparent;border:.5px solid var(--cb);border-radius:7px;padding:6px 14px;font-family:'Poppins',sans-serif;font-size:12px;color:var(--t2);cursor:pointer;margin-bottom:16px;display:inline-block;}
+
+/* PAY */
+.pay-opt{background:var(--card);border:.5px solid var(--sep);border-radius:9px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:border-color .15s;margin-bottom:8px;}
+.pay-opt:hover{border-color:rgba(0,0,0,.18);}
+.pay-opt.sel{border:1.5px solid var(--blue);background:var(--bb);}
+.pay-icon{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pay-name{font-size:13px;font-weight:700;color:var(--t1);}
+.pay-sub{font-size:11px;color:var(--t3);}
+.pay-radio{width:16px;height:16px;border-radius:50%;border:.5px solid var(--cb);background:var(--bg);margin-left:auto;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.pay-opt.sel .pay-radio{background:var(--blue);border-color:var(--blue);}
+.form-input{width:100%;padding:8px 12px;border:.5px solid var(--cb);border-radius:7px;font-family:'Poppins',sans-serif;font-size:12px;color:var(--t1);outline:none;background:var(--card);margin-bottom:8px;}
+.form-input:focus{border-color:var(--blue);}
+.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:-3px;margin-right:6px;}
+
+/* CONFIRM */
+.confirm-card{background:var(--card);border:.5px solid var(--sep);border-radius:12px;max-width:480px;margin:0 auto;overflow:hidden;}
+.confirm-head{background:#0b1220;padding:18px 20px;}
+.confirm-body{padding:16px 20px;}
+.confirm-carton{background:var(--bg);border:.5px solid var(--sep);border-radius:7px;padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+.c-code{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--t1);letter-spacing:.05em;}
+.c-grid{display:flex;gap:2px;}
+.c-num{width:18px;height:18px;background:var(--card);border:.5px solid var(--cb);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--t2);}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="nav">
+    <div class="nav-logo">
+      <div class="nav-box">Q</div>
+      <span class="nav-nm">Quineo</span>
+      <span style="font-size:11px;color:var(--t4);margin-left:4px;">· Billetterie en ligne</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="btn-nav" onclick="goView('search')">Trouver une session</button>
+      <button class="btn-nav">Mon compte</button>
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="view active" id="v-search">
+    <div class="hero fade-up">
+      <div class="hero-title">Achetez vos cartons<br>en ligne</div>
+      <div class="hero-sub">Entrez le code de votre session ou l'URL partagée par votre association</div>
+
+      <div class="search-box">
+        <div class="sb-label">Code de session</div>
+        <div class="code-row">
+          <input class="code-input-big" id="code-input" maxlength="8" placeholder="ex : LPRI25" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn-search" onclick="searchSession()">Accéder →</button>
+        </div>
+        <div class="err-msg" id="err-msg">Code introuvable. Vérifiez avec l'organisateur.</div>
+        <div class="divider">ou accédez via l'URL partagée par l'association</div>
+        <div class="url-row">
+          <input class="url-input" placeholder="quineo.fr/s/amis-quartier-mars25">
+          <button class="btn-url" onclick="goSession()">OK</button>
+        </div>
+      </div>
+
+      <div style="max-width:480px;margin:0 auto;">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;">Sessions ouvertes en ce moment</div>
+        <div class="rs-item" onclick="goSession()">
+          <div class="rs-dot" style="background:#48BB78;"></div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:700;color:var(--t1);">Grand Loto de Printemps 2025</div>
+            <div style="font-size:11px;color:var(--t3);">Amis du Quartier · Lyon 3e · 22 mars 2025</div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.1em;background:var(--bg);padding:2px 8px;border-radius:4px;flex-shrink:0;">LPRI25</div>
+          <div style="font-size:12px;color:var(--t2);flex-shrink:0;margin-left:8px;">dès 3 €</div>
+        </div>
+        <div class="rs-item">
+          <div class="rs-dot" style="background:#CBD5E0;"></div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:700;color:var(--t2);">Loto Été 2025 — Harmonie Rosière</div>
+            <div style="font-size:11px;color:var(--t3);">Ventes ouvertes le 1er juin 2025</div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.1em;background:var(--bg);padding:2px 8px;border-radius:4px;flex-shrink:0;">ETE25</div>
+          <div style="font-size:12px;color:var(--t4);flex-shrink:0;margin-left:8px;">dès 2 €</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSION -->
+  <div class="view" id="v-session">
+    <button class="btn-back" onclick="goView('search')">← Retour</button>
+    <div class="s-banner fade-up">
+      <div style="flex:1;">
+        <div class="s-badge">Session active</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:white;line-height:1;">Grand Loto de Printemps 2025</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.45);margin-top:4px;">Amis du Quartier · 22 mars 2025 · Salle des fêtes, Lyon 3e</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;">Ventes ouvertes encore <strong style="color:#EF9F27;">2 j 14 h</strong></div>
+      </div>
+      <div class="s-code-pill">
+        <div class="s-code-lbl">Code session</div>
+        <div class="s-code-val">LPRI25</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.3);margin-top:2px;">quineo.fr/s/lpri25</div>
+      </div>
+    </div>
+
+    <div class="s-stats fade-up">
+      <div class="stat-card"><div class="stat-val">8</div><div class="stat-lbl">Lots à gagner</div></div>
+      <div class="stat-card"><div class="stat-val">347</div><div class="stat-lbl">Cartons vendus</div></div>
+      <div class="stat-card"><div class="stat-val">153</div><div class="stat-lbl">Cartons restants</div></div>
+    </div>
+
+    <div class="section-title">Choisissez votre forfait</div>
+    <div class="pack-grid">
+      <div class="pack" id="pack-1" onclick="selectPack(1)">
+        <div class="pack-radio" id="pr-1"></div>
+        <div class="pack-qty">1</div>
+        <div class="pack-lbl">Carton solo</div>
+        <div class="pack-price">3 €</div>
+        <div class="pack-unit">3,00 € / carton</div>
+      </div>
+      <div class="pack featured" id="pack-2" onclick="selectPack(2)">
+        <div class="pack-badge">Populaire</div>
+        <div class="pack-radio" id="pr-2"></div>
+        <div class="pack-qty">4</div>
+        <div class="pack-lbl">Lot de 4 cartons</div>
+        <div class="pack-price">10 €</div>
+        <div class="pack-unit">2,50 € / carton</div>
+        <div class="pack-eco">-17 %</div>
+      </div>
+      <div class="pack" id="pack-3" onclick="selectPack(3)">
+        <div class="pack-radio" id="pr-3"></div>
+        <div class="pack-qty">10</div>
+        <div class="pack-lbl">Lot de 10 cartons</div>
+        <div class="pack-price">20 €</div>
+        <div class="pack-unit">2,00 € / carton</div>
+        <div class="pack-eco">-33 %</div>
+      </div>
+      <div class="pack" id="pack-4" onclick="selectPack(4)">
+        <div class="pack-radio" id="pr-4"></div>
+        <div class="pack-qty">1</div>
+        <div class="pack-lbl">Carton découverte</div>
+        <div class="pack-price" style="font-size:16px;">Offert</div>
+        <div class="pack-unit">1 par personne max</div>
+      </div>
+    </div>
+
+    <div class="cart-bar fade-up" id="cart-bar" style="display:none;">
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--t1);" id="cart-label"></div>
+        <div style="font-size:11px;color:var(--t3);" id="cart-sub"></div>
+      </div>
+      <button class="btn-buy" onclick="goView('pay')">Payer →</button>
+    </div>
+  </div>
+
+  <!-- PAIEMENT -->
+  <div class="view" id="v-pay">
+    <button class="btn-back" onclick="goView('session')">← Modifier le forfait</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;" class="fade-up">
+      <div>
+        <div class="section-title" style="margin-bottom:12px;">Récapitulatif</div>
+        <div style="background:var(--card);border:.5px solid var(--sep);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:8px;">Grand Loto de Printemps 2025</div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+            <span style="font-size:12px;color:var(--t2);" id="recap-pack">—</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t1);" id="recap-price">—</span>
+          </div>
+          <div style="border-top:.5px solid var(--sep);margin:10px 0 8px;"></div>
+          <div style="display:flex;justify-content:space-between;align-items:baseline;">
+            <span style="font-size:12px;font-weight:700;color:var(--t1);">Total</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--amber);" id="recap-total">—</span>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-bottom:10px;">Vos informations</div>
+        <input class="form-input" placeholder="Prénom Nom">
+        <input class="form-input" placeholder="Adresse email" style="margin-bottom:0;">
+      </div>
+
+      <div>
+        <div class="section-title" style="margin-bottom:10px;">Mode de paiement</div>
+        <div class="pay-opt sel" id="pay-stripe" onclick="selPay('stripe')">
+          <div class="pay-icon" style="background:#635BFF;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="white" stroke-width="1.8"/><path d="M2 10h20" stroke="white" stroke-width="1.8"/></svg></div>
+          <div><div class="pay-name">Carte bancaire</div><div class="pay-sub">Visa, Mastercard · Stripe</div></div>
+          <div class="pay-radio" id="pr-stripe"><svg width="8" height="8" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="white"/></svg></div>
+        </div>
+        <div class="pay-opt" id="pay-sumup" onclick="selPay('sumup')">
+          <div class="pay-icon" style="background:#1DBF73;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+          <div><div class="pay-name">SumUp</div><div class="pay-sub">Lien de paiement sécurisé</div></div>
+          <div class="pay-radio" id="pr-sumup"></div>
+        </div>
+        <div class="pay-opt" id="pay-helloasso" onclick="selPay('helloasso')">
+          <div class="pay-icon" style="background:#E5007D;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 21C12 21 4 14 4 9a8 8 0 0116 0c0 5-8 12-8 12z" stroke="white" stroke-width="1.8" stroke-linejoin="round" fill="none"/></svg></div>
+          <div><div class="pay-name">HelloAsso</div><div class="pay-sub">Paiement solidaire</div></div>
+          <div class="pay-radio" id="pr-helloasso"></div>
+        </div>
+
+        <button class="btn-buy" style="width:100%;padding:12px;margin-top:4px;" id="pay-btn" onclick="doPay()">
+          Confirmer et payer <span id="pay-amount">—</span>
+        </button>
+        <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:8px;">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="#8a95a3" stroke-width="1.3"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="#8a95a3" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <span style="font-size:10px;color:var(--t4);">Paiement sécurisé · données chiffrées</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION -->
+  <div class="view" id="v-confirm">
+    <div style="max-width:480px;margin:0 auto;" class="fade-up">
+      <div style="text-align:center;margin-bottom:22px;">
+        <div style="width:52px;height:52px;border-radius:50%;background:var(--gb);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L19 7" stroke="#3B6D11" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--t1);">Paiement confirmé !</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:4px;">Un email de confirmation a été envoyé avec vos codes de cartons</div>
+      </div>
+
+      <div class="confirm-card">
+        <div class="confirm-head">
+          <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px;">Grand Loto de Printemps 2025 · LPRI25</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:white;" id="conf-pack-lbl">—</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.35);margin-top:3px;">22 mars 2025 · Salle des fêtes, Lyon 3e</div>
+        </div>
+        <div class="confirm-body">
+          <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Vos cartons</div>
+          <div id="cartons-list"></div>
+          <div style="background:var(--bg);border-radius:6px;padding:9px 12px;display:flex;align-items:center;gap:6px;margin-top:10px;">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8a95a3" stroke-width="1.4"/><path d="M8 5v3l2 2" stroke="#8a95a3" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <span style="font-size:11px;color:var(--t3);">Vérification en direct sur <strong style="color:var(--t2);">quineo.fr/v/LPRI25</strong></span>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:16px;">
+        <button class="btn-back" style="margin-bottom:0;" onclick="goView('search')">Acheter d'autres cartons</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PACKS = [
+  {id:1, qty:1,  label:'Carton solo',         price:3,  priceUnit:3,   eco:null},
+  {id:2, qty:4,  label:'Lot de 4 cartons',     price:10, priceUnit:2.5, eco:'-17 %'},
+  {id:3, qty:10, label:'Lot de 10 cartons',    price:20, priceUnit:2,   eco:'-33 %'},
+  {id:4, qty:1,  label:'Carton découverte',    price:0,  priceUnit:0,   eco:null},
+];
+let selectedPack = null;
+
+function goView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.getElementById('v-' + v).classList.add('active');
+}
+
+function searchSession() {
+  const val = document.getElementById('code-input').value.trim().toUpperCase();
+  const err = document.getElementById('err-msg');
+  if (val === 'LPRI25' || val === 'LOTO25' || val === 'LOTO' || val === 'TEST') {
+    err.classList.remove('vis'); goSession();
+  } else if (val === '') {
+    err.textContent = 'Saisissez un code de session.'; err.classList.add('vis');
+  } else {
+    err.textContent = 'Code introuvable. Vérifiez avec l\'organisateur.'; err.classList.add('vis');
+  }
+}
+
+function goSession() { goView('session'); }
+
+function selectPack(id) {
+  document.querySelectorAll('.pack').forEach(p => {
+    p.classList.remove('selected');
+    const pr = p.querySelector('.pack-radio');
+    if (pr) pr.innerHTML = '';
+  });
+  const p = document.getElementById('pack-' + id);
+  p.classList.add('selected');
+  const pr = document.getElementById('pr-' + id);
+  if (pr) pr.innerHTML = '<svg width="8" height="8" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="white"/></svg>';
+  selectedPack = PACKS.find(x => x.id === id);
+  const cb = document.getElementById('cart-bar');
+  cb.style.display = 'flex';
+  document.getElementById('cart-label').textContent = selectedPack.label + ' · ' + (selectedPack.price === 0 ? 'Offert' : selectedPack.price + ' €');
+  document.getElementById('cart-sub').textContent = selectedPack.qty + ' carton' + (selectedPack.qty > 1 ? 's' : '') + (selectedPack.priceUnit > 0 ? ' · ' + selectedPack.priceUnit.toFixed(2) + ' € / carton' : '');
+  document.getElementById('recap-pack').textContent = selectedPack.label;
+  document.getElementById('recap-price').textContent = selectedPack.price === 0 ? 'Offert' : selectedPack.price + ' €';
+  document.getElementById('recap-total').textContent = selectedPack.price === 0 ? '0 €' : selectedPack.price + ' €';
+  document.getElementById('pay-amount').textContent = selectedPack.price === 0 ? 'gratuitement' : '· ' + selectedPack.price + ' €';
+}
+
+function selPay(id) {
+  document.querySelectorAll('.pay-opt').forEach(el => {
+    el.classList.remove('sel');
+    const pr = el.querySelector('.pay-radio');
+    if (pr) pr.innerHTML = '';
+  });
+  const el = document.getElementById('pay-' + id);
+  el.classList.add('sel');
+  const pr = document.getElementById('pr-' + id);
+  if (pr) pr.innerHTML = '<svg width="8" height="8" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="white"/></svg>';
+}
+
+function doPay() {
+  const btn = document.getElementById('pay-btn');
+  btn.innerHTML = '<span class="spinner"></span>Traitement en cours…';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.innerHTML = 'Confirmer et payer';
+    btn.disabled = false;
+    const pack = selectedPack || PACKS[0];
+    document.getElementById('conf-pack-lbl').textContent = pack.label + ' · ' + (pack.price === 0 ? 'Offert' : pack.price + ' €');
+    const list = document.getElementById('cartons-list');
+    list.innerHTML = '';
+    const allNums = ['5','12','23','37','45','51','62','74','88','90'];
+    const codes = ['C-8821','C-8822','C-8823','C-8824','C-8825','C-8826','C-8827','C-8828','C-8829','C-8830'];
+    for (let i = 0; i < pack.qty && i < 10; i++) {
+      const d = document.createElement('div');
+      d.className = 'confirm-carton';
+      const gridNums = allNums.slice(0, 5).map(n => `<div class="c-num">${n}</div>`).join('');
+      d.innerHTML = `<span class="c-code">${codes[i]}</span><div class="c-grid">${gridNums}<div class="c-num" style="opacity:.2;">—</div></div>`;
+      list.appendChild(d);
+    }
+    goView('confirm');
+  }, 1400);
+}
+</script>
+</body>
+</html>

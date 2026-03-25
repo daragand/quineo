@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quineo — Caisse Animateur v2</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5/700.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins','Segoe UI',sans-serif;background:#e8eaf0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+:root{
+  --bg:#f4f5f9;--card:#fff;--sep:rgba(0,0,0,.06);--cb:rgba(0,0,0,.08);
+  --t1:#0b1220;--t2:#4a5568;--t3:#8a95a3;--t4:#b0bcc8;
+  --amber:#EF9F27;--ab:#FFF8EE;
+  --blue:#185FA5;--bb:#EEF4FC;--bt:#0C447C;
+  --green:#3B6D11;--gb:#EAF3DE;--gt:#27500A;
+  --red:#A32D2D;--rb:#FCEBEB;
+  --orange:#854F0B;--ob:#FAEEDA;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fade-up{animation:fadeUp .25s ease both}
+
+.app{display:flex;height:720px;background:var(--bg);border-radius:14px;overflow:hidden;border:.5px solid var(--cb);width:100%;max-width:1100px;box-shadow:0 4px 32px rgba(0,0,0,.10);}
+
+/* SIDEBAR */
+.sb{width:180px;flex-shrink:0;background:#0b1220;display:flex;flex-direction:column;}
+.sb-logo{padding:13px 13px 11px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.06);}
+.sb-box{width:25px;height:25px;border-radius:5px;background:#EF9F27;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#412402;flex-shrink:0;}
+.sb-nm{font-family:'Bebas Neue',sans-serif;font-size:17px;color:white;letter-spacing:.04em;}
+.sb-sub{font-size:9px;color:rgba(255,255,255,.3);}
+.sbi{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:5px;margin:1px 5px;cursor:pointer;color:rgba(255,255,255,.48);font-size:11px;font-weight:700;}
+.sbi.on{background:#1a2e4a;color:white;}
+.sbi svg{opacity:.6;flex-shrink:0;}
+.sbi.on svg{opacity:1;}
+.sb-s{padding:9px 9px 3px;font-size:9px;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:.14em;text-transform:uppercase;}
+.sb-stat{margin:8px 8px 0;background:rgba(255,255,255,.04);border:.5px solid rgba(255,255,255,.06);border-radius:6px;padding:7px 10px;}
+
+/* MAIN */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:var(--card);border-bottom:.5px solid var(--sep);padding:0 15px;height:49px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.content{flex:1;min-height:0;display:flex;overflow:hidden;}
+
+/* PANELS */
+.left-panel{width:55%;border-right:.5px solid var(--sep);display:flex;flex-direction:column;overflow:hidden;}
+.lp-top{flex-shrink:0;padding:10px 12px;border-bottom:.5px solid var(--sep);}
+.lp-scroll{flex:1;overflow-y:auto;padding:10px 12px;}
+.right-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--card);}
+.rp-head{padding:10px 12px;border-bottom:.5px solid var(--sep);flex-shrink:0;}
+.rp-scroll{flex:1;overflow-y:auto;padding:10px 12px;}
+.rp-foot{padding:9px 12px;border-top:.5px solid var(--sep);flex-shrink:0;background:var(--bg);}
+
+/* PARTICIPANT */
+.part-search-wrap{position:relative;margin-bottom:8px;}
+.part-search-wrap svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;}
+.psearch{width:100%;padding:7px 9px 7px 29px;border:.5px solid var(--cb);border-radius:6px;font-family:'Poppins',sans-serif;font-size:12px;color:var(--t1);background:var(--bg);outline:none;}
+.psearch:focus{border-color:var(--blue);background:var(--card);}
+.part-row{display:flex;align-items:center;gap:8px;padding:7px 9px;border:.5px solid var(--cb);border-radius:7px;cursor:pointer;background:var(--card);margin-bottom:4px;transition:border-color .15s;}
+.part-row:hover{border-color:rgba(0,0,0,.16);}
+.part-row.sel{background:var(--bb);border-color:var(--blue);}
+.part-av{width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;}
+.new-part-btn{display:flex;align-items:center;gap:7px;padding:7px 9px;border:.5px dashed var(--cb);border-radius:7px;cursor:pointer;background:transparent;font-family:'Poppins',sans-serif;font-size:12px;color:var(--t3);width:100%;margin-top:4px;}
+.new-part-btn:hover{border-color:var(--blue);color:var(--blue);}
+
+/* QUOTA INLINE */
+.quota-inline{border-radius:7px;padding:8px 10px;display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.qi-ok{background:var(--gb);border:.5px solid #97C459;}
+.qi-warn{background:var(--ob);border:.5px solid #EF9F27;}
+.qi-block{background:var(--rb);border:.5px solid #F09595;}
+.qi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.qi-ok .qi-dot{background:#48BB78;}
+.qi-warn .qi-dot{background:#EF9F27;}
+.qi-block .qi-dot{background:#E24B4A;}
+.qi-lbl{font-size:11px;font-weight:700;flex:1;}
+.qi-ok .qi-lbl{color:var(--gt);}
+.qi-warn .qi-lbl{color:var(--orange);}
+.qi-block .qi-lbl{color:var(--red);}
+.qi-pbar{flex:1;background:rgba(0,0,0,.08);border-radius:10px;height:5px;overflow:hidden;}
+.qi-pfill{height:5px;border-radius:10px;}
+.qi-ok .qi-pfill{background:#48BB78;}
+.qi-warn .qi-pfill{background:#EF9F27;}
+.qi-block .qi-pfill{background:#E24B4A;}
+.qi-num{font-family:'Bebas Neue',sans-serif;font-size:15px;flex-shrink:0;}
+.qi-ok .qi-num{color:var(--gt);}
+.qi-warn .qi-num{color:var(--orange);}
+.qi-block .qi-num{color:var(--red);}
+
+/* FORFAITS */
+.sec-lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;}
+.pack-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border:.5px solid var(--cb);border-radius:8px;background:var(--card);margin-bottom:5px;transition:border-color .15s;}
+.pack-row.featured{border-color:var(--amber);}
+.pack-row.disabled{opacity:.38;pointer-events:none;}
+.pr-qty-badge{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:white;flex-shrink:0;}
+.pr-info{flex:1;min-width:0;}
+.pr-name{font-size:12px;font-weight:700;color:var(--t1);}
+.pr-sub{font-size:10px;color:var(--t3);}
+.pr-limit{font-size:10px;color:var(--orange);font-weight:700;margin-top:1px;}
+.pr-price{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--amber);flex-shrink:0;text-align:right;min-width:44px;}
+.pr-price-sub{font-size:9px;color:var(--t4);text-align:right;}
+
+/* STEPPER */
+.stepper{display:flex;align-items:center;border:.5px solid var(--cb);border-radius:7px;overflow:hidden;background:var(--bg);flex-shrink:0;}
+.st-btn{width:30px;height:30px;border:none;background:transparent;cursor:pointer;font-size:16px;font-weight:700;color:var(--t2);display:flex;align-items:center;justify-content:center;transition:background .1s;font-family:'Poppins',sans-serif;line-height:1;}
+.st-btn:hover:not(:disabled){background:rgba(0,0,0,.07);}
+.st-btn:disabled{color:var(--t4);cursor:not-allowed;}
+.st-val{min-width:28px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--t1);}
+.st-max{font-size:8px;color:var(--t4);text-align:center;display:block;}
+
+/* PAIEMENT */
+.pay-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border:.5px solid var(--cb);border-radius:8px;cursor:pointer;background:var(--card);margin-bottom:5px;transition:all .15s;}
+.pay-row:hover{border-color:rgba(0,0,0,.18);}
+.pay-row.sel{border-color:var(--blue);background:var(--bb);}
+.pay-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pay-radio{width:14px;height:14px;border-radius:50%;border:.5px solid var(--cb);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pay-row.sel .pay-radio{background:var(--blue);border-color:var(--blue);}
+
+/* MONNAIE */
+.monnaie-box{background:var(--bg);border:.5px solid var(--sep);border-radius:7px;padding:9px 11px;margin-bottom:8px;}
+.enc-input{width:100%;padding:7px 10px;border:.5px solid var(--cb);border-radius:6px;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--t1);text-align:right;outline:none;background:var(--card);margin-top:5px;}
+.enc-input:focus{border-color:var(--blue);}
+
+/* FOOTER */
+.btn-validate{background:#EF9F27;color:#2C1500;border:none;border-radius:8px;padding:9px 0;font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;cursor:pointer;flex:1;}
+.btn-validate:disabled{opacity:.35;cursor:not-allowed;}
+.btn-cancel{background:transparent;color:var(--t2);border:.5px solid var(--cb);border-radius:8px;padding:9px 14px;font-family:'Poppins',sans-serif;font-size:12px;cursor:pointer;}
+
+/* SUCCESS */
+.suc-ov{display:none;position:absolute;inset:0;background:rgba(10,16,30,.8);z-index:20;align-items:center;justify-content:center;border-radius:14px;}
+.suc-ov.vis{display:flex;}
+.suc-card{background:var(--card);border-radius:12px;width:380px;overflow:hidden;border:.5px solid var(--cb);}
+.suc-head{background:#0b1220;padding:15px 18px;}
+.suc-body{padding:14px 18px;}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:-2px;margin-right:5px;}
+.eco-tag{display:inline-block;background:var(--gb);color:var(--gt);font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;margin-left:5px;}
+</style>
+</head>
+<body>
+<div style="position:relative;overflow:hidden;width:100%;max-width:1100px;" id="aw">
+<div class="app">
+
+  <div class="sb">
+    <div class="sb-logo">
+      <div class="sb-box">Q</div>
+      <div><div class="sb-nm">Quineo</div><div class="sb-sub">Animateur</div></div>
+    </div>
+    <div class="sb-s">Caisse</div>
+    <div class="sbi on">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="9" rx="1.5" stroke="white" stroke-width="1.4"/><path d="M1 7h14" stroke="white" stroke-width="1.4"/><circle cx="5" cy="11" r="1" fill="white"/></svg>
+      Vente cartons
+    </div>
+    <div class="sbi">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="white" stroke-width="1.4"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1M5 8h6M5 11h4" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Cartons vendus
+    </div>
+    <div class="sbi">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="2.5" stroke="white" stroke-width="1.4"/><path d="M2.5 13.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Participants
+    </div>
+    <div class="sb-s">Session</div>
+    <div class="sbi">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="white" stroke-width="1.4"/><path d="M8 5v3l2 2" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Tirage en cours
+    </div>
+    <div class="sb-stat" style="margin-top:14px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:white;" id="sb-vendu">347</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.3);">cartons vendus</div>
+    </div>
+    <div class="sb-stat" style="margin-top:6px;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:white;">153</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.3);">cartons restants</div>
+    </div>
+    <div style="margin:auto 8px 11px;background:rgba(239,159,39,.12);border:1px solid rgba(239,159,39,.2);border-radius:6px;padding:7px 9px;display:flex;align-items:center;gap:7px;">
+      <div style="width:24px;height:24px;border-radius:50%;background:#1a2e4a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#85B7EB;flex-shrink:0;">AL</div>
+      <div><div style="font-size:11px;font-weight:700;color:white;">Alex L.</div><div style="font-size:9px;color:rgba(255,255,255,.35);">Animateur</div></div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:14px;font-weight:700;color:var(--t1);">Vente de cartons</span>
+        <span style="font-size:11px;color:var(--t4);">—</span>
+        <span style="font-size:11px;color:var(--t3);">Grand Loto Printemps 2025</span>
+        <span style="background:var(--gb);color:var(--gt);font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;display:flex;align-items:center;gap:3px;"><div style="width:5px;height:5px;border-radius:50%;background:#48BB78;"></div>Active</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8a95a3" stroke-width="1.4"/><path d="M8 5v3l2 2" stroke="#8a95a3" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span style="font-size:11px;color:var(--t3);">Fin des ventes sur place dans</span>
+        <span style="font-size:12px;font-weight:700;color:var(--t1);">14 h 32 min</span>
+        <span style="font-size:10px;font-weight:700;background:var(--ob);color:var(--orange);padding:2px 8px;border-radius:4px;">Limite : 30 cartons/personne</span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- LEFT -->
+      <div class="left-panel">
+        <div class="lp-top">
+          <div class="sec-lbl">1 · Participant</div>
+          <div class="part-search-wrap">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="#8a95a3" stroke-width="1.4"/><path d="M10 10l3 3" stroke="#8a95a3" stroke-width="1.4" stroke-linecap="round"/></svg>
+            <input class="psearch" id="p-search" placeholder="Nom ou email…" oninput="filterParts(this.value)">
+          </div>
+          <div id="parts-list"></div>
+          <button class="new-part-btn" onclick="selectNewPart()">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Nouveau participant (sans compte)
+          </button>
+        </div>
+
+        <div class="lp-scroll">
+          <div class="sec-lbl">2 · Forfait &amp; quantité</div>
+          <!-- QUOTA INLINE -->
+          <div id="quota-inline" style="display:none;"></div>
+          <div id="pack-rows"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right-panel">
+        <div class="rp-head">
+          <div class="sec-lbl" style="margin-bottom:0;">3 · Paiement &amp; validation</div>
+        </div>
+        <div class="rp-scroll">
+          <div id="rp-empty" style="padding:28px 10px;text-align:center;color:var(--t4);font-size:12px;line-height:1.8;">
+            Sélectionnez un participant<br>et au moins un forfait
+          </div>
+          <div id="rp-content" style="display:none;">
+
+            <!-- RECAP -->
+            <div style="background:var(--bg);border:.5px solid var(--sep);border-radius:8px;padding:9px 11px;margin-bottom:10px;" id="rp-recap"></div>
+
+            <!-- MODE PAIEMENT -->
+            <div class="sec-lbl">Mode de paiement</div>
+            <div class="pay-row sel" id="pm-cash" onclick="selMode('cash')">
+              <div class="pay-icon" style="background:#065F46;"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="9" rx="1.5" stroke="white" stroke-width="1.3"/><circle cx="8" cy="8.5" r="2" stroke="white" stroke-width="1.2"/><path d="M1 7h14" stroke="white" stroke-width="1.2"/></svg></div>
+              <div><div style="font-size:12px;font-weight:700;color:var(--t1);">Espèces</div><div style="font-size:10px;color:var(--t3);">Calcul de monnaie automatique</div></div>
+              <div class="pay-radio" id="pmr-cash"><svg width="7" height="7" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="white"/></svg></div>
+            </div>
+            <div class="pay-row" id="pm-cb" onclick="selMode('cb')">
+              <div class="pay-icon" style="background:#185FA5;"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="9" rx="1.5" stroke="white" stroke-width="1.3"/><path d="M1 7h14" stroke="white" stroke-width="1.2"/><circle cx="5" cy="10" r="1" fill="white"/></svg></div>
+              <div><div style="font-size:12px;font-weight:700;color:var(--t1);">Terminal CB</div><div style="font-size:10px;color:var(--t3);">Confirmer après paiement sur terminal</div></div>
+              <div class="pay-radio" id="pmr-cb"></div>
+            </div>
+            <div class="pay-row" id="pm-free" onclick="selMode('free')">
+              <div class="pay-icon" style="background:#7C3AED;"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.4 3.8H13l-3.1 2.3 1.2 3.4L8 9.2l-3.1 2.3 1.2-3.4L3 5.8h3.6z" fill="white"/></svg></div>
+              <div><div style="font-size:12px;font-weight:700;color:var(--t1);">Carton offert</div><div style="font-size:10px;color:var(--t3);">Motif obligatoire · Admin / Animateur uniquement</div></div>
+              <div class="pay-radio" id="pmr-free"></div>
+            </div>
+
+            <!-- ZONE CASH -->
+            <div id="zone-cash" style="margin-top:8px;">
+              <div class="sec-lbl">Montant encaissé</div>
+              <div class="monnaie-box">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;">
+                  <span style="font-size:11px;color:var(--t3);">Total à payer</span>
+                  <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--t1);" id="mn-due">—</span>
+                </div>
+                <input class="enc-input" id="mn-input" type="number" min="0" step="0.5" placeholder="0,00" oninput="calcChange()">
+                <div style="border-top:.5px solid var(--sep);margin:7px 0 0;padding-top:7px;display:flex;justify-content:space-between;align-items:baseline;">
+                  <span style="font-size:11px;color:var(--t3);">Monnaie à rendre</span>
+                  <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;" id="mn-change">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ZONE CB -->
+            <div id="zone-cb" style="display:none;margin-top:8px;">
+              <div style="background:var(--bb);border:.5px solid var(--blue);border-radius:7px;padding:9px 11px;">
+                <div style="font-size:12px;font-weight:700;color:var(--bt);">Faites payer sur le terminal</div>
+                <div style="font-size:11px;color:#378ADD;margin-top:2px;">Présentez le terminal au participant, puis confirmez ici après acceptation.</div>
+              </div>
+              <div style="margin-top:7px;"><div style="font-size:11px;color:var(--t3);margin-bottom:4px;">N° transaction (optionnel)</div><input class="psearch" style="background:var(--card);" placeholder="ex : TXN-8492"></div>
+            </div>
+
+            <!-- ZONE FREE -->
+            <div id="zone-free" style="display:none;margin-top:8px;">
+              <div style="background:#EEEDFE;border:.5px solid #7F77DD;border-radius:7px;padding:9px 11px;margin-bottom:8px;">
+                <div style="font-size:12px;font-weight:700;color:#3C3489;">Attribution gratuite</div>
+                <div style="font-size:11px;color:#534AB7;margin-top:2px;">Tracé séparément dans les rapports financiers.</div>
+              </div>
+              <div style="font-size:11px;color:var(--t3);margin-bottom:4px;">Motif obligatoire</div>
+              <select class="psearch" style="background:var(--card);cursor:pointer;">
+                <option value="">— Sélectionner un motif</option>
+                <option>Invité organisateur</option>
+                <option>Lot de consolation</option>
+                <option>Action promotionnelle</option>
+                <option>Bénévole</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="rp-foot" id="rp-foot" style="display:none;">
+          <div style="display:flex;gap:7px;">
+            <button class="btn-cancel" onclick="resetForm()">Annuler</button>
+            <button class="btn-validate" id="btn-validate" onclick="validateSale()">Valider la vente</button>
+          </div>
+          <div style="font-size:10px;color:var(--t4);margin-top:5px;text-align:center;">Les cartons sont attribués immédiatement après validation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="suc-ov" id="suc-ov">
+  <div class="suc-card fade-up">
+    <div class="suc-head">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--gb);display:flex;align-items:center;justify-content:center;">
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-6" stroke="#3B6D11" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,.5);">Vente confirmée</div>
+      </div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:white;" id="sc-name">—</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);" id="sc-detail">—</div>
+    </div>
+    <div class="suc-body">
+      <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px;">Cartons attribués</div>
+      <div id="sc-cartons"></div>
+      <div style="background:var(--gb);border-radius:6px;padding:6px 10px;margin-top:8px;font-size:11px;color:var(--gt);" id="sc-email">—</div>
+      <button class="btn-validate" style="width:100%;margin-top:10px;" onclick="closeSuccess()">Nouvelle vente</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const QUOTA_MAX = 30;
+const PACKS = [
+  {id:1, qty:1,  label:'Carton solo',         price:3,  unitPrice:3,   eco:null,    maxPer:null, color:'#185FA5'},
+  {id:2, qty:4,  label:'Lot de 4 cartons',     price:10, unitPrice:2.5, eco:'-17 %', maxPer:null, color:'#3B6D11', featured:true},
+  {id:3, qty:10, label:'Lot de 10 cartons',    price:20, unitPrice:2,   eco:'-33 %', maxPer:2,    color:'#BA7517'},
+  {id:4, qty:1,  label:'Carton découverte',    price:0,  unitPrice:0,   eco:null,    maxPer:1,    color:'#7C3AED'},
+];
+const PARTICIPANTS = [
+  {id:1, name:'Sophie Martin',      email:'s.martin@email.fr',    color:'#185FA5', cartons:4},
+  {id:2, name:'Jean-Pierre Durand', email:'jp.durand@email.fr',   color:'#3B6D11', cartons:0},
+  {id:3, name:'Marie Lefebvre',     email:'m.lefebvre@email.fr',  color:'#A32D2D', cartons:28},
+  {id:4, name:'Thomas Bernard',     email:'t.bernard@email.fr',   color:'#7C3AED', cartons:1},
+  {id:5, name:'Isabelle Moreau',    email:'i.moreau@email.fr',    color:'#0891B2', cartons:0},
+];
+
+let selPart = null, qtys = {1:0,2:0,3:0,4:0}, selMode_ = 'cash', totalSold = 347;
+
+function initials(n){return n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function cartonsInCart(){return PACKS.reduce((s,p)=>s+p.qty*(qtys[p.id]||0),0);}
+function totalPrice(){return PACKS.reduce((s,p)=>s+p.price*(qtys[p.id]||0),0);}
+function alreadyBought(){return selPart?selPart.cartons:0;}
+function remaining(){return QUOTA_MAX - alreadyBought() - cartonsInCart();}
+function packMaxAllowed(pack){
+  const globalLeft = QUOTA_MAX - alreadyBought();
+  let m = Math.floor(globalLeft / pack.qty);
+  if(pack.maxPer!==null) m=Math.min(m, pack.maxPer);
+  return Math.max(0,m);
+}
+function packCanAdd(pack){
+  const cur=qtys[pack.id]||0;
+  const cartonsIfAdd=cartonsInCart()+pack.qty;
+  if(cartonsIfAdd+alreadyBought()>QUOTA_MAX) return false;
+  if(pack.maxPer!==null && cur>=pack.maxPer) return false;
+  return true;
+}
+
+function renderParts(list){
+  const el=document.getElementById('parts-list');
+  let h='';
+  list.forEach(p=>{
+    const isSel=selPart&&selPart.id===p.id;
+    const near=p.cartons>=25;
+    const full=p.cartons>=QUOTA_MAX;
+    h+=`<div class="part-row${isSel?' sel':''}" onclick="selectPart(${p.id})">
+      <div class="part-av" style="background:${p.color};">${initials(p.name)}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:700;color:var(--t1);">${p.name}</div>
+        <div style="font-size:10px;color:var(--t3);">${p.email}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-size:10px;font-weight:700;${full?'color:var(--red)':near?'color:var(--orange)':'color:var(--t3);'}">${p.cartons} / ${QUOTA_MAX}</div>
+        ${full?'<div style="font-size:9px;color:var(--red);font-weight:700;">Limite atteinte</div>':near?'<div style="font-size:9px;color:var(--orange);font-weight:700;">Quasi limite</div>':''}
+      </div>
+    </div>`;
+  });
+  el.innerHTML=h;
+}
+
+function filterParts(q){
+  const f=q.trim()?PARTICIPANTS.filter(p=>p.name.toLowerCase().includes(q.toLowerCase())||p.email.toLowerCase().includes(q.toLowerCase())):PARTICIPANTS;
+  renderParts(f);
+}
+
+function selectPart(id){
+  selPart=PARTICIPANTS.find(x=>x.id===id)||null;
+  qtys={1:0,2:0,3:0,4:0};
+  renderParts(PARTICIPANTS);
+  renderPackRows();
+  updateRight();
+}
+
+function selectNewPart(){
+  selPart={id:0,name:'Nouveau participant',email:'(sans compte)',color:'#8a95a3',cartons:0};
+  qtys={1:0,2:0,3:0,4:0};
+  renderParts(PARTICIPANTS);
+  renderPackRows();
+  updateRight();
+}
+
+function renderQuotaInline(){
+  if(!selPart){document.getElementById('quota-inline').style.display='none';return;}
+  const used=alreadyBought()+cartonsInCart();
+  const pct=Math.min(100,Math.round(used/QUOTA_MAX*100));
+  const left=QUOTA_MAX-used;
+  const state=pct<80?'ok':pct<97?'warn':'block';
+  document.getElementById('quota-inline').style.display='';
+  document.getElementById('quota-inline').innerHTML=`<div class="quota-inline qi-${state}">
+    <div class="qi-dot"></div>
+    <div class="qi-lbl">${state==='block'?'Limite atteinte':state==='warn'?'Quasi limite ('+left+' restant'++(left>1?'s':'')+')':(left+' carton'+(left>1?'s':'')+' disponible'+(left>1?'s':''))}</div>
+    <div class="qi-pbar"><div class="qi-pfill" style="width:${pct}%"></div></div>
+    <div class="qi-num">${used} / ${QUOTA_MAX}</div>
+  </div>`;
+}
+
+function renderPackRows(){
+  if(!selPart){document.getElementById('pack-rows').innerHTML='<div style="padding:12px 4px;text-align:center;font-size:12px;color:var(--t4);">Sélectionnez d\'abord un participant</div>';return;}
+  renderQuotaInline();
+  let h='';
+  PACKS.forEach(pack=>{
+    const qty=qtys[pack.id]||0;
+    const maxA=packMaxAllowed(pack);
+    const canAdd=packCanAdd(pack);
+    const isDisabled=maxA===0;
+    let limitText='';
+    if(pack.maxPer!==null) limitText=`<div class="pr-limit">Max ${pack.maxPer}× par personne${qty>0?' · '+qty+' utilisé'+(qty>1?'s':''):''}</div>`;
+    if(isDisabled&&pack.maxPer!==null&&alreadyBought()>=pack.maxPer*pack.qty) limitText=`<div class="pr-limit">Forfait épuisé pour ce participant</div>`;
+
+    const lineTotal=pack.price*qty;
+    h+=`<div class="pack-row${pack.featured?' featured':''}${isDisabled?' disabled':''}">
+      <div class="pr-qty-badge" style="background:${pack.color};">${pack.qty}</div>
+      <div class="pr-info">
+        <div class="pr-name">${pack.label}${pack.eco?`<span class="eco-tag">${pack.eco}</span>`:''}</div>
+        <div class="pr-sub">${pack.price===0?'Gratuit':pack.unitPrice.toFixed(2).replace('.',',')+' € / carton'}</div>
+        ${limitText}
+      </div>
+      <div class="stepper">
+        <button class="st-btn" onclick="changeQty(${pack.id},-1)" ${qty===0?'disabled':''}>−</button>
+        <div style="padding:0 2px;">
+          <div class="st-val">${qty}</div>
+          ${maxA>0?`<span class="st-max">/${maxA}</span>`:''}
+        </div>
+        <button class="st-btn" onclick="changeQty(${pack.id},+1)" ${!canAdd?'disabled':''}>+</button>
+      </div>
+      <div style="text-align:right;min-width:48px;flex-shrink:0;">
+        <div class="pr-price">${qty>0?(pack.price===0?'Offert':lineTotal+' €'):(pack.price===0?'0 €':pack.price+' €')}</div>
+        <div class="pr-price-sub">${qty>1?'×'+qty+' forfaits':''}</div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('pack-rows').innerHTML=h;
+}
+
+function changeQty(id,delta){
+  if(!selPart)return;
+  const pack=PACKS.find(p=>p.id===id);
+  const cur=qtys[id]||0;
+  const next=cur+delta;
+  if(next<0)return;
+  const cartonsAfter=cartonsInCart()-pack.qty*cur+pack.qty*next;
+  if(cartonsAfter+alreadyBought()>QUOTA_MAX)return;
+  if(pack.maxPer!==null&&next>pack.maxPer)return;
+  qtys[id]=next;
+  renderPackRows();
+  updateRight();
+}
+
+function updateRight(){
+  const hasItems=cartonsInCart()>0;
+  document.getElementById('rp-empty').style.display=(!selPart||!hasItems)?'':'none';
+  document.getElementById('rp-content').style.display=(selPart&&hasItems)?'':'none';
+  document.getElementById('rp-foot').style.display=(selPart&&hasItems)?'':'none';
+  if(selPart&&hasItems) renderRecap();
+}
+
+function renderRecap(){
+  const el=document.getElementById('rp-recap');
+  let rows='';
+  PACKS.forEach(p=>{
+    const q=qtys[p.id]||0;
+    if(!q)return;
+    rows+=`<div style="display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;"><span style="font-size:11px;color:var(--t2);">${p.label} × ${q} (${p.qty*q} carton${p.qty*q>1?'s':''})</span><span style="font-size:12px;font-weight:700;color:var(--t1);">${p.price===0?'Offert':(p.price*q)+' €'}</span></div>`;
+  });
+  const tot=totalPrice();
+  const nb=cartonsInCart();
+  el.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px;">${selPart.name}</div>${rows}
+    <div style="border-top:.5px solid var(--sep);margin:7px 0 6px;"></div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <span style="font-size:11px;color:var(--t3);">${nb} carton${nb>1?'s':''} · quota restant : ${remaining()}</span>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--amber);">${tot===0?'Offert':tot+' €'}</span>
+    </div>`;
+  document.getElementById('mn-due').textContent=tot===0?'0 €':tot+' €';
+  document.getElementById('mn-input').value='';
+  document.getElementById('mn-change').textContent='—';
+  document.getElementById('mn-change').style.color='var(--green)';
+  if(tot===0)selMode('free'); else if(selMode_==='free')selMode('cash');
+}
+
+function selMode(m){
+  selMode_=m;
+  ['cash','cb','free'].forEach(k=>{
+    const row=document.getElementById('pm-'+k);
+    const radio=document.getElementById('pmr-'+k);
+    if(row)row.classList.toggle('sel',k===m);
+    if(radio)radio.innerHTML=k===m?'<svg width="7" height="7" viewBox="0 0 10 10"><circle cx="5" cy="5" r="3" fill="white"/></svg>':'';
+  });
+  document.getElementById('zone-cash').style.display=m==='cash'?'':'none';
+  document.getElementById('zone-cb').style.display=m==='cb'?'':'none';
+  document.getElementById('zone-free').style.display=m==='free'?'':'none';
+}
+
+function calcChange(){
+  const tot=totalPrice();
+  const enc=parseFloat(document.getElementById('mn-input').value)||0;
+  const diff=enc-tot;
+  const el=document.getElementById('mn-change');
+  if(!enc){el.textContent='—';el.style.color='var(--green)';}
+  else if(diff<0){el.textContent='Insuffisant ('+Math.abs(diff).toFixed(2)+' € manquants)';el.style.color='var(--red)';}
+  else{el.textContent=diff.toFixed(2).replace('.',',')+' €';el.style.color='var(--green)';}
+}
+
+function validateSale(){
+  const btn=document.getElementById('btn-validate');
+  btn.innerHTML='<span class="spinner"></span>Traitement…';
+  btn.disabled=true;
+  setTimeout(()=>{
+    btn.innerHTML='Valider la vente';btn.disabled=false;
+    totalSold+=cartonsInCart();
+    document.getElementById('sb-vendu').textContent=totalSold;
+    document.getElementById('sc-name').textContent=selPart.name;
+    const nb=cartonsInCart();const tot=totalPrice();
+    document.getElementById('sc-detail').textContent=nb+' carton'+(nb>1?'s':'')+' · '+(tot===0?'Offert':tot+' €');
+    const list=document.getElementById('sc-cartons');list.innerHTML='';
+    const codes=['C-9001','C-9002','C-9003','C-9004','C-9005','C-9006','C-9007','C-9008','C-9009','C-9010'];
+    for(let i=0;i<Math.min(nb,10);i++){
+      const d=document.createElement('div');
+      d.style.cssText='background:var(--bg);border:.5px solid var(--sep);border-radius:5px;padding:5px 9px;display:flex;justify-content:space-between;margin-bottom:4px;';
+      d.innerHTML=`<span style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--t1);">${codes[i]}</span><span style="font-size:9px;font-weight:700;background:var(--gb);color:var(--gt);padding:1px 6px;border-radius:3px;">Attribué</span>`;
+      list.appendChild(d);
+    }
+    document.getElementById('sc-email').textContent=selPart.id>0?'Email envoyé à '+selPart.email:'Vente sans compte · reçu imprimable disponible';
+    document.getElementById('suc-ov').classList.add('vis');
+  },900);
+}
+
+function closeSuccess(){
+  document.getElementById('suc-ov').classList.remove('vis');
+  resetForm();
+}
+
+function resetForm(){
+  selPart=null;qtys={1:0,2:0,3:0,4:0};selMode_='cash';
+  document.getElementById('p-search').value='';
+  renderParts(PARTICIPANTS);
+  document.getElementById('quota-inline').style.display='none';
+  document.getElementById('pack-rows').innerHTML='<div style="padding:12px 4px;text-align:center;font-size:12px;color:var(--t4);">Sélectionnez d\'abord un participant</div>';
+  document.getElementById('rp-empty').style.display='';
+  document.getElementById('rp-content').style.display='none';
+  document.getElementById('rp-foot').style.display='none';
+  selMode('cash');
+}
+
+// INIT
+renderParts(PARTICIPANTS);
+document.getElementById('pack-rows').innerHTML='<div style="padding:12px 4px;text-align:center;font-size:12px;color:var(--t4);">Sélectionnez d\'abord un participant</div>';
+</script>
+</body>
+</html>

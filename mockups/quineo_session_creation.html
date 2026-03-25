@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quineo — Créer une session</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5/700.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Poppins','Segoe UI',sans-serif;background:#e8eaf0;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px;}
+:root{
+  --bg:#f4f5f9;--card:#fff;--sep:rgba(0,0,0,.06);--cb:rgba(0,0,0,.09);
+  --t1:#0b1220;--t2:#4a5568;--t3:#8a95a3;--t4:#b0bcc8;
+  --amber:#EF9F27;--ab:#FFF8EE;
+  --blue:#185FA5;--bb:#EEF4FC;--bt:#0C447C;
+  --green:#3B6D11;--gb:#EAF3DE;--gt:#27500A;
+  --red:#A32D2D;--rb:#FCEBEB;
+  --purple:#534AB7;--pb:#EEEDFE;--pt:#26215C;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .22s ease both}
+
+/* SHELL */
+.app{display:flex;min-height:720px;background:var(--bg);border-radius:14px;overflow:hidden;border:.5px solid var(--cb);width:100%;max-width:1100px;box-shadow:0 4px 32px rgba(0,0,0,.10);}
+
+/* SIDEBAR */
+.sb{width:180px;flex-shrink:0;background:#0b1220;display:flex;flex-direction:column;}
+.sb-logo{padding:13px 13px 11px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,.06);}
+.sb-box{width:25px;height:25px;border-radius:5px;background:#EF9F27;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#412402;flex-shrink:0;}
+.sb-nm{font-family:'Bebas Neue',sans-serif;font-size:17px;color:white;letter-spacing:.04em;}
+.sb-sub{font-size:9px;color:rgba(255,255,255,.3);}
+.sb-s{padding:9px 9px 3px;font-size:9px;font-weight:700;color:rgba(255,255,255,.2);letter-spacing:.14em;text-transform:uppercase;}
+.sbi{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:5px;margin:1px 5px;cursor:pointer;color:rgba(255,255,255,.48);font-size:11px;font-weight:700;}
+.sbi:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.8);}
+.sbi.on{background:#1a2e4a;color:white;}
+.sbi.on svg{opacity:1;} .sbi svg{opacity:.6;flex-shrink:0;}
+.sb-plan{margin:auto 8px 11px;background:rgba(239,159,39,.12);border:1px solid rgba(239,159,39,.2);border-radius:6px;padding:7px 9px;}
+
+/* MAIN */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.topbar{background:var(--card);border-bottom:.5px solid var(--sep);padding:0 18px;height:50px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+
+/* BODY LAYOUT */
+.body{display:flex;flex:1;overflow:hidden;}
+.form-area{flex:1;min-width:0;overflow-y:auto;padding:18px 20px 32px;}
+.summary-panel{width:220px;flex-shrink:0;border-left:.5px solid var(--sep);overflow-y:auto;background:var(--card);padding:14px 14px 20px;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--bg);border-radius:8px;padding:3px;margin-bottom:20px;width:fit-content;}
+.tab{padding:6px 16px;border-radius:6px;font-size:12px;font-weight:700;color:var(--t3);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.tab:hover{color:var(--t2);}
+.tab.active{background:var(--card);color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+.tab-dot{width:7px;height:7px;border-radius:50%;background:var(--t4);flex-shrink:0;}
+.tab.active .tab-dot.filled{background:var(--green);}
+.tab.active .tab-dot{background:var(--blue);}
+
+/* PANE */
+.pane{display:none;}
+.pane.active{display:block;animation:fadeUp .2s ease both;}
+
+/* FORM ELEMENTS */
+.section{margin-bottom:24px;}
+.sec-title{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:.5px solid var(--sep);}
+.sec-desc{font-size:11px;color:var(--t3);margin-top:-6px;margin-bottom:10px;line-height:1.5;}
+.field{margin-bottom:12px;}
+.fl{font-size:11px;font-weight:700;color:var(--t2);margin-bottom:5px;display:flex;align-items:center;gap:5px;}
+.fl-hint{font-size:10px;color:var(--t4);font-weight:400;}
+.fi{width:100%;padding:8px 11px;border:.5px solid var(--cb);border-radius:7px;font-family:'Poppins',sans-serif;font-size:12px;color:var(--t1);background:var(--card);outline:none;transition:border-color .15s;}
+.fi:focus{border-color:var(--blue);}
+.fi::placeholder{color:var(--t4);}
+textarea.fi{resize:vertical;min-height:68px;line-height:1.5;}
+.fi-pre{display:flex;align-items:center;border:.5px solid var(--cb);border-radius:7px;background:var(--card);overflow:hidden;}
+.fi-pre:focus-within{border-color:var(--blue);}
+.fi-prefix{padding:0 10px;font-size:11px;color:var(--t3);background:var(--bg);border-right:.5px solid var(--cb);height:36px;display:flex;align-items:center;white-space:nowrap;flex-shrink:0;}
+.fi-pre input{border:none;outline:none;background:transparent;font-family:'Poppins',sans-serif;font-size:12px;color:var(--t1);padding:0 10px;flex:1;height:36px;}
+.fi-pre input::placeholder{color:var(--t4);}
+.slug-preview{font-size:11px;color:var(--blue);margin-top:4px;font-weight:700;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+/* TOGGLES */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:var(--bg);border-radius:7px;margin-bottom:6px;border:.5px solid transparent;}
+.toggle-row.on{background:var(--bb);border-color:rgba(24,95,165,.2);}
+.tr-left{flex:1;min-width:0;}
+.tr-name{font-size:12px;font-weight:700;color:var(--t1);}
+.tr-sub{font-size:10px;color:var(--t3);margin-top:1px;}
+.toggle{width:34px;height:19px;border-radius:20px;background:var(--t4);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--blue);}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:white;transition:transform .2s;}
+.toggle.on .toggle-thumb{transform:translateX(15px);}
+
+/* COLOR SWATCHES */
+.color-row{display:flex;align-items:center;gap:8px;}
+.color-swatch{width:32px;height:32px;border-radius:6px;border:.5px solid var(--cb);cursor:pointer;position:relative;overflow:hidden;flex-shrink:0;}
+.color-swatch input[type=color]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.color-val{font-size:11px;font-weight:700;color:var(--t2);font-family:monospace;}
+
+/* PARTNER LOGOS */
+.partner-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.partner-slot{border:.5px dashed var(--cb);border-radius:7px;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:all .15s;background:var(--bg);}
+.partner-slot:hover{border-color:var(--blue);background:var(--bb);}
+.partner-slot.filled{border-style:solid;border-color:var(--cb);background:var(--card);}
+.partner-slot.filled .ps-icon{display:none;}
+.ps-label{font-size:10px;color:var(--t4);text-align:center;}
+
+/* MODES PAIEMENT */
+.provider-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.provider-card{border:.5px solid var(--cb);border-radius:8px;padding:8px 10px;cursor:pointer;transition:all .15s;background:var(--card);}
+.provider-card:hover{border-color:rgba(0,0,0,.16);}
+.provider-card.on{background:var(--bb);border-color:var(--blue);}
+.provider-card.on.warn{background:var(--ab);border-color:var(--amber);}
+.pc-header{display:flex;align-items:center;gap:7px;margin-bottom:3px;}
+.pc-dot{width:8px;height:8px;border-radius:50%;background:var(--t4);flex-shrink:0;}
+.provider-card.on .pc-dot{background:var(--blue);}
+.provider-card.on.warn .pc-dot{background:var(--amber);}
+.pc-name{font-size:11px;font-weight:700;color:var(--t1);}
+.pc-sub{font-size:10px;color:var(--t3);}
+.pc-badge{font-size:9px;font-weight:700;margin-left:auto;padding:1px 6px;border-radius:3px;}
+.pc-badge.cfg{background:var(--gb);color:var(--gt);}
+.pc-badge.nocfg{background:var(--bg);color:var(--t4);}
+
+/* DATE PAIR */
+.date-pair{background:var(--bg);border:.5px solid var(--sep);border-radius:8px;padding:10px 12px;margin-bottom:10px;}
+.dp-title{font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.dp-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;}
+
+/* RULES TABLE */
+.rules-table{border:.5px solid var(--sep);border-radius:8px;overflow:hidden;margin-bottom:8px;}
+.rt-head{display:grid;grid-template-columns:120px 1fr;background:var(--bg);padding:7px 12px;border-bottom:.5px solid var(--sep);}
+.rt-head span{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;}
+.rt-row{display:grid;grid-template-columns:120px 1fr;padding:8px 12px;border-bottom:.5px solid var(--sep);align-items:center;}
+.rt-row:last-child{border-bottom:none;}
+.rt-type{display:flex;align-items:center;gap:6px;}
+.tbadge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.06em;text-transform:uppercase;}
+.tq{background:var(--bb);color:var(--bt);}
+.tdq{background:var(--ab);color:#633806;}
+.tcp{background:var(--gb);color:var(--gt);}
+.rule-btns{display:flex;gap:4px;flex-wrap:wrap;}
+.rule-btn{padding:4px 9px;border:.5px solid var(--cb);border-radius:5px;font-family:'Poppins',sans-serif;font-size:10px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--t3);transition:all .15s;}
+.rule-btn:hover{color:var(--t1);border-color:rgba(0,0,0,.2);}
+.rule-btn.on{background:#0b1220;color:#EF9F27;border-color:transparent;}
+
+/* LIMIT FIELD */
+.limit-row{display:flex;align-items:center;gap:10px;padding:8px 11px;background:var(--bg);border-radius:7px;border:.5px solid var(--sep);}
+.limit-stepper{display:flex;align-items:center;border:.5px solid var(--cb);border-radius:6px;overflow:hidden;background:var(--card);}
+.ls-btn{width:28px;height:28px;border:none;background:transparent;cursor:pointer;font-size:15px;font-weight:700;color:var(--t2);display:flex;align-items:center;justify-content:center;transition:background .1s;}
+.ls-btn:hover{background:rgba(0,0,0,.05);}
+.ls-val{min-width:36px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t1);}
+
+/* SUMMARY PANEL */
+.sp-title{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+.sp-section{margin-bottom:14px;}
+.sp-row{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:4px;}
+.sp-lbl{font-size:10px;color:var(--t3);flex-shrink:0;}
+.sp-val{font-size:11px;font-weight:700;color:var(--t1);text-align:right;word-break:break-word;}
+.sp-url{font-size:10px;color:var(--blue);word-break:break-all;}
+.sp-sep{border-top:.5px solid var(--sep);margin:10px 0;}
+.sp-mode{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;margin:2px 0;width:fit-content;}
+.sp-rule-row{display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-bottom:.5px solid var(--sep);}
+.sp-rule-row:last-child{border-bottom:none;}
+
+/* BUTTONS */
+.btn-primary{background:#EF9F27;color:#2C1500;border:none;border-radius:8px;padding:9px 22px;font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.btn-primary:hover{opacity:.9;}
+.btn-secondary{background:transparent;color:var(--t2);border:.5px solid var(--cb);border-radius:8px;padding:9px 16px;font-family:'Poppins',sans-serif;font-size:12px;cursor:pointer;}
+.btn-ghost{background:transparent;color:var(--t3);border:none;padding:9px 12px;font-family:'Poppins',sans-serif;font-size:12px;cursor:pointer;border-radius:6px;}
+.btn-ghost:hover{background:var(--bg);color:var(--t1);}
+
+/* STATUS BADGE */
+.status-select{display:flex;gap:6px;flex-wrap:wrap;}
+.status-opt{padding:6px 14px;border:.5px solid var(--cb);border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;background:var(--bg);color:var(--t3);transition:all .15s;}
+.status-opt:hover{color:var(--t1);}
+.status-opt.on-draft{background:var(--bg);color:var(--t2);border-color:rgba(0,0,0,.16);}
+.status-opt.on-active{background:var(--gb);color:var(--gt);border-color:#97C459;}
+
+/* UPLOAD ZONE */
+.upload-zone{border:.5px dashed var(--cb);border-radius:8px;padding:18px;text-align:center;cursor:pointer;background:var(--bg);transition:all .15s;}
+.upload-zone:hover{border-color:var(--blue);background:var(--bb);}
+.upload-zone.has-img{background:var(--card);border-style:solid;}
+
+/* INFO BOX */
+.info-box{background:var(--bb);border:.5px solid rgba(24,95,165,.2);border-radius:7px;padding:9px 12px;display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;}
+.warn-box{background:var(--ab);border:.5px solid rgba(239,159,39,.3);border-radius:7px;padding:9px 12px;display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sb">
+    <div class="sb-logo">
+      <div class="sb-box">Q</div>
+      <div><div class="sb-nm">Quineo</div><div class="sb-sub">Amis du Quartier</div></div>
+    </div>
+    <div class="sb-s">Navigation</div>
+    <div class="sbi"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="white"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="white"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="white"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="white"/></svg>Dashboard</div>
+    <div class="sbi on"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="white" stroke-width="1.4"/><path d="M5 3V2M11 3V2M2 7h12" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>Sessions</div>
+    <div class="sbi"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="white" stroke-width="1.4"/><path d="M5 8h6M8 5v6" stroke="white" stroke-width="1.4" stroke-linecap="round"/></svg>Lots & tirages</div>
+    <div class="sbi"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="9" rx="1.5" stroke="white" stroke-width="1.4"/><path d="M5 4V3a1 1 0 011-1h4a1 1 0 011 1v1M5 8h6M5 11h4" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>Cartons</div>
+    <div class="sb-s">Finances</div>
+    <div class="sbi"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="9" rx="1.5" stroke="white" stroke-width="1.4"/><path d="M1 7h14" stroke="white" stroke-width="1.4"/><circle cx="5" cy="11" r="1" fill="white"/></svg>Paiements</div>
+    <div class="sbi"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 13V5l6-3 6 3v8" stroke="white" stroke-width="1.4" stroke-linejoin="round"/><rect x="6" y="9" width="4" height="4" rx=".5" stroke="white" stroke-width="1.2"/></svg>Rapports</div>
+    <div class="sb-s">Paramètres</div>
+    <div class="sbi"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="white" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>Paramètres</div>
+    <div class="sb-plan">
+      <div style="font-size:9px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px;">Plan actuel</div>
+      <div style="font-size:13px;font-weight:700;color:#EF9F27;">Pro</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.35);">Renouv. 15 avr. 2026</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:11px;color:var(--t3);cursor:pointer;" onclick="">Sessions</span>
+        <span style="font-size:11px;color:var(--t4);">/</span>
+        <span style="font-size:14px;font-weight:700;color:var(--t1);">Nouvelle session</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn-ghost">Annuler</button>
+        <button class="btn-secondary" onclick="saveDraft()">Enregistrer en brouillon</button>
+        <button class="btn-primary" onclick="saveSession()">Créer la session →</button>
+        <div style="width:28px;height:28px;border-radius:50%;background:#1a2e4a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#85B7EB;flex-shrink:0;">AL</div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="form-area">
+
+        <!-- TABS -->
+        <div class="tabs" id="tabs">
+          <div class="tab active" onclick="goTab(0)"><div class="tab-dot filled" id="td0"></div>Informations</div>
+          <div class="tab" onclick="goTab(1)"><div class="tab-dot" id="td1"></div>Identité visuelle</div>
+          <div class="tab" onclick="goTab(2)"><div class="tab-dot" id="td2"></div>Ventes & paiement</div>
+          <div class="tab" onclick="goTab(3)"><div class="tab-dot" id="td3"></div>Règles de jeu</div>
+        </div>
+
+        <!-- PANE 0 : INFOS GÉNÉRALES -->
+        <div class="pane active" id="pane-0">
+          <div class="section">
+            <div class="sec-title">Informations générales</div>
+            <div class="grid2">
+              <div class="field">
+                <div class="fl">Nom de la session <span class="fl-hint">obligatoire</span></div>
+                <input class="fi" id="f-name" placeholder="Grand Loto de Printemps 2025" oninput="syncSlug(this.value);updateSummary()">
+              </div>
+              <div class="field">
+                <div class="fl">Lieu</div>
+                <input class="fi" id="f-lieu" placeholder="Salle des fêtes, Lyon 3e" oninput="updateSummary()">
+              </div>
+            </div>
+            <div class="field">
+              <div class="fl">Description <span class="fl-hint">affichée sur la page publique</span></div>
+              <textarea class="fi" id="f-desc" placeholder="Décrivez votre session loto pour les participants…"></textarea>
+            </div>
+            <div class="field">
+              <div class="fl">URL publique <span class="fl-hint">slug unique — généré automatiquement</span></div>
+              <div class="fi-pre">
+                <span class="fi-prefix">quineo.fr/s/</span>
+                <input id="f-slug" placeholder="grand-loto-printemps-2025" oninput="slugManual=true;updateSummary()">
+              </div>
+              <div class="slug-preview" id="slug-preview">quineo.fr/s/grand-loto-printemps-2025</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="sec-title">Date & capacité</div>
+            <div class="grid3">
+              <div class="field">
+                <div class="fl">Date de l'événement</div>
+                <input class="fi" type="date" id="f-date" value="2025-03-22" oninput="updateSummary()">
+              </div>
+              <div class="field">
+                <div class="fl">Heure de début</div>
+                <input class="fi" type="time" id="f-time" value="14:00" oninput="updateSummary()">
+              </div>
+              <div class="field">
+                <div class="fl">Cartons max <span class="fl-hint">quota plan Pro : 2 000</span></div>
+                <input class="fi" type="number" id="f-maxcartons" value="500" min="1" max="2000" oninput="updateSummary()">
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="sec-title">Statut initial</div>
+            <div class="sec-desc">Une session en <strong>Brouillon</strong> n'est pas visible publiquement. Passez en <strong>Active</strong> le jour J.</div>
+            <div class="status-select">
+              <div class="status-opt on-draft" id="st-draft" onclick="setSt('draft')">
+                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" style="display:inline;vertical-align:-1px;margin-right:3px;"><rect x="1" y="1" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/></svg>
+                Brouillon
+              </div>
+              <div class="status-opt" id="st-active" onclick="setSt('active')">
+                <div style="width:8px;height:8px;border-radius:50%;background:#48BB78;display:inline-block;vertical-align:-1px;margin-right:4px;"></div>
+                Active
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="sec-title">Partenaires</div>
+            <div class="sec-desc">Logos affichés en bas de l'écran de diffusion. Format PNG ou SVG recommandé.</div>
+            <div class="partner-grid">
+              <div class="partner-slot filled" id="ps0" onclick="togglePartner(0)">
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#E6F1FB,#B5D4F4);border-radius:6px;display:flex;align-items:center;justify-content:center;">
+                  <div style="width:36px;height:14px;background:#185FA5;border-radius:3px;opacity:.5;"></div>
+                </div>
+              </div>
+              <div class="partner-slot filled" id="ps1" onclick="togglePartner(1)">
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#EAF3DE,#C0DD97);border-radius:6px;display:flex;align-items:center;justify-content:center;">
+                  <div style="width:40px;height:14px;background:#3B6D11;border-radius:3px;opacity:.5;"></div>
+                </div>
+              </div>
+              <div class="partner-slot" id="ps2" onclick="togglePartner(2)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="#b0bcc8" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span class="ps-label">Ajouter un logo</span>
+              </div>
+              <div class="partner-slot" id="ps3" onclick="togglePartner(3)">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="#b0bcc8" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <span class="ps-label">Ajouter un logo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 1 : IDENTITÉ VISUELLE -->
+        <div class="pane" id="pane-1">
+          <div class="section">
+            <div class="sec-title">Logo & bannière</div>
+            <div class="grid2">
+              <div class="field">
+                <div class="fl">Logo de l'association</div>
+                <div class="upload-zone" id="logo-zone" onclick="">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin:0 auto 6px;display:block;opacity:.3;"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M3 15l5-4 4 3 3-2.5 6 4.5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none"/></svg>
+                  <div style="font-size:11px;font-weight:700;color:var(--t3);">Cliquez ou glissez-déposez</div>
+                  <div style="font-size:10px;color:var(--t4);margin-top:2px;">PNG, SVG — max 2 Mo</div>
+                </div>
+              </div>
+              <div class="field">
+                <div class="fl">Bannière session <span class="fl-hint">16:9 recommandé</span></div>
+                <div class="upload-zone" style="height:78px;" onclick="">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="margin:0 auto 4px;display:block;opacity:.3;"><rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M2 10h20" stroke="currentColor" stroke-width="1.3"/></svg>
+                  <div style="font-size:11px;font-weight:700;color:var(--t3);">Bannière (1200×675 px)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="sec-title">Couleurs de l'association</div>
+            <div class="sec-desc">Utilisées sur la page publique, l'écran de diffusion et les cartons PDF.</div>
+            <div class="grid2">
+              <div class="field">
+                <div class="fl">Couleur primaire</div>
+                <div class="color-row">
+                  <div class="color-swatch" id="sw-primary" style="background:#0b1220;">
+                    <input type="color" value="#0b1220" oninput="updateColor('primary',this.value)">
+                  </div>
+                  <span class="color-val" id="cv-primary">#0b1220</span>
+                  <div style="flex:1;height:22px;border-radius:4px;background:#0b1220;border:.5px solid var(--cb);" id="cp-primary"></div>
+                </div>
+              </div>
+              <div class="field">
+                <div class="fl">Couleur secondaire</div>
+                <div class="color-row">
+                  <div class="color-swatch" id="sw-secondary" style="background:#EF9F27;">
+                    <input type="color" value="#EF9F27" oninput="updateColor('secondary',this.value)">
+                  </div>
+                  <span class="color-val" id="cv-secondary">#EF9F27</span>
+                  <div style="flex:1;height:22px;border-radius:4px;background:#EF9F27;border:.5px solid var(--cb);" id="cp-secondary"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PREVIEW MINI CARD -->
+            <div style="margin-top:8px;">
+              <div class="fl" style="margin-bottom:6px;">Aperçu</div>
+              <div id="preview-card" style="border-radius:8px;padding:14px 16px;background:#0b1220;max-width:320px;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:white;line-height:1;" id="pv-name">Grand Loto de Printemps 2025</div>
+                <div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:3px;" id="pv-lieu">Amis du Quartier · Salle des fêtes, Lyon 3e</div>
+                <div style="display:inline-block;background:#EF9F27;color:#2C1500;font-size:9px;font-weight:700;padding:3px 10px;border-radius:4px;margin-top:8px;" id="pv-badge">Session active</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 2 : VENTES & PAIEMENT -->
+        <div class="pane" id="pane-2">
+          <div class="section">
+            <div class="sec-title">Modes de vente autorisés</div>
+            <div class="sec-desc">Les modes non cochés seront désactivés — les acheteurs ne pourront pas les utiliser pour cette session.</div>
+            <div class="provider-grid">
+              <div class="provider-card on" id="pv-cash" onclick="toggleProvider('cash')">
+                <div class="pc-header">
+                  <div class="pc-dot"></div>
+                  <span class="pc-name">Espèces</span>
+                  <span class="pc-badge cfg">Activé</span>
+                </div>
+                <div class="pc-sub">Vente sur place · confirmation manuelle</div>
+              </div>
+              <div class="provider-card on" id="pv-cb" onclick="toggleProvider('cb')">
+                <div class="pc-header">
+                  <div class="pc-dot"></div>
+                  <span class="pc-name">Terminal CB</span>
+                  <span class="pc-badge cfg">Activé</span>
+                </div>
+                <div class="pc-sub">SumUp Air, Zettle, Square…</div>
+              </div>
+              <div class="provider-card on" id="pv-stripe" onclick="toggleProvider('stripe')">
+                <div class="pc-header">
+                  <div class="pc-dot"></div>
+                  <span class="pc-name">Stripe en ligne</span>
+                  <span class="pc-badge cfg">Configuré</span>
+                </div>
+                <div class="pc-sub">Carte bancaire · webhook auto</div>
+              </div>
+              <div class="provider-card on" id="pv-sumup" onclick="toggleProvider('sumup')">
+                <div class="pc-header">
+                  <div class="pc-dot"></div>
+                  <span class="pc-name">SumUp en ligne</span>
+                  <span class="pc-badge cfg">Configuré</span>
+                </div>
+                <div class="pc-sub">Lien de paiement SumUp</div>
+              </div>
+              <div class="provider-card" id="pv-helloasso" onclick="toggleProvider('helloasso')">
+                <div class="pc-header">
+                  <div class="pc-dot"></div>
+                  <span class="pc-name">HelloAsso</span>
+                  <span class="pc-badge nocfg">Non configuré</span>
+                </div>
+                <div class="pc-sub">Remb. manuel · back-office HelloAsso</div>
+              </div>
+              <div class="provider-card" id="pv-free" onclick="toggleProvider('free')">
+                <div class="pc-header">
+                  <div class="pc-dot"></div>
+                  <span class="pc-name">Cartons offerts</span>
+                  <span class="pc-badge nocfg">Désactivé</span>
+                </div>
+                <div class="pc-sub">Attribution gratuite · motif requis</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="sec-title">Dates de fin des ventes</div>
+            <div class="sec-desc">Les ventes sont automatiquement bloquées à ces horaires, quel que soit le canal. Une date vide = pas de limite.</div>
+            <div class="date-pair">
+              <div class="dp-title">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="4" width="14" height="9" rx="1.5" stroke="#185FA5" stroke-width="1.3"/><path d="M5 4V2M11 4V2M1 8h14" stroke="#185FA5" stroke-width="1.2" stroke-linecap="round"/></svg>
+                Ventes en ligne
+                <span class="dp-badge" style="background:var(--bb);color:var(--bt);">ONLINE</span>
+              </div>
+              <div class="grid2">
+                <div class="field" style="margin-bottom:0;">
+                  <div class="fl">Date limite</div>
+                  <input class="fi" type="date" value="2025-03-20">
+                </div>
+                <div class="field" style="margin-bottom:0;">
+                  <div class="fl">Heure limite</div>
+                  <input class="fi" type="time" value="23:59">
+                </div>
+              </div>
+            </div>
+            <div class="date-pair">
+              <div class="dp-title">
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1a5 5 0 100 10A5 5 0 008 1z" stroke="#3B6D11" stroke-width="1.3"/><path d="M8 4v4l2.5 2" stroke="#3B6D11" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Ventes sur place
+                <span class="dp-badge" style="background:var(--gb);color:var(--gt);">CASH / CB</span>
+              </div>
+              <div class="grid2">
+                <div class="field" style="margin-bottom:0;">
+                  <div class="fl">Date limite</div>
+                  <input class="fi" type="date" value="2025-03-22">
+                </div>
+                <div class="field" style="margin-bottom:0;">
+                  <div class="fl">Heure limite</div>
+                  <input class="fi" type="time" value="16:00">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="sec-title">Limites d'achat</div>
+            <div class="info-box">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px;"><circle cx="8" cy="8" r="6" stroke="#185FA5" stroke-width="1.4"/><path d="M8 5v3l2 2" stroke="#185FA5" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <div style="font-size:11px;color:var(--bt);line-height:1.5;">Conformément à la réglementation française (art. L.322-4 CSI), la mise maximale par carton est de <strong>20 €</strong>. Le plafond par personne est recommandé pour éviter les dérives de jeu excessif.</div>
+            </div>
+            <div class="limit-row" style="margin-bottom:8px;">
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:700;color:var(--t1);">Cartons max par personne</div>
+                <div style="font-size:10px;color:var(--t3);margin-top:1px;">Tous forfaits confondus · s'applique en ligne et sur place</div>
+              </div>
+              <div class="limit-stepper">
+                <button class="ls-btn" onclick="changeLimit(-1)">−</button>
+                <div class="ls-val" id="lv">30</div>
+                <button class="ls-btn" onclick="changeLimit(+1)">+</button>
+              </div>
+            </div>
+            <div class="limit-row">
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:700;color:var(--t1);">Cartons offerts max par session</div>
+                <div style="font-size:10px;color:var(--t3);margin-top:1px;">Limite globale d'attribution gratuite (FREE) · 0 = désactivé</div>
+              </div>
+              <div class="limit-stepper">
+                <button class="ls-btn" onclick="changeFreeLimit(-1)">−</button>
+                <div class="ls-val" id="flv">10</div>
+                <button class="ls-btn" onclick="changeFreeLimit(+1)">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 3 : RÈGLES DE JEU -->
+        <div class="pane" id="pane-3">
+          <div class="section">
+            <div class="sec-title">Règles ex-aequo par type de tirage</div>
+            <div class="sec-desc">Définissez ici la règle applicable lorsque plusieurs cartons remplissent la condition gagnante au même numéro. Ces règles s'appliquent à toute la session.</div>
+
+            <div class="rules-table">
+              <div class="rt-head">
+                <span>Type de tirage</span>
+                <span>Règle en cas d'ex-aequo</span>
+              </div>
+              <div class="rt-row">
+                <div class="rt-type"><span class="tbadge tq">Quine</span></div>
+                <div class="rule-btns" id="rb-quine">
+                  <button class="rule-btn on" onclick="setRule('quine','SUDDEN_DEATH',this)">Mort subite</button>
+                  <button class="rule-btn" onclick="setRule('quine','SHARE_LOT',this)">Partage</button>
+                  <button class="rule-btn" onclick="setRule('quine','EACH_WINS',this)">Chacun gagne</button>
+                  <button class="rule-btn" onclick="setRule('quine','REDRAW',this)">Re-tirage</button>
+                </div>
+              </div>
+              <div class="rt-row">
+                <div class="rt-type"><span class="tbadge tdq">Double quine</span></div>
+                <div class="rule-btns" id="rb-dquine">
+                  <button class="rule-btn on" onclick="setRule('dquine','SUDDEN_DEATH',this)">Mort subite</button>
+                  <button class="rule-btn" onclick="setRule('dquine','SHARE_LOT',this)">Partage</button>
+                  <button class="rule-btn" onclick="setRule('dquine','EACH_WINS',this)">Chacun gagne</button>
+                  <button class="rule-btn" onclick="setRule('dquine','REDRAW',this)">Re-tirage</button>
+                </div>
+              </div>
+              <div class="rt-row">
+                <div class="rt-type"><span class="tbadge tcp">Carton plein</span></div>
+                <div class="rule-btns" id="rb-carton">
+                  <button class="rule-btn" onclick="setRule('carton','SUDDEN_DEATH',this)">Mort subite</button>
+                  <button class="rule-btn" onclick="setRule('carton','SHARE_LOT',this)">Partage</button>
+                  <button class="rule-btn on" onclick="setRule('carton','EACH_WINS',this)">Chacun gagne</button>
+                  <button class="rule-btn" onclick="setRule('carton','REDRAW',this)">Re-tirage</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- RÈGLES EXPLIQUÉES -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+              <div style="background:var(--bg);border:.5px solid var(--sep);border-radius:7px;padding:9px 11px;">
+                <div style="font-size:11px;font-weight:700;color:var(--t1);margin-bottom:4px;">Mort subite</div>
+                <div style="font-size:11px;color:var(--t3);line-height:1.5;">Un numéro supplémentaire est tiré. Le premier carton validant la condition gagne. Compétitif et rapide.</div>
+              </div>
+              <div style="background:var(--bg);border:.5px solid var(--sep);border-radius:7px;padding:9px 11px;">
+                <div style="font-size:11px;font-weight:700;color:var(--t1);margin-bottom:4px;">Partage du lot</div>
+                <div style="font-size:11px;color:var(--t3);line-height:1.5;">La valeur du lot est divisée entre tous les gagnants ex-aequo. Convivial, idéal pour les petits lots.</div>
+              </div>
+              <div style="background:var(--bg);border:.5px solid var(--sep);border-radius:7px;padding:9px 11px;">
+                <div style="font-size:11px;font-weight:700;color:var(--t1);margin-bottom:4px;">Chacun gagne</div>
+                <div style="font-size:11px;color:var(--t3);line-height:1.5;">Chaque gagnant reçoit un exemplaire du lot. Nécessite un stock > 1. Recommandé pour le carton plein.</div>
+              </div>
+              <div style="background:var(--bg);border:.5px solid var(--sep);border-radius:7px;padding:9px 11px;">
+                <div style="font-size:11px;font-weight:700;color:var(--t1);margin-bottom:4px;">Re-tirage</div>
+                <div style="font-size:11px;color:var(--t3);line-height:1.5;">Le tirage repart de zéro pour ce lot uniquement. Rare — réservé aux cas litigieux avec validation arbitre.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="sec-title">Intervalle de tirage automatique</div>
+            <div class="sec-desc">Temps entre chaque numéro en mode automatique. Modifiable en cours de session.</div>
+            <div class="limit-row">
+              <div style="flex:1;">
+                <div style="font-size:12px;font-weight:700;color:var(--t1);">Intervalle (secondes)</div>
+                <div style="font-size:10px;color:var(--t3);margin-top:1px;">Défaut : 2,2 s · Min : 1 s · Max : 10 s</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input class="fi" type="range" id="interval-range" min="1" max="10" step="0.2" value="2.2" oninput="document.getElementById('iv').textContent=parseFloat(this.value).toFixed(1)" style="width:100px;padding:0;">
+                <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--t1);min-width:36px;text-align:right;" id="iv">2.2</div>
+                <span style="font-size:11px;color:var(--t3);">s</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="sec-title">Équipe & accès</div>
+            <div class="sec-desc">Invitez des bénévoles avec des droits temporaires pour cette session uniquement.</div>
+            <div style="display:flex;flex-direction:column;gap:5px;" id="team-list">
+              <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--card);border:.5px solid var(--sep);border-radius:7px;">
+                <div style="width:26px;height:26px;border-radius:50%;background:#1a2e4a;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#85B7EB;flex-shrink:0;">AL</div>
+                <div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--t1);">Alex L.</div><div style="font-size:10px;color:var(--t3);">alex@amis-quartier.fr</div></div>
+                <span style="font-size:9px;font-weight:700;background:#0b1220;color:#EF9F27;padding:2px 8px;border-radius:4px;">Admin</span>
+              </div>
+            </div>
+            <button onclick="addMember()" style="display:flex;align-items:center;gap:6px;margin-top:7px;padding:7px 10px;border:.5px dashed var(--cb);border-radius:7px;background:transparent;font-family:'Poppins',sans-serif;font-size:12px;color:var(--t3);cursor:pointer;width:100%;">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Inviter un bénévole (Animateur / Vérificateur)
+            </button>
+          </div>
+        </div>
+
+        <!-- NAVIGATION BAS DE PAGE -->
+        <div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:16px;border-top:.5px solid var(--sep);">
+          <button class="btn-ghost" id="btn-prev" onclick="prevTab()" style="display:none;">← Précédent</button>
+          <div style="flex:1;"></div>
+          <button class="btn-primary" id="btn-next" onclick="nextTab()">Suivant — Identité visuelle →</button>
+        </div>
+
+      </div>
+
+      <!-- SUMMARY PANEL -->
+      <div class="summary-panel">
+        <div class="sp-title">Récapitulatif</div>
+
+        <div class="sp-section">
+          <div class="sp-row"><span class="sp-lbl">Nom</span><span class="sp-val" id="sp-name">—</span></div>
+          <div class="sp-row"><span class="sp-lbl">Date</span><span class="sp-val" id="sp-date">22 mars 2025</span></div>
+          <div class="sp-row"><span class="sp-lbl">Lieu</span><span class="sp-val" id="sp-lieu">—</span></div>
+          <div class="sp-row"><span class="sp-lbl">Cartons max</span><span class="sp-val" id="sp-max">500</span></div>
+          <div class="sp-url" id="sp-url">quineo.fr/s/—</div>
+        </div>
+
+        <div class="sp-sep"></div>
+
+        <div class="sp-section">
+          <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;">Modes de vente</div>
+          <div id="sp-modes"></div>
+        </div>
+
+        <div class="sp-sep"></div>
+
+        <div class="sp-section">
+          <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;">Limite achat</div>
+          <div class="sp-row"><span class="sp-lbl">Max/personne</span><span class="sp-val" id="sp-limit">30</span></div>
+          <div class="sp-row"><span class="sp-lbl">Offerts max</span><span class="sp-val" id="sp-free">10</span></div>
+        </div>
+
+        <div class="sp-sep"></div>
+
+        <div class="sp-section">
+          <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;">Règles ex-aequo</div>
+          <div id="sp-rules"></div>
+        </div>
+
+        <div class="sp-sep"></div>
+
+        <!-- STATUT DE COMPLÉTION -->
+        <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Complétion</div>
+        <div id="sp-completion"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentTab = 0;
+let slugManual = false;
+let limit = 30, freeLimit = 10;
+const rules = {quine:'SUDDEN_DEATH', dquine:'SUDDEN_DEATH', carton:'EACH_WINS'};
+const providers = {cash:true, cb:true, stripe:true, sumup:true, helloasso:false, free:false};
+const RULE_LABELS = {SUDDEN_DEATH:'Mort subite', SHARE_LOT:'Partage', EACH_WINS:'Chacun gagne', REDRAW:'Re-tirage'};
+const PROVIDER_LABELS = {cash:'Espèces', cb:'Terminal CB', stripe:'Stripe', sumup:'SumUp', helloasso:'HelloAsso', free:'Cartons offerts'};
+const PROVIDER_COLORS = {cash:'#065F46', cb:'#185FA5', stripe:'#635BFF', sumup:'#1DBF73', helloasso:'#E5007D', free:'#7C3AED'};
+
+const TAB_LABELS = ['Informations', 'Identité visuelle', 'Ventes & paiement', 'Règles de jeu'];
+const NEXT_LABELS = ['Suivant — Identité visuelle →', 'Suivant — Ventes & paiement →', 'Suivant — Règles de jeu →', 'Créer la session →'];
+
+function goTab(i) {
+  document.querySelectorAll('.tab').forEach((t,j) => t.classList.toggle('active', j===i));
+  document.querySelectorAll('.pane').forEach((p,j) => p.classList.toggle('active', j===i));
+  currentTab = i;
+  document.getElementById('btn-prev').style.display = i === 0 ? 'none' : '';
+  document.getElementById('btn-next').textContent = NEXT_LABELS[i];
+  updateSummary();
+}
+function nextTab() {
+  if (currentTab < 3) goTab(currentTab + 1);
+  else saveSession();
+}
+function prevTab() {
+  if (currentTab > 0) goTab(currentTab - 1);
+}
+
+function toSlug(s) {
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9\s-]/g,'')
+    .trim().replace(/\s+/g,'-')
+    .replace(/-+/g,'-').slice(0,60);
+}
+function syncSlug(v) {
+  if (slugManual) return;
+  const slug = toSlug(v) || '';
+  document.getElementById('f-slug').value = slug;
+  document.getElementById('slug-preview').textContent = slug ? 'quineo.fr/s/' + slug : 'quineo.fr/s/—';
+  document.getElementById('sp-url').textContent = slug ? 'quineo.fr/s/' + slug : 'quineo.fr/s/—';
+}
+document.getElementById('f-slug').addEventListener('input', function() {
+  document.getElementById('slug-preview').textContent = this.value ? 'quineo.fr/s/' + this.value : 'quineo.fr/s/—';
+  document.getElementById('sp-url').textContent = this.value ? 'quineo.fr/s/' + this.value : 'quineo.fr/s/—';
+});
+
+function setSt(s) {
+  ['draft','active'].forEach(k => {
+    const el = document.getElementById('st-' + k);
+    el.className = 'status-opt' + (k===s?' on-'+k:'');
+  });
+}
+
+function togglePartner(i) {
+  const el = document.getElementById('ps'+i);
+  // visual feedback only
+}
+
+function updateColor(type, val) {
+  document.getElementById('sw-' + type).style.background = val;
+  document.getElementById('cv-' + type).textContent = val.toUpperCase();
+  document.getElementById('cp-' + type).style.background = val;
+  if (type === 'primary') {
+    document.getElementById('preview-card').style.background = val;
+  }
+  if (type === 'secondary') {
+    document.getElementById('pv-badge').style.background = val;
+    // choose text color based on lightness
+    const r=parseInt(val.slice(1,3),16),g=parseInt(val.slice(3,5),16),b=parseInt(val.slice(5,7),16);
+    const lum=(r*299+g*587+b*114)/1000;
+    document.getElementById('pv-badge').style.color = lum > 140 ? '#2C1500' : 'white';
+  }
+}
+
+function toggleProvider(id) {
+  providers[id] = !providers[id];
+  const el = document.getElementById('pv-' + id);
+  el.classList.toggle('on', providers[id]);
+  const badge = el.querySelector('.pc-badge');
+  if (badge) {
+    badge.className = 'pc-badge ' + (providers[id] ? 'cfg' : 'nocfg');
+    badge.textContent = providers[id] ? (id==='helloasso'?'Activé':'Activé') : (id==='helloasso'?'Non configuré':'Désactivé');
+  }
+  updateSummary();
+}
+
+function changeLimit(d) {
+  limit = Math.max(1, Math.min(500, limit + d));
+  document.getElementById('lv').textContent = limit;
+  document.getElementById('sp-limit').textContent = limit;
+}
+function changeFreeLimit(d) {
+  freeLimit = Math.max(0, Math.min(100, freeLimit + d));
+  document.getElementById('flv').textContent = freeLimit;
+  document.getElementById('sp-free').textContent = freeLimit;
+}
+
+function setRule(type, rule, btn) {
+  rules[type] = rule;
+  document.querySelectorAll('#rb-' + type + ' .rule-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  updateSummary();
+}
+
+function addMember() {
+  const list = document.getElementById('team-list');
+  const roles = ['Animateur', 'Vérificateur'];
+  const names = ['Sophie M.', 'Thomas B.', 'Marie L.'];
+  const colors = ['#3B6D11', '#A32D2D', '#0891B2'];
+  const i = list.children.length - 1;
+  if (i >= names.length) return;
+  const d = document.createElement('div');
+  d.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--card);border:.5px solid var(--sep);border-radius:7px;';
+  d.innerHTML = `<div style="width:26px;height:26px;border-radius:50%;background:${colors[i]};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;">${names[i][0]+names[i].split(' ')[1][0]}</div>
+    <div style="flex:1;"><div style="font-size:12px;font-weight:700;color:var(--t1);">${names[i]}</div><div style="font-size:10px;color:var(--t3);">Lien d'invitation envoyé · expire dans 7 j</div></div>
+    <span style="font-size:9px;font-weight:700;background:var(--bb);color:var(--bt);padding:2px 8px;border-radius:4px;">${roles[i%2]}</span>`;
+  list.appendChild(d);
+}
+
+function updateSummary() {
+  const name = document.getElementById('f-name')?.value || '—';
+  const lieu = document.getElementById('f-lieu')?.value || '—';
+  const dateVal = document.getElementById('f-date')?.value;
+  const max = document.getElementById('f-maxcartons')?.value || '500';
+  const slug = document.getElementById('f-slug')?.value || '—';
+
+  document.getElementById('sp-name').textContent = name || '—';
+  document.getElementById('sp-lieu').textContent = lieu || '—';
+  document.getElementById('sp-max').textContent = max;
+  document.getElementById('sp-url').textContent = slug !== '—' ? 'quineo.fr/s/' + slug : 'quineo.fr/s/—';
+  if (dateVal) {
+    const d = new Date(dateVal);
+    document.getElementById('sp-date').textContent = d.toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'});
+  }
+
+  // Preview card
+  const pvn = document.getElementById('pv-name');
+  const pvl = document.getElementById('pv-lieu');
+  if (pvn) pvn.textContent = name || 'Grand Loto de Printemps 2025';
+  if (pvl) pvl.textContent = (lieu || 'Lieu à définir');
+
+  // Modes
+  const modesEl = document.getElementById('sp-modes');
+  let modesH = '';
+  Object.entries(providers).forEach(([k,v]) => {
+    if (!v) return;
+    modesH += `<div class="sp-mode" style="background:${PROVIDER_COLORS[k]}18;color:${PROVIDER_COLORS[k]};"><div style="width:5px;height:5px;border-radius:50%;background:${PROVIDER_COLORS[k]};"></div>${PROVIDER_LABELS[k]}</div>`;
+  });
+  modesEl.innerHTML = modesH || '<span style="font-size:11px;color:var(--t4);">Aucun mode sélectionné</span>';
+
+  // Rules
+  const rulesEl = document.getElementById('sp-rules');
+  rulesEl.innerHTML = `
+    <div class="sp-rule-row"><span class="tbadge tq" style="font-size:9px;">Quine</span><span style="font-size:10px;font-weight:700;color:var(--t1);">${RULE_LABELS[rules.quine]}</span></div>
+    <div class="sp-rule-row"><span class="tbadge tdq" style="font-size:9px;">D. Quine</span><span style="font-size:10px;font-weight:700;color:var(--t1);">${RULE_LABELS[rules.dquine]}</span></div>
+    <div class="sp-rule-row"><span class="tbadge tcp" style="font-size:9px;">Carton</span><span style="font-size:10px;font-weight:700;color:var(--t1);">${RULE_LABELS[rules.carton]}</span></div>`;
+
+  // Completion checklist
+  const checks = [
+    {label:'Nom de session', ok: !!document.getElementById('f-name')?.value},
+    {label:'Date & lieu', ok: !!(document.getElementById('f-date')?.value && document.getElementById('f-lieu')?.value)},
+    {label:'URL publique', ok: !!(document.getElementById('f-slug')?.value)},
+    {label:'Mode de vente', ok: Object.values(providers).some(v=>v)},
+    {label:'Règles ex-aequo', ok: true},
+  ];
+  const compEl = document.getElementById('sp-completion');
+  compEl.innerHTML = checks.map(c => `
+    <div style="display:flex;align-items:center;gap:6px;padding:3px 0;">
+      <div style="width:14px;height:14px;border-radius:50%;${c.ok?'background:var(--gb);':'background:var(--bg);border:.5px solid var(--cb);'}display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        ${c.ok?'<svg width="8" height="8" viewBox="0 0 10 10"><path d="M1.5 5l3 3 4-5" stroke="#3B6D11" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>':''}
+      </div>
+      <span style="font-size:11px;${c.ok?'color:var(--t2);':'color:var(--t4);'}">${c.label}</span>
+    </div>`).join('');
+}
+
+function saveDraft() {
+  const btn = event.target;
+  btn.textContent = '✓ Brouillon enregistré';
+  setTimeout(() => btn.textContent = 'Enregistrer en brouillon', 2000);
+}
+function saveSession() {
+  const btn = document.querySelector('.btn-primary');
+  btn.textContent = 'Création en cours…';
+  setTimeout(() => { btn.textContent = '✓ Session créée !'; }, 1200);
+}
+
+// INIT
+updateSummary();
+document.getElementById('f-name').value = 'Grand Loto de Printemps 2025';
+document.getElementById('f-lieu').value = 'Salle des fêtes, Lyon 3e';
+document.getElementById('f-slug').value = 'grand-loto-printemps-2025';
+document.getElementById('slug-preview').textContent = 'quineo.fr/s/grand-loto-printemps-2025';
+updateSummary();
+</script>
+</body>
+</html>

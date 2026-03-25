@@ -1,0 +1,323 @@
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@5/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/poppins@5/700.css">
+
+<style>
+  @keyframes popBall{0%{transform:scale(.4);opacity:0}65%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+  @keyframes pulseRing{0%{box-shadow:0 0 0 0 rgba(239,159,39,.55)}70%{box-shadow:0 0 0 12px rgba(239,159,39,0)}100%{box-shadow:0 0 0 0 rgba(239,159,39,0)}}
+  @keyframes winnerIn{0%{opacity:0;transform:scale(.88)}100%{opacity:1;transform:scale(1)}}
+  .pop-anim{animation:popBall .35s cubic-bezier(.34,1.56,.64,1) both}
+  .hero-pulse{animation:pulseRing 1.4s ease-out}
+
+  /* THEME TOKENS */
+  .qs[data-theme="dark"]  { --bg:#0b1220; --bg2:#111c31; --bg3:#141f35; --bg4:#0d1929; --border:rgba(255,255,255,.07); --border2:rgba(255,255,255,.06); --border3:rgba(255,255,255,.05); --text:white; --text2:rgba(255,255,255,.9); --text3:rgba(255,255,255,.4); --text4:rgba(255,255,255,.2); --text5:rgba(255,255,255,.25); --text6:rgba(255,255,255,.35); --text7:rgba(255,255,255,.3); --text8:rgba(255,255,255,.18); --text9:rgba(255,255,255,.15); --text10:rgba(255,255,255,.22); --hero-bg:white; --hero-num:#0b1220; --ball-drawn-bg:#EF9F27; --ball-drawn-txt:#2C1500; --ball-curr-bg:white; --ball-curr-txt:#0b1220; --cell-drawn-bg:#EF9F27; --cell-drawn-txt:#2C1500; --cell-curr-bg:white; --cell-curr-txt:#0b1220; --cell-empty-bg:rgba(255,255,255,.04); --cell-empty-txt:rgba(255,255,255,.2); --cell-empty-border:rgba(255,255,255,.07); --leg-empty-border:rgba(255,255,255,.2); --part-logo:rgba(255,255,255,.06); --part-div:rgba(255,255,255,.08); --winner-bg:#0e2210; --winner-border:#639922; --winner-tag:#97C459; --winner-sub:rgba(255,255,255,.45); --winner-wait:rgba(255,255,255,.35); --icon-op:.22; --hist-rule:rgba(255,255,255,.06); }
+
+  .qs[data-theme="light"] { --bg:#f0f2f7; --bg2:#ffffff; --bg3:#eef1f8; --bg4:#e6e9f2; --border:rgba(0,0,0,.07); --border2:rgba(0,0,0,.06); --border3:rgba(0,0,0,.05); --text:#0b1220; --text2:#0b1220; --text3:#4a5568; --text4:#718096; --text5:#8a95a3; --text6:#6b7a8d; --text7:#8895a6; --text8:#a0aab6; --text9:#b0bcc8; --text10:#9aaab8; --hero-bg:#0b1220; --hero-num:white; --ball-drawn-bg:#EF9F27; --ball-drawn-txt:#2C1500; --ball-curr-bg:#0b1220; --ball-curr-txt:white; --cell-drawn-bg:#EF9F27; --cell-drawn-txt:#2C1500; --cell-curr-bg:#0b1220; --cell-curr-txt:white; --cell-empty-bg:rgba(0,0,0,.04); --cell-empty-txt:rgba(0,0,0,.3); --cell-empty-border:rgba(0,0,0,.1); --leg-empty-border:rgba(0,0,0,.25); --part-logo:rgba(0,0,0,.06); --part-div:rgba(0,0,0,.1); --winner-bg:#f0fff4; --winner-border:#48bb78; --winner-tag:#276749; --winner-sub:rgba(0,0,0,.45); --winner-wait:rgba(0,0,0,.35); --icon-op:.25; --hist-rule:rgba(0,0,0,.08); }
+
+  .qs { font-family:'Poppins','Segoe UI',sans-serif; transition:background .3s; }
+
+  #qscreen {
+    background:var(--bg);
+    border-radius:12px;
+    overflow:hidden;
+    width:100%;
+    aspect-ratio:16/9;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    color:var(--text);
+    transition:background .3s,color .3s;
+  }
+
+  .q-header {
+    background:var(--bg2);
+    padding:8px 16px;
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid var(--border);
+    flex-shrink:0;
+    transition:background .3s,border-color .3s;
+  }
+  .q-logo-box {
+    width:28px;height:28px;border-radius:5px;
+    background:#EF9F27;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Bebas Neue',sans-serif;font-size:17px;color:#412402;
+  }
+  .q-badge {
+    background:#1a2e4a;border:1.5px solid #378ADD;
+    border-radius:4px;padding:2px 12px;
+    font-size:11px;font-weight:700;color:#85B7EB;letter-spacing:.14em;
+  }
+
+  /* TOGGLE */
+  .theme-toggle {
+    display:flex;align-items:center;gap:6px;
+    background:var(--bg3);
+    border:1px solid var(--border2);
+    border-radius:20px;padding:3px 10px 3px 6px;
+    cursor:pointer;user-select:none;
+    transition:background .2s;
+  }
+  .toggle-track {
+    width:28px;height:15px;border-radius:20px;
+    background:var(--bg4);border:1px solid var(--border2);
+    position:relative;transition:background .25s;
+  }
+  .toggle-thumb {
+    position:absolute;top:1px;left:1px;
+    width:11px;height:11px;border-radius:50%;
+    background:#EF9F27;
+    transition:transform .25s cubic-bezier(.34,1.4,.64,1);
+  }
+  .qs[data-theme="light"] .toggle-thumb { transform:translateX(13px); }
+  .toggle-label { font-size:10px;font-weight:700;color:var(--text4);letter-spacing:.1em;text-transform:uppercase; }
+
+  .q-cnt { font-family:'Bebas Neue',sans-serif;font-size:24px;color:#EF9F27; }
+
+  /* MAIN ROW */
+  .q-main {
+    flex:1;min-height:0;
+    display:flex;padding:10px 16px;gap:14px;overflow:hidden;
+  }
+
+  /* LOT COL */
+  .q-lot { width:21%;display:flex;flex-direction:column;gap:7px;flex-shrink:0; }
+  .q-lot-photo {
+    flex:1;min-height:0;
+    background:var(--bg3);border-radius:8px;
+    border:1px solid var(--border2);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+    transition:background .3s;
+  }
+  .q-lot-info {
+    background:var(--bg3);border-radius:7px;
+    padding:7px 9px;border:1px solid var(--border2);
+    transition:background .3s;
+  }
+
+  /* HERO */
+  .q-hero { width:27%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex-shrink:0; }
+  #hero-ball {
+    width:90px;height:90px;border-radius:50%;
+    background:var(--hero-bg);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .18s, background .3s;
+  }
+  #hero-num { font-family:'Bebas Neue',sans-serif;font-size:54px;color:var(--hero-num);line-height:1;transition:color .3s; }
+
+  /* HIST */
+  .q-hist { flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:8px;overflow:hidden; }
+
+  /* GRID */
+  .q-grid { padding:5px 16px 8px;border-top:1px solid var(--border3);transition:border-color .3s; }
+
+  /* PARTNERS */
+  .q-partners {
+    background:var(--bg4);
+    border-top:1px solid var(--border3);
+    padding:5px 16px;
+    display:flex;align-items:center;justify-content:center;gap:18px;
+    flex-shrink:0;
+    transition:background .3s;
+  }
+
+  /* WINNER OVERLAY */
+  #winner-overlay {
+    display:none;
+    position:absolute;inset:0;
+    background:rgba(10,16,30,.88);
+    align-items:center;justify-content:center;z-index:10;
+  }
+  .winner-card {
+    background:var(--winner-bg);
+    border:2px solid var(--winner-border);
+    border-radius:14px;padding:22px 36px;
+    text-align:center;max-width:58%;
+    animation:winnerIn .4s cubic-bezier(.34,1.36,.64,1) both;
+    transition:background .3s,border-color .3s;
+  }
+</style>
+
+<div class="qs" data-theme="dark" id="qs">
+
+  <div id="qscreen">
+
+    <!-- HEADER -->
+    <div class="q-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="q-logo-box">Q</div>
+        <span style="font-size:12px;font-weight:700;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;transition:color .3s;">Grand Loto de Printemps 2025</span>
+        <span style="font-size:11px;color:var(--text3);transition:color .3s;">—</span>
+        <span style="font-size:11px;color:var(--text3);transition:color .3s;">Amis du Quartier</span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="q-badge">QUINE</div>
+        <!-- THEME TOGGLE -->
+        <div class="theme-toggle" onclick="toggleTheme()" title="Basculer jour / nuit" role="switch" aria-checked="false" id="toggle-btn">
+          <div class="toggle-track"><div class="toggle-thumb"></div></div>
+          <span class="toggle-label" id="toggle-label">Nuit</span>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:baseline;gap:3px;">
+        <span id="cnt" class="q-cnt"></span>
+        <span style="font-size:11px;color:var(--text7);font-weight:400;transition:color .3s;">&nbsp;/ 90 numéros</span>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="q-main">
+
+      <!-- LOT -->
+      <div class="q-lot">
+        <div class="q-lot-photo">
+          <svg viewBox="0 0 40 36" width="38" height="34" fill="none">
+            <rect x="3" y="8" width="34" height="24" rx="3" stroke="currentColor" stroke-width="1.8" style="opacity:var(--icon-op)"/>
+            <circle cx="20" cy="20" r="7" stroke="currentColor" stroke-width="1.8" style="opacity:var(--icon-op)"/>
+            <path d="M14 8l2-5h8l2 5" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none" style="opacity:var(--icon-op)"/>
+            <circle cx="32" cy="13" r="2" fill="currentColor" style="opacity:var(--icon-op)"/>
+          </svg>
+          <span style="font-size:9px;color:var(--text8);letter-spacing:.1em;text-transform:uppercase;transition:color .3s;">Photo du lot</span>
+        </div>
+        <div class="q-lot-info">
+          <div style="font-size:12px;font-weight:700;color:var(--text);line-height:1.25;margin-bottom:3px;transition:color .3s;">Robot Cuiseur Pro</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#EF9F27;letter-spacing:.04em;line-height:1;">400 €</div>
+          <div style="font-size:11px;color:var(--text6);margin-top:2px;transition:color .3s;">Lot n° 3 / 8</div>
+        </div>
+      </div>
+
+      <!-- HERO -->
+      <div class="q-hero">
+        <span style="font-size:11px;font-weight:700;color:var(--text5);letter-spacing:.18em;text-transform:uppercase;transition:color .3s;">Numéro tiré</span>
+        <div id="hero-ball">
+          <span id="hero-num"></span>
+        </div>
+        <span id="hero-rank" style="font-size:11px;color:var(--text10);transition:color .3s;"></span>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="q-hist">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;font-weight:700;color:var(--text5);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;transition:color .3s;">Derniers numéros</span>
+          <div style="flex:1;height:1px;background:var(--hist-rule);transition:background .3s;"></div>
+        </div>
+        <div id="history" style="display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;overflow:hidden;"></div>
+      </div>
+
+    </div>
+
+    <!-- GRID -->
+    <div class="q-grid">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+        <span style="font-size:11px;font-weight:700;color:var(--text4);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;transition:color .3s;">Tableau 1–90</span>
+        <div style="display:flex;align-items:center;gap:5px;margin-left:8px;">
+          <div style="width:12px;height:12px;border-radius:2px;background:#EF9F27;flex-shrink:0;"></div>
+          <span style="font-size:11px;color:var(--text4);transition:color .3s;">Tiré</span>
+          <div style="width:12px;height:12px;border-radius:2px;background:var(--cell-curr-bg);flex-shrink:0;margin-left:8px;transition:background .3s;"></div>
+          <span style="font-size:11px;color:var(--text4);transition:color .3s;">Dernier</span>
+          <div style="width:12px;height:12px;border-radius:2px;border:1px solid var(--leg-empty-border);flex-shrink:0;margin-left:8px;"></div>
+          <span style="font-size:11px;color:var(--text4);transition:color .3s;">Non tiré</span>
+        </div>
+      </div>
+      <div id="grid90" style="display:flex;flex-wrap:wrap;gap:2px;"></div>
+    </div>
+
+    <!-- PARTNERS -->
+    <div class="q-partners">
+      <span style="font-size:11px;color:var(--text9);letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;transition:color .3s;">Partenaires</span>
+      <div style="width:1px;height:14px;background:var(--part-div);transition:background .3s;"></div>
+      <div style="height:14px;width:52px;background:var(--part-logo);border-radius:3px;transition:background .3s;"></div>
+      <div style="height:14px;width:64px;background:var(--part-logo);border-radius:3px;transition:background .3s;"></div>
+      <div style="height:14px;width:46px;background:var(--part-logo);border-radius:3px;transition:background .3s;"></div>
+      <div style="height:14px;width:58px;background:var(--part-logo);border-radius:3px;transition:background .3s;"></div>
+    </div>
+
+    <!-- WINNER OVERLAY -->
+    <div id="winner-overlay">
+      <div class="winner-card">
+        <div style="font-size:11px;font-weight:700;color:var(--winner-tag);letter-spacing:.22em;text-transform:uppercase;margin-bottom:10px;transition:color .3s;">Gagnant détecté !</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--text);line-height:1;margin-bottom:4px;transition:color .3s;">Marie Dupont</div>
+        <div style="font-size:11px;color:var(--winner-sub);margin-bottom:16px;transition:color .3s;">Carton #C042 · ligne 2 complétée</div>
+        <div style="display:inline-block;background:#EF9F27;color:#2C1500;padding:5px 18px;border-radius:5px;font-size:12px;font-weight:700;">QUINE — Robot Cuiseur Pro · 400 €</div>
+        <div style="margin-top:14px;font-size:11px;color:var(--winner-wait);transition:color .3s;">En attente de confirmation par l'animateur...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTROLS -->
+  <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+    <button id="draw-btn" onclick="qDraw()" style="font-family:'Poppins',sans-serif;font-size:13px;font-weight:700;padding:9px 22px;background:#EF9F27;color:#2C1500;border:none;border-radius:8px;cursor:pointer;">Tirer un numéro</button>
+    <button onclick="qReset()" style="font-family:'Poppins',sans-serif;font-size:12px;padding:9px 16px;background:transparent;color:var(--color-text-secondary);border:.5px solid var(--color-border-secondary);border-radius:8px;cursor:pointer;">Réinitialiser</button>
+    <span id="msg" style="font-family:'Poppins',sans-serif;font-size:11px;color:var(--color-text-secondary);"></span>
+  </div>
+
+</div>
+
+<script>
+const INIT=[45,12,67,3,89,31,52,74,18,37,82,7,61,24,9];
+let drawn=[...INIT],current=9,winnerShown=false,triggered=false;
+
+function toggleTheme(){
+  const el=document.getElementById('qs');
+  const isDark=el.dataset.theme==='dark';
+  el.dataset.theme=isDark?'light':'dark';
+  document.getElementById('toggle-label').textContent=isDark?'Jour':'Nuit';
+  document.getElementById('toggle-btn').setAttribute('aria-checked',isDark?'true':'false');
+}
+
+function buildCell(n){
+  const isDrawn=drawn.includes(n);
+  const isCurr=n===current;
+  const el=document.createElement('div');
+  const bg=isCurr?'var(--cell-curr-bg)':isDrawn?'var(--cell-drawn-bg)':'var(--cell-empty-bg)';
+  const txt=isCurr?'var(--cell-curr-txt)':isDrawn?'var(--cell-drawn-txt)':'var(--cell-empty-txt)';
+  const brd=(!isCurr&&!isDrawn)?`border:1px solid var(--cell-empty-border);`:'';
+  el.style.cssText=`width:26px;height:20px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:${isDrawn?'700':'400'};font-family:'Poppins',sans-serif;background:${bg};color:${txt};${brd}`;
+  el.textContent=n;
+  el.setAttribute('aria-label',`${n}${isDrawn?' déjà tiré':' non tiré'}`);
+  return el;
+}
+
+function updateAll(){
+  document.getElementById('cnt').textContent=drawn.length;
+  document.getElementById('hero-num').textContent=current;
+  const nth=drawn.length;
+  document.getElementById('hero-rank').textContent=`${nth}${nth===1?'er':'e'} numéro tiré`;
+  const hist=document.getElementById('history');
+  hist.innerHTML='';
+  drawn.slice(-15).reverse().forEach((n,i)=>{
+    const isNew=i===0;
+    const el=document.createElement('div');
+    el.style.cssText=`width:${isNew?'34px':'27px'};height:${isNew?'34px':'27px'};border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:${isNew?'14px':'11px'};font-weight:700;font-family:'Poppins',sans-serif;flex-shrink:0;background:${isNew?'var(--ball-curr-bg)':'var(--ball-drawn-bg)'};color:${isNew?'var(--ball-curr-txt)':'var(--ball-drawn-txt)'};`;
+    el.textContent=n;
+    if(isNew) el.classList.add('pop-anim');
+    hist.appendChild(el);
+  });
+  const grid=document.getElementById('grid90');
+  grid.innerHTML='';
+  for(let n=1;n<=90;n++) grid.appendChild(buildCell(n));
+}
+
+function qDraw(){
+  if(winnerShown){hideWinner();return;}
+  const avail=Array.from({length:90},(_,i)=>i+1).filter(n=>!drawn.includes(n));
+  if(!avail.length){document.getElementById('msg').textContent='Tous les 90 numéros ont été tirés.';return;}
+  const n=avail[Math.floor(Math.random()*avail.length)];
+  drawn.push(n);current=n;
+  updateAll();
+  const b=document.getElementById('hero-ball');
+  b.classList.add('hero-pulse');b.style.transform='scale(1.18)';
+  setTimeout(()=>{b.style.transform='scale(1)';setTimeout(()=>b.classList.remove('hero-pulse'),600);},220);
+  document.getElementById('msg').textContent='';
+  if(drawn.length>=20&&!triggered){triggered=true;setTimeout(showWinner,600);}
+}
+function showWinner(){winnerShown=true;document.getElementById('winner-overlay').style.display='flex';document.getElementById('draw-btn').textContent='Confirmer le gagnant';}
+function hideWinner(){winnerShown=false;document.getElementById('winner-overlay').style.display='none';document.getElementById('draw-btn').textContent='Tirer un numéro';}
+function qReset(){drawn=[...INIT];current=9;winnerShown=false;triggered=false;hideWinner();updateAll();document.getElementById('msg').textContent='';}
+
+updateAll();
+</script>

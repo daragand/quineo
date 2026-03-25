@@ -1,26 +1,179 @@
 @import "tailwindcss";
 
+@import '@fontsource/poppins/400.css';
+@import '@fontsource/poppins/700.css';
+@import '@fontsource/bebas-neue/400.css';
+
+/* ─────────────────────────────────────────
+   THEME — tokens exposés comme classes Tailwind
+   bg-navy, text-amber, font-display, w-sidebar…
+───────────────────────────────────────── */
+@theme {
+  /* ── Couleurs Navy ── */
+  --color-navy:           #0b1220;
+  --color-navy-light:     #111c31;
+  --color-navy-mid:       #1a2e4a;
+  --color-navy-deep:      #0d1929;
+
+  /* ── Fond & surfaces ── */
+  --color-bg:             #f4f5f9;
+  --color-card:           #ffffff;
+
+  /* ── Amber (couleur primaire) ── */
+  --color-amber:          #EF9F27;
+  --color-amber-dark:     #2C1500;
+  --color-amber-deep:     #633806;
+  --color-amber-bg:       #FFF8EE;
+
+  /* ── Bleu ── */
+  --color-qblue:          #185FA5;
+  --color-qblue-light:    #378ADD;
+  --color-qblue-bg:       #EEF4FC;
+  --color-qblue-text:     #0C447C;
+
+  /* ── Vert ── */
+  --color-qgreen:         #3B6D11;
+  --color-qgreen-mid:     #639922;
+  --color-qgreen-bg:      #EAF3DE;
+  --color-qgreen-text:    #27500A;
+  --color-qgreen-live:    #48BB78;
+
+  /* ── Rouge ── */
+  --color-qred:           #A32D2D;
+  --color-qred-bg:        #FCEBEB;
+  --color-qred-text:      #501313;
+
+  /* ── Orange ── */
+  --color-orange:         #854F0B;
+  --color-orange-bg:      #FAEEDA;
+
+  /* ── Violet ── */
+  --color-purple:         #534AB7;
+  --color-purple-bg:      #EEEDFE;
+  --color-purple-text:    #26215C;
+
+  /* ── Texte ── */
+  --color-text-primary:   #0b1220;
+  --color-text-secondary: #4a5568;
+  --color-text-muted:     #8a95a3;
+  --color-text-hint:      #b0bcc8;
+
+  /* ── Polices ── */
+  --font-body:            'Poppins', 'Segoe UI', sans-serif;
+  --font-display:         'Bebas Neue', sans-serif;
+
+  /* ── Layout ── */
+  --width-sidebar:        180px;
+  --height-topbar:        49px;
+
+  /* ── Radius (surcharge les défauts Tailwind) ── */
+  --radius-sm:            6px;
+  --radius-md:            8px;
+  --radius-lg:            12px;
+  --radius-xl:            14px;
+}
+
+/* ─────────────────────────────────────────
+   TOKENS SÉMANTIQUES
+   Utilisés avec var() dans le CSS — pas en classes Tailwind
+   (rgba incompatible avec le résolveur de couleurs @theme)
+───────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-border:       rgba(0, 0, 0, .09);
+  --color-border-light: rgba(0, 0, 0, .06);
+  --color-sep:          rgba(0, 0, 0, .06);
+  --transition-fast:    150ms ease;
+  --transition-base:    200ms ease;
+
+  /* ── Tokens écran de tirage (mode jour) ── */
+  --tirage-hero-bg:           #0b1220;
+  --tirage-hero-num:          #ffffff;
+  --tirage-ball-drawn-bg:     #EF9F27;
+  --tirage-ball-drawn-txt:    #2C1500;
+  --tirage-ball-curr-bg:      #0b1220;
+  --tirage-ball-curr-txt:     #ffffff;
+  --tirage-cell-drawn-bg:     #EF9F27;
+  --tirage-cell-drawn-txt:    #2C1500;
+  --tirage-cell-curr-bg:      #0b1220;
+  --tirage-cell-curr-txt:     #ffffff;
+  --tirage-cell-empty-bg:     rgba(0, 0, 0, .04);
+  --tirage-cell-empty-txt:    rgba(0, 0, 0, .3);
+  --tirage-cell-empty-border: rgba(0, 0, 0, .1);
+  --tirage-winner-bg:         #f0fff4;
+  --tirage-winner-border:     #48BB78;
+  --tirage-winner-tag:        #276749;
+  --tirage-bg2:               #ffffff;
+  --tirage-bg3:               #eef1f8;
+  --tirage-bg4:               #e6e9f2;
+  --tirage-hist-rule:         rgba(0, 0, 0, .08);
+  --tirage-icon-op:           .25;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─────────────────────────────────────────
+   MODE SOMBRE — écran de tirage uniquement
+   Activé via data-theme="dark" sur le wrapper de page
+───────────────────────────────────────── */
+[data-theme="dark"] {
+  --color-bg:             #0b1220;
+  --color-card:           #111c31;
+  --color-border:         rgba(255, 255, 255, .07);
+  --color-border-light:   rgba(255, 255, 255, .05);
+  --color-sep:            rgba(255, 255, 255, .05);
+  --color-text-primary:   #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, .7);
+  --color-text-muted:     rgba(255, 255, 255, .4);
+  --color-text-hint:      rgba(255, 255, 255, .2);
+
+  /* ── Tokens écran de tirage (mode nuit) ── */
+  --tirage-hero-bg:           #ffffff;
+  --tirage-hero-num:          #0b1220;
+  --tirage-ball-drawn-bg:     #EF9F27;
+  --tirage-ball-drawn-txt:    #2C1500;
+  --tirage-ball-curr-bg:      #ffffff;
+  --tirage-ball-curr-txt:     #0b1220;
+  --tirage-cell-drawn-bg:     #EF9F27;
+  --tirage-cell-drawn-txt:    #2C1500;
+  --tirage-cell-curr-bg:      #ffffff;
+  --tirage-cell-curr-txt:     #0b1220;
+  --tirage-cell-empty-bg:     rgba(255, 255, 255, .04);
+  --tirage-cell-empty-txt:    rgba(255, 255, 255, .2);
+  --tirage-cell-empty-border: rgba(255, 255, 255, .07);
+  --tirage-winner-bg:         #0e2210;
+  --tirage-winner-border:     #639922;
+  --tirage-winner-tag:        #97C459;
+  --tirage-bg2:               #111c31;
+  --tirage-bg3:               #141f35;
+  --tirage-bg4:               #0d1929;
+  --tirage-hist-rule:         rgba(255, 255, 255, .06);
+  --tirage-icon-op:           .22;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─────────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────────── */
+@keyframes winnerIn {
+  from { opacity: 0; transform: scale(.88); }
+  to   { opacity: 1; transform: scale(1);   }
+}
+
+/* ─────────────────────────────────────────
+   BASE
+───────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
 }
+
+/* ─────────────────────────────────────────
+   UTILITAIRES CSS CUSTOM
+───────────────────────────────────────── */
+.font-display { font-family: var(--font-display); }
+.font-body    { font-family: var(--font-body); }
