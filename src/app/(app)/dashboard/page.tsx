@@ -1,61 +1,205 @@
 import Link from 'next/link'
+import { QueryTypes } from 'sequelize'
+import { db } from '@/lib/db'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { MetricCard } from '@/components/dashboard/MetricCard'
 import { SessionTable } from '@/components/dashboard/SessionTable'
 import { LotsPanel } from '@/components/dashboard/LotsPanel'
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed'
+import type { SessionStatus, TirageType } from '@/types/session'
 
 // ─────────────────────────────────────────
-// Données statiques de démonstration
+// Types locaux
 // ─────────────────────────────────────────
 
-const SESSIONS = [
-  { id: '1', name: 'Grand Loto Printemps 2025', date: '2025-03-22', cartonsSold: 347, cartonsMax: 500, status: 'running' as const },
-  { id: '2', name: 'Loto Noël 2024',            date: '2024-12-14', cartonsSold: 482, cartonsMax: 500, status: 'closed'  as const },
-  { id: '3', name: 'Loto Automne 2024',          date: '2024-10-05', cartonsSold: 310, cartonsMax: 500, status: 'closed'  as const },
-  { id: '4', name: 'Loto Été 2025',              date: '2025-07-12', cartonsSold: 0,   cartonsMax: 500, status: 'draft'   as const },
-]
+interface RawSession {
+  id: string
+  name: string
+  date: string | null
+  status: string
+  max_cartons: number | null
+  association_id: string
+}
 
-const LOTS = [
-  { id: 'l1', name: 'TV 55" 4K OLED',    value: 800, tirageType: 'carton_plein' as const, status: 'drawn'   as const },
-  { id: 'l2', name: 'Séjour Spa 2 pers.', value: 350, tirageType: 'double_quine' as const, status: 'drawn'   as const },
-  { id: 'l3', name: 'Robot Cuiseur Pro',  value: 400, tirageType: 'quine'        as const, status: 'pending' as const },
-]
+interface RawLot {
+  id: string
+  name: string
+  value: string | null
+  status: string
+}
 
-const ACTIVITY = [
-  {
-    id: 'a1',
-    variant: 'success' as const,
-    text: '<strong style="color:var(--color-text-primary);font-weight:700;">Sophie M.</strong> — quine confirmé, lot n°2 attribué',
-    time: 'il y a 3 min',
-  },
-  {
-    id: 'a2',
-    variant: 'info' as const,
-    text: 'Tirage lot n°3 démarré — <strong style="color:var(--color-text-primary);font-weight:700;">23 numéros</strong> tirés',
-    time: 'il y a 8 min',
-  },
-  {
-    id: 'a3',
-    variant: 'warning' as const,
-    text: '<strong style="color:var(--color-text-primary);font-weight:700;">12 cartons</strong> vendus en ligne (lot de 4)',
-    time: 'il y a 22 min',
-  },
-]
+interface RawProvider {
+  name: string
+  type: string
+  active: boolean
+}
 
-const PROVIDERS = [
-  { name: 'SumUp',     sub: 'En ligne + Terminal', active: true },
-  { name: 'Espèces',   sub: 'Sur place',           active: true },
-  { name: 'HelloAsso', sub: 'Non configuré',       active: false },
-  { name: 'Stripe',    sub: 'Non configuré',       active: false },
-]
+interface RawAuditLog {
+  id: string
+  action: string
+  details: Record<string, unknown> | null
+  created_at: string
+}
+
+interface RawTirage {
+  id: string
+  lot?: { name: string; order: number } | null
+}
 
 // ─────────────────────────────────────────
-// Page
+// Helpers
 // ─────────────────────────────────────────
 
-export default function DashboardPage() {
+function relativeTime(date: string): string {
+  const diffMs = Date.now() - new Date(date).getTime()
+  const mins = Math.floor(diffMs / 60_000)
+  if (mins < 1)  return 'à l\'instant'
+  if (mins < 60) return `il y a ${mins} min`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return `il y a ${hours}h`
+  return `il y a ${Math.floor(hours / 24)}j`
+}
+
+function auditToActivity(log: RawAuditLog) {
+  const action = log.action
+  let variant: 'success' | 'info' | 'warning' = 'info'
+  let text = action
+
+  if (action.includes('SOLD') || action.includes('TIRAGE_COMPLETED') || action.includes('WIN')) {
+    variant = 'success'
+  } else if (action.includes('WARN') || action.includes('QUOTA')) {
+    variant = 'warning'
+  }
+
+  // Enrichissement si details disponibles
+  const d = log.details
+  if (d && typeof d === 'object') {
+    if (d.participant_name) {
+      text = `<strong style="color:var(--color-text-primary);font-weight:700;">${d.participant_name}</strong> — ${action.toLowerCase().replace(/_/g, ' ')}`
+    } else {
+      text = action.replace(/_/g, ' ').toLowerCase()
+    }
+  } else {
+    text = action.replace(/_/g, ' ').toLowerCase()
+  }
+
+  return { id: log.id, variant, text, time: relativeTime(log.created_at) }
+}
+
+// ─────────────────────────────────────────
+// Page (Server Component)
+// ─────────────────────────────────────────
+
+export default async function DashboardPage() {
+
+  // 1. Sessions récentes
+  const rawSessions = await db.Session.findAll({
+    attributes: ['id', 'name', 'date', 'status', 'max_cartons', 'association_id'],
+    order: [['date', 'DESC']],
+    limit: 4,
+    raw: true,
+  }) as unknown as RawSession[]
+
+  // 2. Cartons vendus par session
+  const cartonCounts = await db.sequelize.query<{ session_id: string; count: string }>(
+    `SELECT session_id, COUNT(*) AS count FROM cartons WHERE status = 'sold' GROUP BY session_id`,
+    { type: QueryTypes.SELECT },
+  )
+  const cartonMap = new Map(cartonCounts.map(r => [r.session_id, parseInt(r.count, 10)]))
+
+  // 3. Session de référence (running en priorité, sinon la plus récente)
+  const refSession = rawSessions.find(s => s.status === 'running') ?? rawSessions[0] ?? null
+
+  // 4. Lots de la session de référence
+  const rawLots = refSession
+    ? await db.Lot.findAll({
+        where: { session_id: refSession.id },
+        attributes: ['id', 'name', 'value', 'status'],
+        order: [['order', 'ASC']],
+        limit: 5,
+        raw: true,
+      }) as unknown as RawLot[]
+    : []
+
+  // 5. Tirage en cours
+  const activeTirage = refSession
+    ? await db.Tirage.findOne({
+        where: { session_id: refSession.id, status: 'running' },
+        include: [{ model: db.Lot, as: 'lot', attributes: ['name', 'order'] }],
+      }) as unknown as RawTirage | null
+    : null
+
+  const drawEventsCount = activeTirage
+    ? await db.DrawEvent.count({ where: { tirage_id: activeTirage.id } })
+    : 0
+
+  // 6. Providers de paiement de l'association de référence
+  const rawProviders = refSession
+    ? await db.PaymentProvider.findAll({
+        where: { association_id: refSession.association_id },
+        attributes: ['name', 'type', 'active'],
+        raw: true,
+      }) as unknown as RawProvider[]
+    : []
+
+  // 7. Recettes session de référence
+  const revenueRows = refSession
+    ? await db.sequelize.query<{ total: string }>(
+        `SELECT COALESCE(SUM(p.amount), 0) AS total
+         FROM paiements p
+         JOIN paiement_cartons pc ON pc.paiement_id = p.id
+         JOIN cartons c ON c.id = pc.carton_id
+         WHERE c.session_id = :sessionId AND p.status = 'completed'`,
+        { type: QueryTypes.SELECT, replacements: { sessionId: refSession.id } },
+      )
+    : [{ total: '0' }]
+  const revenue = parseFloat(revenueRows[0]?.total ?? '0')
+
+  // 8. Activité récente (audit logs)
+  const rawLogs = await db.AuditLog.findAll({
+    order: [['created_at', 'DESC']],
+    limit: 5,
+    raw: true,
+  }) as unknown as RawAuditLog[]
+
+  // ── Calculs métriques ──────────────────
+  const cartonsSold = refSession ? (cartonMap.get(refSession.id) ?? 0) : 0
+  const cartonsMax  = refSession?.max_cartons ?? 0
+  const cartonsProgress = cartonsMax > 0 ? Math.round((cartonsSold / cartonsMax) * 100) : 0
+  const lotsWon   = rawLots.filter(l => l.status === 'drawn').length
+  const lotsTotal = rawLots.length
+
+  // ── Mise en forme pour les composants ──
+  const sessions = rawSessions.map(s => ({
+    id: s.id,
+    name: s.name,
+    date: s.date ?? undefined,
+    cartonsSold: cartonMap.get(s.id) ?? 0,
+    cartonsMax: s.max_cartons ?? 0,
+    status: s.status as SessionStatus,
+  }))
+
+  const lots = rawLots.map(l => ({
+    id: l.id,
+    name: l.name,
+    value: l.value != null ? parseFloat(l.value) : undefined,
+    tirageType: 'quine' as TirageType, // champ non présent en base — valeur par défaut
+    status: l.status as 'pending' | 'drawn' | 'cancelled',
+  }))
+
+  const providers = rawProviders.map(p => ({
+    name: p.name,
+    sub: p.type.charAt(0).toUpperCase() + p.type.slice(1),
+    active: p.active,
+  }))
+
+  const activity = rawLogs.map(auditToActivity)
+
+  // ─────────────────────────────────────────
+  // Rendu
+  // ─────────────────────────────────────────
+
   return (
     <div className="flex flex-col gap-[14px]">
 
@@ -64,40 +208,49 @@ export default function DashboardPage() {
 
         <MetricCard
           label="Cartons vendus"
-          value="347"
-          progress={69}
-          sub="69 % sur 500 max — plan Pro"
+          value={cartonsMax > 0 ? String(cartonsSold) : '—'}
+          progress={cartonsMax > 0 ? cartonsProgress : undefined}
+          sub={cartonsMax > 0
+            ? `${cartonsProgress} % sur ${cartonsMax} max`
+            : 'Aucun max défini'}
         />
 
         <MetricCard
           label="Recettes session"
-          value="1 041 €"
-          badge={{ text: '+14 % vs dernière session', variant: 'green' }}
+          value={revenue > 0 ? `${revenue.toLocaleString('fr-FR')} €` : '0 €'}
         />
 
         <MetricCard
           label="Lots attribués"
-          value="2 / 8"
-          sub="6 lots restants"
+          value={lotsTotal > 0 ? `${lotsWon} / ${lotsTotal}` : '—'}
+          sub={lotsTotal > 0 ? `${lotsTotal - lotsWon} lots restants` : 'Aucun lot'}
         />
 
         <MetricCard label="Tirage en cours" value="">
-          <div className="flex items-center gap-[7px] mt-[5px]">
-            <span
-              aria-hidden="true"
-              className="rounded-full flex-shrink-0"
-              style={{ width: 8, height: 8, background: '#48BB78', display: 'block' }}
-            />
-            <span
-              className="font-bold"
-              style={{ fontSize: 12, color: 'var(--color-text-primary)' }}
-            >
-              Lot n°3 actif
-            </span>
-          </div>
-          <div style={{ fontSize: 10, color: 'var(--color-text-hint)', marginTop: 4 }}>
-            23 numéros tirés / 90
-          </div>
+          {activeTirage?.lot ? (
+            <>
+              <div className="flex items-center gap-[7px] mt-[5px]">
+                <span
+                  aria-hidden="true"
+                  className="rounded-full flex-shrink-0"
+                  style={{ width: 8, height: 8, background: '#48BB78', display: 'block' }}
+                />
+                <span
+                  className="font-bold"
+                  style={{ fontSize: 12, color: 'var(--color-text-primary)' }}
+                >
+                  {activeTirage.lot.name}
+                </span>
+              </div>
+              <div style={{ fontSize: 10, color: 'var(--color-text-hint)', marginTop: 4 }}>
+                {drawEventsCount} numéros tirés / 90
+              </div>
+            </>
+          ) : (
+            <div style={{ fontSize: 12, color: 'var(--color-text-hint)', marginTop: 5 }}>
+              Aucun tirage actif
+            </div>
+          )}
         </MetricCard>
 
       </div>
@@ -118,7 +271,10 @@ export default function DashboardPage() {
             </Link>
           }
         >
-          <SessionTable rows={SESSIONS} />
+          {sessions.length > 0
+            ? <SessionTable rows={sessions} />
+            : <p style={{ fontSize: 11, color: 'var(--color-text-hint)', padding: '8px 0' }}>Aucune session.</p>
+          }
         </Card>
 
         {/* Colonne droite */}
@@ -136,11 +292,11 @@ export default function DashboardPage() {
               </Link>
             }
           >
-            <LotsPanel lots={LOTS} />
+            <LotsPanel lots={lots} />
           </Card>
 
           <Card title="Activité récente">
-            <ActivityFeed items={ACTIVITY} />
+            <ActivityFeed items={activity} />
           </Card>
 
         </div>
@@ -151,7 +307,7 @@ export default function DashboardPage() {
         title="Providers de paiement actifs"
         headerRight={
           <Link
-            href="/settings/providers"
+            href="/parametres/providers"
             className="font-bold hover:opacity-70 transition-opacity duration-[100ms]"
             style={{ fontSize: 11, color: 'var(--color-qblue)' }}
           >
@@ -160,7 +316,9 @@ export default function DashboardPage() {
         }
       >
         <div className="flex flex-wrap items-center gap-[10px]">
-          {PROVIDERS.map((p) => (
+          {providers.length === 0 ? (
+            <p style={{ fontSize: 11, color: 'var(--color-text-hint)' }}>Aucun provider configuré.</p>
+          ) : providers.map((p) => (
             <div
               key={p.name}
               className="flex items-center gap-[6px] rounded-[6px] px-[13px] py-[7px]"

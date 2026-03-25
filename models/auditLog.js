@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     entity_id: {
       type: DataTypes.STRING,
-      comment: 'UUID de l'entité concernée',
+      comment: "UUID de l'entité concernée",
     },
     details: {
       type: DataTypes.JSONB,
