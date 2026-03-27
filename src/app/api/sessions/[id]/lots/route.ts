@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { withAuth, withRole, apiError } from '@/lib/auth'
 import { db } from '@/lib/db'
 
-type Ctx = { params: Promise<{ id: string }>; user: import('@/lib/auth').TokenPayload }
+type Ctx = { params: Promise<Record<string, string>>; user: import('@/lib/auth').TokenPayload }
 
 async function checkSession(sessionId: string, associationId: string) {
   return db.Session.findOne({ where: { id: sessionId, association_id: associationId } })

@@ -19,15 +19,15 @@ export function AppShell({
   caisseProps,
 }: AppShellProps) {
   return (
-    <div className="flex h-screen overflow-hidden bg-bg">
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <Sidebar
         variant={sidebarVariant}
         associationName={associationName}
         caisse={caisseProps}
       />
 
-      {/* Zone principale : topbar + contenu */}
-      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+      {/* Zone principale scrollable */}
+      <div style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
         {children}
       </div>
     </div>

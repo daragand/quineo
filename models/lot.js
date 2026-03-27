@@ -6,7 +6,13 @@ module.exports = (sequelize, DataTypes) => {
   class Lot extends Model {
     static associate(models) {
       Lot.belongsTo(models.Session, { foreignKey: 'session_id', as: 'session' });
-      Lot.hasOne(models.Tirage, { foreignKey: 'lot_id', as: 'tirage' });
+      Lot.hasOne(models.Tirage,     { foreignKey: 'lot_id',     as: 'tirage' });
+      Lot.belongsToMany(models.Tirage, {
+        through:    models.TirageLot,
+        foreignKey: 'lot_id',
+        otherKey:   'tirage_id',
+        as:         'tirages',
+      });
     }
   }
 

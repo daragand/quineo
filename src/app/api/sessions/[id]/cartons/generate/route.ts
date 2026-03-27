@@ -4,7 +4,7 @@ import { withAuth, withRole, apiError } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { generateBatch } from '@/lib/cartonGen'
 
-type Ctx = { params: Promise<{ id: string }>; user: import('@/lib/auth').TokenPayload }
+type Ctx = { params: Promise<Record<string, string>>; user: import('@/lib/auth').TokenPayload }
 
 const GenerateSchema = z.object({
   count: z.number().int().min(1).max(5000),

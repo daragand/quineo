@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { withAuth, apiError } from '@/lib/auth'
 import { db } from '@/lib/db'
 
-type Ctx = { params: Promise<{ id: string }>; user: import('@/lib/auth').TokenPayload }
+type Ctx = { params: Promise<Record<string, string>>; user: import('@/lib/auth').TokenPayload }
 
 // ─────────────────────────────────────────
 // GET /api/tirages/[id]

@@ -8,7 +8,7 @@ import { Stepper } from '@/components/ui/Stepper'
 // ─────────────────────────────────────────
 
 export interface Pack {
-  id: number
+  id: string
   qty: number
   label: string
   price: number
@@ -23,11 +23,11 @@ export interface Pack {
 
 interface ForfaitListProps {
   packs: Pack[]
-  quantities: Record<number, number>
+  quantities: Record<string, number>
   /** Cartons déjà achetés par le participant sélectionné */
   alreadyBought: number
   quotaMax: number
-  onChangeQty: (packId: number, qty: number) => void
+  onChangeQty: (packId: string, qty: number) => void
 }
 
 // ─────────────────────────────────────────

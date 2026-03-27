@@ -24,6 +24,7 @@ const modelFactories = [
   require('./paiement'),
   require('./paiementCarton'),
   require('./tirage'),
+  require('./tirageLot'),
   require('./drawEvent'),
   require('./partner'),
   require('./paymentProvider'),

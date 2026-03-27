@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuth, withRole, apiError } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { getIO } from '@/lib/socket'
 
-type Ctx = { params: Promise<{ id: string }>; user: import('@/lib/auth').TokenPayload }
+type Ctx = { params: Promise<Record<string, string>>; user: import('@/lib/auth').TokenPayload }
 
 const WinnerSchema = z.object({
   winning_carton_id: z.string().uuid(),
@@ -54,9 +55,16 @@ export const POST = withAuth(
       }
     })
 
+    // Diffusion temps réel à tous les clients de ce tirage
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cj = carton.toJSON() as any
+    const p  = cj.participant
+    const participantName = p ? [p.first_name, p.last_name].filter(Boolean).join(' ') || 'Gagnant' : 'Gagnant'
+    getIO()?.to(`tirage:${id}`).emit('winner', { participantName, cartonRef: cj.serial_number })
+
     return NextResponse.json({
       tirage:   tirage.toJSON(),
-      carton:   carton.toJSON(),
+      carton:   cj,
       session_closed: !nextPending,
     })
   })

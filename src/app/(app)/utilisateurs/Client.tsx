@@ -61,20 +61,54 @@ function relativeTime(iso: string | null) {
   if (h < 24) return `Il y a ${h}h`
   const d = Math.floor(h / 24)
   if (d < 7)  return `Il y a ${d} jour${d > 1 ? 's' : ''}`
-  return `Il y a plus d'une semaine`
+  return 'Il y a plus d\'une semaine'
 }
 
 // ─────────────────────────────────────────
 // Modal invitation
 // ─────────────────────────────────────────
 
-function InviteModal({ onClose }: { onClose: () => void }) {
-  const [email, setEmail] = useState('')
-  const [role, setRole]   = useState<UserRole>('operator')
-  const [sent, setSent]   = useState(false)
+function InviteModal({
+  onClose,
+  onSuccess,
+}: {
+  onClose: () => void
+  onSuccess: (user: UserRow) => void
+}) {
+  const [email,      setEmail]      = useState('')
+  const [firstName,  setFirstName]  = useState('')
+  const [lastName,   setLastName]   = useState('')
+  const [role,       setRole]       = useState<UserRole>('operator')
+  const [loading,    setLoading]    = useState(false)
+  const [error,      setError]      = useState('')
+  const [sent,       setSent]       = useState(false)
 
-  function handleSend() {
-    if (!email.includes('@')) return
+  async function handleSend() {
+    if (!email.includes('@')) { setError('Adresse email invalide'); return }
+    setLoading(true)
+    setError('')
+    const res = await fetch('/api/utilisateurs', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ email, role, first_name: firstName || undefined, last_name: lastName || undefined }),
+    })
+    setLoading(false)
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Erreur lors de la création')
+      return
+    }
+    const data = await res.json()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const u = data.user as any
+    onSuccess({
+      id:        u.id,
+      name:      [u.first_name, u.last_name].filter(Boolean).join(' ') || email,
+      email:     u.email,
+      role:      u.role,
+      active:    u.active,
+      updatedAt: null,
+    })
     setSent(true)
     setTimeout(onClose, 1500)
   }
@@ -103,39 +137,138 @@ function InviteModal({ onClose }: { onClose: () => void }) {
           {sent ? (
             <div className="text-center py-[16px]">
               <div className="font-bold mb-[4px]" style={{ fontSize: 14, color: 'var(--color-qgreen-text)' }}>
-                Invitation envoyée ✓
+                Utilisateur créé ✓
               </div>
               <div style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-                Un email a été envoyé à {email}
+                Compte créé pour {email}
               </div>
             </div>
           ) : (
             <>
+              <div className="grid gap-[10px] mb-[12px]" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                <Input label="Prénom" placeholder="Jean" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                <Input label="Nom" placeholder="Dupont" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+              </div>
               <div className="mb-[12px]">
-                <Input label="Adresse email" type="email" placeholder="prenom@association.fr"
-                  value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Email de l'invité" />
+                <Input label="Adresse email" type="email" placeholder="jean.dupont@association.fr"
+                  value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
               <div className="mb-[16px]">
                 <Select label="Rôle" value={role} onChange={(e) => setRole(e.target.value as UserRole)}
-                  aria-label="Rôle"
                   options={[
-                    { value: 'admin', label: 'Administrateur' },
+                    { value: 'admin',    label: 'Administrateur' },
                     { value: 'operator', label: 'Opérateur' },
-                    { value: 'viewer', label: 'Lecteur' },
+                    { value: 'viewer',   label: 'Lecteur' },
                   ]} />
                 <div className="mt-[6px] rounded-[6px] px-[10px] py-[7px]"
                   style={{ background: 'var(--color-bg)', fontSize: 11, color: 'var(--color-text-secondary)' }}>
                   {ROLE_DESC[role]}
                 </div>
               </div>
+              {error && (
+                <div className="mb-[10px] rounded-[6px] px-[10px] py-[7px]"
+                  style={{ background: '#FEF2F2', fontSize: 12, color: 'var(--color-qred)' }}>
+                  {error}
+                </div>
+              )}
               <div className="flex gap-[8px]">
-                <Button variant="primary" size="sm" fullWidth onClick={handleSend}>
-                  Envoyer l&apos;invitation
+                <Button variant="primary" size="sm" fullWidth onClick={handleSend} disabled={loading}>
+                  {loading ? 'Création…' : 'Créer le compte'}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={onClose}>Annuler</Button>
+                <Button variant="ghost" size="sm" onClick={onClose} disabled={loading}>Annuler</Button>
               </div>
             </>
           )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────
+// Modal édition
+// ─────────────────────────────────────────
+
+function EditModal({
+  user,
+  onClose,
+  onSuccess,
+}: {
+  user: UserRow
+  onClose: () => void
+  onSuccess: (updated: Partial<UserRow>) => void
+}) {
+  const nameParts = user.name.split(' ')
+  const [firstName, setFirstName] = useState(nameParts[0] ?? '')
+  const [lastName,  setLastName]  = useState(nameParts.slice(1).join(' ') ?? '')
+  const [role,      setRole]      = useState<UserRole>(user.role)
+  const [loading,   setLoading]   = useState(false)
+  const [error,     setError]     = useState('')
+
+  async function handleSave() {
+    setLoading(true)
+    setError('')
+    const res = await fetch(`/api/utilisateurs/${user.id}`, {
+      method:  'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ first_name: firstName || undefined, last_name: lastName || undefined, role }),
+    })
+    setLoading(false)
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Erreur lors de la mise à jour')
+      return
+    }
+    onSuccess({
+      role,
+      name: [firstName, lastName].filter(Boolean).join(' ') || user.email,
+    })
+    onClose()
+  }
+
+  return (
+    <div
+      role="dialog" aria-modal="true" aria-label="Modifier l'utilisateur"
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: 'rgba(0,0,0,.4)' }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div className="rounded-[14px] overflow-hidden w-full"
+        style={{ maxWidth: 380, background: 'var(--color-card)', border: '.5px solid var(--color-sep)' }}>
+        <div className="flex items-center justify-between px-[20px] py-[14px]"
+          style={{ borderBottom: '.5px solid var(--color-sep)' }}>
+          <div className="font-bold" style={{ fontSize: 14, color: 'var(--color-text-primary)' }}>
+            Modifier — {user.name}
+          </div>
+          <button type="button" onClick={onClose} aria-label="Fermer"
+            className="rounded-full flex items-center justify-center cursor-pointer hover:bg-[var(--color-bg)]"
+            style={{ width: 26, height: 26, border: 'none', background: 'transparent', fontSize: 16, fontFamily: 'var(--font-body)', color: 'var(--color-text-muted)' }}>
+            ×
+          </button>
+        </div>
+        <div className="px-[20px] py-[18px] flex flex-col gap-[10px]">
+          <div className="grid gap-[10px]" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            <Input label="Prénom" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            <Input label="Nom" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+          </div>
+          <Select label="Rôle" value={role} onChange={(e) => setRole(e.target.value as UserRole)}
+            options={[
+              { value: 'admin',    label: 'Administrateur' },
+              { value: 'operator', label: 'Opérateur' },
+              { value: 'viewer',   label: 'Lecteur' },
+            ]} />
+          {error && (
+            <div className="rounded-[6px] px-[10px] py-[7px]"
+              style={{ background: '#FEF2F2', fontSize: 12, color: 'var(--color-qred)' }}>
+              {error}
+            </div>
+          )}
+          <div className="flex gap-[8px]">
+            <Button variant="primary" size="sm" fullWidth onClick={handleSave} disabled={loading}>
+              {loading ? 'Enregistrement…' : 'Enregistrer'}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onClose} disabled={loading}>Annuler</Button>
+          </div>
         </div>
       </div>
     </div>
@@ -147,17 +280,40 @@ function InviteModal({ onClose }: { onClose: () => void }) {
 // ─────────────────────────────────────────
 
 export function UtilisateursClient({ initialUsers }: { initialUsers: UserRow[] }) {
-  const [showInvite, setShowInvite] = useState(false)
-  const [search, setSearch]         = useState('')
-  const [roleFilter, setRoleFilter] = useState('all')
+  const [users,       setUsers]       = useState<UserRow[]>(initialUsers)
+  const [showInvite,  setShowInvite]  = useState(false)
+  const [editUser,    setEditUser]    = useState<UserRow | null>(null)
+  const [search,      setSearch]      = useState('')
+  const [roleFilter,  setRoleFilter]  = useState('all')
+  const [toggling,    setToggling]    = useState<string | null>(null)
 
-  const filtered = initialUsers.filter((u) => {
-    const matchRole = roleFilter === 'all' || u.role === roleFilter
-    const matchSearch =
-      u.name.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase())
+  const filtered = users.filter((u) => {
+    const matchRole   = roleFilter === 'all' || u.role === roleFilter
+    const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) ||
+                        u.email.toLowerCase().includes(search.toLowerCase())
     return matchRole && matchSearch
   })
+
+  function handleInviteSuccess(user: UserRow) {
+    setUsers((prev) => [...prev, user])
+  }
+
+  function handleEditSuccess(id: string, updated: Partial<UserRow>) {
+    setUsers((prev) => prev.map((u) => u.id === id ? { ...u, ...updated } : u))
+  }
+
+  async function toggleActive(user: UserRow) {
+    setToggling(user.id)
+    const res = await fetch(`/api/utilisateurs/${user.id}`, {
+      method:  'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ active: !user.active }),
+    })
+    setToggling(null)
+    if (res.ok) {
+      setUsers((prev) => prev.map((u) => u.id === user.id ? { ...u, active: !user.active } : u))
+    }
+  }
 
   return (
     <div>
@@ -167,7 +323,7 @@ export function UtilisateursClient({ initialUsers }: { initialUsers: UserRow[] }
             Utilisateurs
           </h1>
           <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 3 }}>
-            {initialUsers.filter((u) => u.active).length} membre{initialUsers.filter((u) => u.active).length > 1 ? 's' : ''} actif{initialUsers.filter((u) => u.active).length > 1 ? 's' : ''}
+            {users.filter((u) => u.active).length} membre{users.filter((u) => u.active).length > 1 ? 's' : ''} actif{users.filter((u) => u.active).length > 1 ? 's' : ''}
           </p>
         </div>
         <Button variant="primary" size="sm" onClick={() => setShowInvite(true)}>
@@ -179,7 +335,7 @@ export function UtilisateursClient({ initialUsers }: { initialUsers: UserRow[] }
       <div className="grid gap-[8px] mb-[20px]" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
         {(['admin', 'operator', 'viewer'] as UserRole[]).map((r) => {
           const c = ROLE_COLORS[r]
-          const count = initialUsers.filter((u) => u.role === r).length
+          const count = users.filter((u) => u.role === r).length
           return (
             <div key={r} className="rounded-[8px] px-[14px] py-[10px]"
               style={{ background: 'var(--color-card)', border: '.5px solid var(--color-sep)' }}>
@@ -205,10 +361,10 @@ export function UtilisateursClient({ initialUsers }: { initialUsers: UserRow[] }
         <Select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}
           aria-label="Filtrer par rôle" style={{ width: 160 }}
           options={[
-            { value: 'all', label: 'Tous les rôles' },
-            { value: 'admin', label: 'Administrateur' },
+            { value: 'all',      label: 'Tous les rôles' },
+            { value: 'admin',    label: 'Administrateur' },
             { value: 'operator', label: 'Opérateur' },
-            { value: 'viewer', label: 'Lecteur' },
+            { value: 'viewer',   label: 'Lecteur' },
           ]} />
       </div>
 
@@ -256,15 +412,35 @@ export function UtilisateursClient({ initialUsers }: { initialUsers: UserRow[] }
                 {relativeTime(u.updatedAt)}
               </span>
               <div className="flex gap-[4px] flex-shrink-0">
-                <Button variant="ghost" size="sm">Modifier</Button>
-                {u.active && <Button variant="ghost" size="sm">Désactiver</Button>}
+                <Button variant="ghost" size="sm" onClick={() => setEditUser(u)}>
+                  Modifier
+                </Button>
+                <Button
+                  variant="ghost" size="sm"
+                  disabled={toggling === u.id}
+                  onClick={() => toggleActive(u)}
+                >
+                  {toggling === u.id ? '…' : u.active ? 'Désactiver' : 'Réactiver'}
+                </Button>
               </div>
             </div>
           )
         })}
       </div>
 
-      {showInvite && <InviteModal onClose={() => setShowInvite(false)} />}
+      {showInvite && (
+        <InviteModal
+          onClose={() => setShowInvite(false)}
+          onSuccess={handleInviteSuccess}
+        />
+      )}
+      {editUser && (
+        <EditModal
+          user={editUser}
+          onClose={() => setEditUser(null)}
+          onSuccess={(updated) => handleEditSuccess(editUser.id, updated)}
+        />
+      )}
     </div>
   )
 }

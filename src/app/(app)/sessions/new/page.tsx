@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Input, Textarea } from '@/components/ui/Input'
 import { Toggle } from '@/components/ui/Toggle'
@@ -119,8 +120,35 @@ function SectionDesc({ children }: { children: React.ReactNode }) {
 // ─────────────────────────────────────────
 
 export default function NewSessionPage() {
-  const [tab, setTab] = useState(0)
-  const [form, setForm] = useState<FormState>(INITIAL)
+  const router = useRouter()
+  const [tab,      setTab]      = useState(0)
+  const [form,     setForm]     = useState<FormState>(INITIAL)
+  const [loading,  setLoading]  = useState(false)
+  const [error,    setError]    = useState('')
+
+  async function handleSubmit() {
+    if (!form.name.trim()) { setError('Le nom de la session est obligatoire'); setTab(0); return }
+    setLoading(true)
+    setError('')
+    const res = await fetch('/api/sessions', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        name:        form.name.trim(),
+        date:        form.date || undefined,
+        description: form.description || undefined,
+        max_cartons: form.maxCartons || undefined,
+        status:      form.status,
+      }),
+    })
+    setLoading(false)
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Erreur lors de la création')
+      return
+    }
+    router.push('/sessions')
+  }
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -628,14 +656,20 @@ export default function NewSessionPage() {
           ) : (
             <div />
           )}
+          {error && tab === 3 && (
+            <div className="mb-[8px] rounded-[7px] px-[12px] py-[8px]"
+              style={{ background: '#FEF2F2', fontSize: 12, color: 'var(--color-qred)', border: '.5px solid var(--color-qred)' }}>
+              {error}
+            </div>
+          )}
           <Button
             variant={tab === 3 ? 'primary' : 'secondary'}
+            disabled={loading}
             onClick={() => {
-              if (tab < 3) setTab(tab + 1)
-              // TODO: submit
+              if (tab < 3) { setTab(tab + 1) } else { handleSubmit() }
             }}
           >
-            {NEXT_LABELS[tab]}
+            {tab === 3 && loading ? 'Création en cours…' : NEXT_LABELS[tab]}
           </Button>
         </div>
       </div>

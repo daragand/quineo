@@ -8,7 +8,7 @@ import { cn } from '@/lib/cn'
 // ─────────────────────────────────────────
 
 export interface Participant {
-  id: number
+  id: string
   name: string
   email: string
   color: string
@@ -21,6 +21,7 @@ interface ParticipantSearchProps {
   quotaMax: number
   onSelect: (p: Participant) => void
   onNewParticipant: () => void
+  onQueryChange?: (q: string) => void
 }
 
 // ─────────────────────────────────────────
@@ -41,16 +42,19 @@ export function ParticipantSearch({
   quotaMax,
   onSelect,
   onNewParticipant,
+  onQueryChange,
 }: ParticipantSearchProps) {
   const [query, setQuery] = useState('')
 
-  const filtered = query.trim()
-    ? participants.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query.toLowerCase()) ||
-          p.email.toLowerCase().includes(query.toLowerCase())
-      )
-    : participants
+  const filtered = onQueryChange
+    ? participants
+    : query.trim()
+      ? participants.filter(
+          (p) =>
+            p.name.toLowerCase().includes(query.toLowerCase()) ||
+            p.email.toLowerCase().includes(query.toLowerCase())
+        )
+      : participants
 
   return (
     <div>
@@ -68,7 +72,7 @@ export function ParticipantSearch({
           type="search"
           placeholder="Nom ou email…"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => { setQuery(e.target.value); onQueryChange?.(e.target.value) }}
           aria-label="Rechercher un participant"
           className="w-full rounded-[6px] transition-colors duration-[150ms]"
           style={{

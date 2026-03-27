@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Op } from 'sequelize'
 import { withAuth, apiError } from '@/lib/auth'
 import { db } from '@/lib/db'
 
-type Ctx = { params: Promise<{ id: string }>; user: import('@/lib/auth').TokenPayload }
+type Ctx = { params: Promise<Record<string, string>>; user: import('@/lib/auth').TokenPayload }
 
 // ─────────────────────────────────────────
 // GET /api/sessions/[id]/cartons
@@ -17,6 +18,7 @@ export const GET = withAuth(async (req: NextRequest, ctx: Ctx) => {
 
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status') ?? undefined
+  const serial = searchParams.get('serial') ?? undefined
   const page   = Math.max(1, parseInt(searchParams.get('page') ?? '1'))
   const limit  = Math.min(100, parseInt(searchParams.get('limit') ?? '50'))
   const offset = (page - 1) * limit
@@ -24,6 +26,7 @@ export const GET = withAuth(async (req: NextRequest, ctx: Ctx) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const where: any = { session_id: id }
   if (status) where.status = status
+  if (serial) where.serial_number = { [Op.iLike]: `${serial}%` }
 
   const { count, rows } = await db.Carton.findAndCountAll({
     where,

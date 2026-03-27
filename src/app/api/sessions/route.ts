@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuth, withRole, apiError } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { assocScope } from '@/lib/services/scope'
 
 // ─────────────────────────────────────────
 // GET /api/sessions
@@ -10,10 +11,10 @@ import { db } from '@/lib/db'
 export const GET = withAuth(async (_req: NextRequest, { user }) => {
   try {
     const sessions = await db.Session.findAll({
-      where:   { association_id: user.association_id },
+      where:   assocScope(user),
       include: [
-        { model: db.Lot,       as: 'lots',         attributes: ['id', 'name', 'status', 'order'] },
-        { model: db.CartonPack, as: 'carton_packs', attributes: ['id', 'label', 'quantity', 'price'] },
+        { model: db.Lot,        as: 'lots',         attributes: ['id', 'name', 'status', 'order'] },
+        { model: db.CartonPack, as: 'carton_packs',  attributes: ['id', 'label', 'quantity', 'price'] },
       ],
       order: [['created_at', 'DESC']],
     })

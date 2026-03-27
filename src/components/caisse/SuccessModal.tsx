@@ -7,18 +7,13 @@ import type { PayMode } from './PaymentMode'
 // Types
 // ─────────────────────────────────────────
 
-interface CartonRange {
-  from: number
-  to: number
-}
-
 interface SuccessData {
   participantName: string
   participantEmail: string
   cartonsCount: number
   totalPaid: number
   payMode: PayMode
-  ranges: CartonRange[]
+  serials: string[]
 }
 
 interface SuccessModalProps {
@@ -37,7 +32,6 @@ const PAY_MODE_LABELS: Record<PayMode, string> = {
 // ─────────────────────────────────────────
 
 export function SuccessModal({ data, onClose }: SuccessModalProps) {
-  // Fermeture avec Echap
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
@@ -72,17 +66,11 @@ export function SuccessModal({ data, onClose }: SuccessModalProps) {
                 <path d="M3 8l4 4 6-6" stroke="var(--color-qgreen)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <span
-              className="font-bold"
-              style={{ fontSize: 10, color: 'rgba(255,255,255,.5)' }}
-            >
+            <span className="font-bold" style={{ fontSize: 10, color: 'rgba(255,255,255,.5)' }}>
               Vente confirmée
             </span>
           </div>
-          <div
-            className="font-display leading-none"
-            style={{ fontSize: 20, color: 'white' }}
-          >
+          <div className="font-display leading-none" style={{ fontSize: 20, color: 'white' }}>
             {data.participantName}
           </div>
           <div style={{ fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 2 }}>
@@ -102,25 +90,23 @@ export function SuccessModal({ data, onClose }: SuccessModalProps) {
             Cartons attribués
           </div>
 
-          {/* Plages de cartons */}
           <div className="flex flex-wrap gap-[5px] mb-[8px]">
-            {data.ranges.map((r) => (
+            {data.serials.map((serial) => (
               <span
-                key={`${r.from}-${r.to}`}
+                key={serial}
                 className="font-display rounded-[5px] px-[8px] py-[3px]"
                 style={{
-                  fontSize: 14,
+                  fontSize: 13,
                   background: 'var(--color-bg)',
                   color: 'var(--color-text-primary)',
                   border: '.5px solid var(--color-border)',
                 }}
               >
-                {r.from === r.to ? r.from : `${r.from}–${r.to}`}
+                {serial}
               </span>
             ))}
           </div>
 
-          {/* Email */}
           <div
             className="rounded-[6px] px-[10px] py-[6px] mb-[10px]"
             style={{ background: 'var(--color-qgreen-bg)', fontSize: 11, color: 'var(--color-qgreen-text)' }}

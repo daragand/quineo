@@ -8,6 +8,7 @@ const SES = {
   TLSE_PRINTEMPS:   '30000000-0000-4000-8000-000000000005',
   MARS_ETE:         '30000000-0000-4000-8000-000000000006',
   STRASB_PAQUES:    '30000000-0000-4000-8000-000000000007',
+  SAINTES_ETE_26:   '30000000-0000-4000-8000-000000000008',
 };
 
 module.exports = {
@@ -68,6 +69,13 @@ module.exports = {
       { id: '40000000-0000-4000-8000-000000000038', session_id: SES.STRASB_PAQUES, name: 'Tablette Samsung Galaxy Tab S9', description: '11 pouces, 128 Go, WiFi', order: 3, value: 499.00, status: 'pending', created_at: now, updated_at: now },
       { id: '40000000-0000-4000-8000-000000000039', session_id: SES.STRASB_PAQUES, name: 'Coffret bières artisanales alsaciennes', description: '24 bières de 8 brasseries artisanales', order: 4, value: 79.00, status: 'pending', created_at: now, updated_at: now },
       { id: '40000000-0000-4000-8000-000000000040', session_id: SES.STRASB_PAQUES, name: 'Bon cadeau Cultura 80€', description: null, order: 5, value: 80.00, status: 'pending', created_at: now, updated_at: now },
+
+      // ── Saintes Été 2026 (brouillon – PECHE_SAINTES) ──
+      { id: '40000000-0000-4000-8000-000000000041', session_id: SES.SAINTES_ETE_26, name: 'Canne à pêche Shimano Nexave', description: 'Ensemble spinning 2.40m + moulinet', order: 1, value: 179.00, status: 'pending', created_at: now, updated_at: now },
+      { id: '40000000-0000-4000-8000-000000000042', session_id: SES.SAINTES_ETE_26, name: 'Glacière Campingaz 48L', description: 'Glacière électrique 12V/220V', order: 2, value: 149.00, status: 'pending', created_at: now, updated_at: now },
+      { id: '40000000-0000-4000-8000-000000000043', session_id: SES.SAINTES_ETE_26, name: 'Pack leurres mer assortis', description: '80 leurres souples + rigides', order: 3, value: 89.00, status: 'pending', created_at: now, updated_at: now },
+      { id: '40000000-0000-4000-8000-000000000044', session_id: SES.SAINTES_ETE_26, name: 'Bon cadeau Décathlon 100€', description: null, order: 4, value: 100.00, status: 'pending', created_at: now, updated_at: now },
+      { id: '40000000-0000-4000-8000-000000000045', session_id: SES.SAINTES_ETE_26, name: 'Combinaison néoprène 5mm', description: 'Combinaison adulte homme/femme au choix', order: 5, value: 129.00, status: 'pending', created_at: now, updated_at: now },
     ]);
   },
 

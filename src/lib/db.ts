@@ -22,6 +22,7 @@ export interface DbModels {
   Paiement:        ModelStatic<Model>
   PaiementCarton:  ModelStatic<Model>
   Tirage:          ModelStatic<Model>
+  TirageLot:       ModelStatic<Model>
   DrawEvent:       ModelStatic<Model>
   Partner:         ModelStatic<Model>
   PaymentProvider: ModelStatic<Model>

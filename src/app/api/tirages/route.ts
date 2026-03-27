@@ -1,15 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { Op } from 'sequelize'
 import { z } from 'zod'
 import { withAuth, withRole, apiError } from '@/lib/auth'
+import { assocScope } from '@/lib/services/scope'
 import { db } from '@/lib/db'
+
+// ─────────────────────────────────────────
+// GET /api/tirages — liste des tirages de l'association
+// ─────────────────────────────────────────
+
+export const GET = withAuth(async (_req: NextRequest, { user }) => {
+  const scope = assocScope(user)
+
+  const sessions = await db.Session.findAll({
+    where:      scope,
+    attributes: ['id'],
+    raw:        true,
+  }) as unknown as Array<{ id: string }>
+
+  if (sessions.length === 0) return NextResponse.json({ tirages: [] })
+
+  const sessionIds = sessions.map(s => s.id)
+
+  const tirages = await db.Tirage.findAll({
+    where:   { session_id: { [Op.in]: sessionIds } },
+    include: [
+      { model: db.Lot,        as: 'lot',         attributes: ['id', 'name', 'value'] },
+      { model: db.Session,    as: 'session',      attributes: ['id', 'name'] },
+      { model: db.DrawEvent,  as: 'draw_events',  attributes: ['id'] },
+      { model: db.Carton,     as: 'winning_carton', required: false,
+        include: [{ model: db.Participant, as: 'participant', attributes: ['first_name', 'last_name'] }] },
+    ],
+    order: [['created_at', 'DESC']],
+  })
+
+  return NextResponse.json({ tirages })
+})
 
 // ─────────────────────────────────────────
 // POST /api/tirages — démarrer un tirage
 // ─────────────────────────────────────────
 
 const StartSchema = z.object({
-  session_id: z.string().uuid(),
-  lot_id:     z.string().uuid(),
+  session_id: z.uuid(),
+  lot_id:     z.uuid(),
 })
 
 export const POST = withAuth(

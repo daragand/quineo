@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card }     from '@/components/ui/Card'
 import { Badge }    from '@/components/ui/Badge'
 import { Button }   from '@/components/ui/Button'
@@ -41,8 +42,8 @@ interface LotFormState { name: string; description: string; value: string }
 const EMPTY_FORM: LotFormState = { name: '', description: '', value: '' }
 
 function LotForm({
-  initial, onSave, onCancel,
-}: { initial?: LotFormState; onSave: (f: LotFormState) => void; onCancel: () => void }) {
+  initial, loading, onSave, onCancel,
+}: { initial?: LotFormState; loading?: boolean; onSave: (f: LotFormState) => void; onCancel: () => void }) {
   const [form, setForm] = useState<LotFormState>(initial ?? EMPTY_FORM)
   function set<K extends keyof LotFormState>(k: K, v: LotFormState[K]) {
     setForm((p) => ({ ...p, [k]: v }))
@@ -63,9 +64,9 @@ function LotForm({
         value={form.description} onChange={(e) => set('description', e.target.value)}
       />
       <div className="flex justify-end gap-[8px] mt-[4px]">
-        <Button variant="ghost" onClick={onCancel}>Annuler</Button>
-        <Button variant="primary" disabled={!form.name.trim()} onClick={() => onSave(form)}>
-          Enregistrer
+        <Button variant="ghost" onClick={onCancel} disabled={loading}>Annuler</Button>
+        <Button variant="primary" disabled={!form.name.trim() || loading} onClick={() => onSave(form)}>
+          {loading ? 'Enregistrement…' : 'Enregistrer'}
         </Button>
       </div>
     </div>
@@ -77,10 +78,10 @@ function LotForm({
 // ─────────────────────────────────────────
 
 function LotItem({
-  lot, index, isEditing, isFirst, isLast,
+  lot, index, isEditing, isFirst, isLast, saving,
   onEdit, onCancelEdit, onSaveEdit, onDelete, onMoveUp, onMoveDown,
 }: {
-  lot: LotRow; index: number; isEditing: boolean; isFirst: boolean; isLast: boolean
+  lot: LotRow; index: number; isEditing: boolean; isFirst: boolean; isLast: boolean; saving?: boolean
   onEdit: () => void; onCancelEdit: () => void
   onSaveEdit: (f: LotFormState) => void
   onDelete: () => void; onMoveUp: () => void; onMoveDown: () => void
@@ -97,6 +98,7 @@ function LotItem({
           </div>
           <LotForm
             initial={{ name: lot.name, description: lot.description ?? '', value: lot.value ? String(lot.value) : '' }}
+            loading={saving}
             onSave={onSaveEdit}
             onCancel={onCancelEdit}
           />
@@ -197,15 +199,21 @@ function LotItem({
 
 export function LotsClient({
   initialLots,
+  sessionId,
   sessionName,
 }: {
   initialLots: LotRow[]
+  sessionId:   string | null
   sessionName: string
 }) {
-  const [lots, setLots]         = useState<LotRow[]>(initialLots)
+  const router = useRouter()
+  const [lots, setLots]           = useState<LotRow[]>(initialLots)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [isAdding, setIsAdding] = useState(false)
-  const [filter, setFilter]     = useState<'all' | LotStatus>('all')
+  const [savingId, setSavingId]   = useState<string | null>(null)
+  const [isAdding, setIsAdding]   = useState(false)
+  const [addLoading, setAddLoading] = useState(false)
+  const [filter, setFilter]       = useState<'all' | LotStatus>('all')
+  const [error, setError]         = useState('')
 
   const filtered = filter === 'all' ? lots : lots.filter((l) => l.status === filter)
 
@@ -213,19 +221,59 @@ export function LotsClient({
   const pendingCount = lots.filter((l) => l.status === 'pending').length
   const totalValue   = lots.reduce((sum, l) => sum + (l.value ?? 0), 0)
 
-  function addLot(f: LotFormState) {
+  async function addLot(f: LotFormState) {
+    if (!sessionId) return
+    setAddLoading(true)
+    setError('')
+    const res = await fetch(`/api/sessions/${sessionId}/lots`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        name:        f.name.trim(),
+        description: f.description || undefined,
+        value:       f.value ? Number(f.value) : undefined,
+        order:       lots.length + 1,
+      }),
+    })
+    setAddLoading(false)
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Erreur lors de la création')
+      return
+    }
+    const data = await res.json()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const l = data.lot as any
     setLots((prev) => [...prev, {
-      id:          `lot-${Date.now()}`,
-      name:        f.name,
-      description: f.description || undefined,
-      value:       f.value ? Number(f.value) : undefined,
-      order:       prev.length + 1,
-      status:      'pending',
+      id:          l.id,
+      name:        l.name,
+      description: l.description ?? undefined,
+      value:       l.value != null ? Number(l.value) : undefined,
+      order:       l.order,
+      status:      l.status as LotStatus,
     }])
     setIsAdding(false)
   }
 
-  function saveEdit(id: string, f: LotFormState) {
+  async function saveEdit(id: string, f: LotFormState) {
+    if (!sessionId) return
+    setSavingId(id)
+    setError('')
+    const res = await fetch(`/api/sessions/${sessionId}/lots/${id}`, {
+      method:  'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        name:        f.name.trim(),
+        description: f.description || undefined,
+        value:       f.value ? Number(f.value) : undefined,
+      }),
+    })
+    setSavingId(null)
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Erreur lors de la mise à jour')
+      return
+    }
     setLots((prev) =>
       prev.map((l) =>
         l.id === id
@@ -236,18 +284,42 @@ export function LotsClient({
     setEditingId(null)
   }
 
-  function deleteLot(id: string) {
+  async function deleteLot(id: string) {
+    if (!sessionId) return
+    setError('')
+    const res = await fetch(`/api/sessions/${sessionId}/lots/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Impossible de supprimer ce lot')
+      return
+    }
     setLots((prev) => prev.filter((l) => l.id !== id).map((l, i) => ({ ...l, order: i + 1 })))
   }
 
-  function move(index: number, direction: -1 | 1) {
+  async function move(index: number, direction: -1 | 1) {
+    if (!sessionId) return
+    const target = index + direction
+    if (target < 0 || target >= lots.length) return
+    const a = lots[index]
+    const b = lots[target]
+    // Mise à jour optimiste
     setLots((prev) => {
       const next = [...prev]
-      const target = index + direction
-      if (target < 0 || target >= next.length) return prev
       ;[next[index], next[target]] = [next[target], next[index]]
       return next.map((l, i) => ({ ...l, order: i + 1 }))
     })
+    // Persistance en parallèle
+    await Promise.all([
+      fetch(`/api/sessions/${sessionId}/lots/${a.id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: b.order }),
+      }),
+      fetch(`/api/sessions/${sessionId}/lots/${b.id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: a.order }),
+      }),
+    ])
+    router.refresh()
   }
 
   return (
@@ -276,6 +348,13 @@ export function LotsClient({
         ))}
       </div>
 
+      {error && (
+        <div className="rounded-[7px] px-[12px] py-[9px]"
+          style={{ background: 'var(--color-qred-bg, #FEF2F2)', border: '.5px solid var(--color-qred)', fontSize: 12, color: 'var(--color-qred)' }}>
+          {error}
+        </div>
+      )}
+
       {/* Liste */}
       <Card
         title={`Lots — ${sessionName}`}
@@ -289,6 +368,7 @@ export function LotsClient({
             />
             <Button
               variant="primary" size="sm"
+              disabled={!sessionId}
               onClick={() => { setIsAdding(true); setEditingId(null) }}
             >
               + Ajouter un lot
@@ -304,11 +384,15 @@ export function LotsClient({
             <div className="font-bold mb-[12px]" style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>
               Nouveau lot
             </div>
-            <LotForm onSave={addLot} onCancel={() => setIsAdding(false)} />
+            <LotForm loading={addLoading} onSave={addLot} onCancel={() => setIsAdding(false)} />
           </div>
         )}
 
-        {filtered.length === 0 ? (
+        {!sessionId ? (
+          <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', padding: '8px 0' }}>
+            Aucune session active. Créez une session pour ajouter des lots.
+          </p>
+        ) : filtered.length === 0 ? (
           <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', padding: '8px 0' }}>
             Aucun lot{filter !== 'all' ? ' dans ce statut' : ''}. Ajoutez-en un ci-dessus.
           </p>
@@ -324,6 +408,7 @@ export function LotsClient({
                   isEditing={editingId === lot.id}
                   isFirst={realIndex === 0}
                   isLast={realIndex === lots.length - 1}
+                  saving={savingId === lot.id}
                   onEdit={() => { setEditingId(lot.id); setIsAdding(false) }}
                   onCancelEdit={() => setEditingId(null)}
                   onSaveEdit={(f) => saveEdit(lot.id, f)}

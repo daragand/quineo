@@ -22,7 +22,7 @@ const REFRESH_TTL = '30d'
 export interface TokenPayload {
   sub:            string   // user id
   association_id: string
-  role:           'admin' | 'operator' | 'viewer'
+  role:           'super_admin' | 'admin' | 'operator' | 'viewer'
   email:          string
 }
 
@@ -87,11 +87,20 @@ export function withAuth(handler: RouteHandler) {
     if (!token) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
+    let user: TokenPayload
     try {
-      const user = verifyAccessToken(token)
-      return await handler(req, { ...ctx, user })
+      user = verifyAccessToken(token)
     } catch {
       return NextResponse.json({ error: 'Token invalide ou expiré' }, { status: 401 })
+    }
+    try {
+      return await handler(req, { ...ctx, user })
+    } catch (err) {
+      console.error('[API error]', req.method, req.nextUrl.pathname, err)
+      const message = process.env.NODE_ENV !== 'production'
+        ? String(err)
+        : 'Erreur serveur'
+      return NextResponse.json({ error: message }, { status: 500 })
     }
   }
 }

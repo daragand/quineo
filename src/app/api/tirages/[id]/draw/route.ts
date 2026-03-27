@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { withAuth, withRole, apiError } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { getIO } from '@/lib/socket'
 
-type Ctx = { params: Promise<{ id: string }>; user: import('@/lib/auth').TokenPayload }
+type Ctx = { params: Promise<Record<string, string>>; user: import('@/lib/auth').TokenPayload }
 
 // ─────────────────────────────────────────
 // POST /api/tirages/[id]/draw — tirer le prochain numéro
@@ -43,6 +44,9 @@ export const POST = withAuth(
       sequence,
       drawn_at: new Date(),
     })
+
+    // Diffusion temps réel à tous les clients de ce tirage
+    getIO()?.to(`tirage:${id}`).emit('draw', { number, sequence })
 
     return NextResponse.json({ event, number, sequence, remaining: remaining.length - 1 })
   })

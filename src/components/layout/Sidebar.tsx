@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Icon } from '@/components/ui/Icon'
 import {
   Squares2X2Icon,
@@ -14,6 +14,8 @@ import {
   Cog6ToothIcon,
   UsersIcon,
   ClockIcon,
+  TrophyIcon,
+  ArrowRightStartOnRectangleIcon,
 } from '@heroicons/react/24/solid'
 import { cn } from '@/lib/cn'
 
@@ -43,8 +45,9 @@ const NAV_ADMIN: NavSection[] = [
     items: [
       { label: 'Dashboard',      href: '/dashboard',  icon: Squares2X2Icon },
       { label: 'Sessions',       href: '/sessions',   icon: CalendarDaysIcon },
-      { label: 'Lots & tirages', href: '/lots',       icon: SquaresPlusIcon },
-      { label: 'Cartons',        href: '/cartons',    icon: ClipboardDocumentListIcon },
+      { label: 'Lots',     href: '/lots',     icon: SquaresPlusIcon },
+      { label: 'Tirages',  href: '/tirages',  icon: TrophyIcon },
+      { label: 'Cartons',  href: '/cartons',  icon: ClipboardDocumentListIcon },
     ],
   },
   {
@@ -106,6 +109,13 @@ export function Sidebar({
   caisse,
 }: SidebarProps) {
   const pathname = usePathname()
+  const router   = useRouter()
+
+  async function handleLogout() {
+    await fetch('/api/auth/me', { method: 'DELETE' })
+    router.push('/login')
+    router.refresh()
+  }
   const nav = variant === 'caisse' ? NAV_CAISSE : NAV_ADMIN
 
   const isActive = (href: string) =>
@@ -274,25 +284,36 @@ export function Sidebar({
 
       {/* ── Pied : plan (admin) ── */}
       {variant === 'admin' && (
-        <div
-          className="mx-2 mb-3 rounded-[6px] px-[9px] py-[7px]"
-          style={{
-            background: 'rgba(239,159,39,.12)',
-            border: '1px solid rgba(239,159,39,.2)',
-          }}
-        >
+        <div className="mx-2 mb-2 flex flex-col gap-2">
           <div
-            className="font-bold uppercase tracking-[.12em]"
-            style={{ fontSize: 9, color: 'rgba(255,255,255,.3)', marginBottom: 2 }}
+            className="rounded-[6px] px-[9px] py-[7px]"
+            style={{
+              background: 'rgba(239,159,39,.12)',
+              border: '1px solid rgba(239,159,39,.2)',
+            }}
           >
-            Plan actuel
+            <div
+              className="font-bold uppercase tracking-[.12em]"
+              style={{ fontSize: 9, color: 'rgba(255,255,255,.3)', marginBottom: 2 }}
+            >
+              Plan actuel
+            </div>
+            <div className="font-bold" style={{ fontSize: 13, color: 'var(--color-amber)' }}>
+              Pro
+            </div>
+            <div style={{ fontSize: 9, color: 'rgba(255,255,255,.35)', marginTop: 1 }}>
+              Renouv. 15 avr. 2026
+            </div>
           </div>
-          <div className="font-bold" style={{ fontSize: 13, color: 'var(--color-amber)' }}>
-            Pro
-          </div>
-          <div style={{ fontSize: 9, color: 'rgba(255,255,255,.35)', marginTop: 1 }}>
-            Renouv. 15 avr. 2026
-          </div>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 w-full rounded-[5px] font-bold transition-colors duration-[150ms] hover:bg-white/5"
+            style={{ fontSize: 11, color: 'rgba(255,255,255,.38)', padding: '6px 9px', marginBottom: 4 }}
+          >
+            <ArrowRightStartOnRectangleIcon width={14} height={14} aria-hidden="true" />
+            Déconnexion
+          </button>
         </div>
       )}
     </aside>
