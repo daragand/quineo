@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { db } from '@/lib/db'
 import { getServerUser } from '@/lib/auth-server'
 import { Op } from 'sequelize'

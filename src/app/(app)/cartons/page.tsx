@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getServerUser } from '@/lib/auth-server'
 import { listCartons } from '@/lib/services/cartons'
 import { CartonsClient } from './Client'

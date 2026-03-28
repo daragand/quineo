@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { getServerUser } from '@/lib/auth-server'
 import { getDashboardData } from '@/lib/services/dashboard'

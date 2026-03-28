@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getServerUser } from '@/lib/auth-server'
 import { getTirageData } from '@/lib/services/tirage'
 import { listSessions } from '@/lib/services/sessions'

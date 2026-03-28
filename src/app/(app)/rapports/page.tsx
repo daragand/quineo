@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getServerUser } from '@/lib/auth-server'
 import { getRapportsData } from '@/lib/services/rapports'
 import { RapportsClient } from './Client'
