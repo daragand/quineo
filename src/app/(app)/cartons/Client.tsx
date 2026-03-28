@@ -427,7 +427,7 @@ export function CartonsClient({
       limit: String(PAGE_SIZE),
     })
     if (opts.status && opts.status !== 'all') params.set('status', opts.status)
-    if (opts.serial)  params.set('serial', opts.serial)
+    if (opts.serial)  params.set('q', opts.serial)
 
     const res = await fetch(`/api/sessions/${sid}/cartons?${params}`)
     setFetchLoading(false)
@@ -451,6 +451,7 @@ export function CartonsClient({
     setPages(data.pages)
     setPage(data.page)
     setSelected(new Set())
+    if (data.counts) setCounts(data.counts)
   }, [sessions])
 
   // ── Recherche avec debounce ────────────
@@ -481,8 +482,6 @@ export function CartonsClient({
     setStatus('all')
     setPage(1)
     fetchCartons(sid, { page: 1 })
-    const s = sessions.find(x => x.id === sid)
-    if (s) setCounts({ available: 0, sold: 0, cancelled: 0 }) // reset pendant le fetch
   }
 
   // ── Sélection ────────────────────────
@@ -601,10 +600,10 @@ export function CartonsClient({
         <div style={{ flex: 1, maxWidth: 260 }}>
           <Input
             type="text"
-            placeholder="Numéro de série…"
+            placeholder="Numéro de série ou nom du participant…"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            aria-label="Rechercher un carton par numéro de série"
+            aria-label="Rechercher par numéro de série ou nom du participant"
           />
         </div>
         <Select

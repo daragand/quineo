@@ -26,8 +26,8 @@ export function AppShell({
         caisse={caisseProps}
       />
 
-      {/* Zone principale scrollable */}
-      <div style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
+      {/* Zone principale : colonne flex (topbar fixe + contenu scrollable) */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflow: 'hidden' }}>
         {children}
       </div>
     </div>

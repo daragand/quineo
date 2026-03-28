@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuth, withRole, apiError } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { deleteSessionImagesDir } from '@/lib/lot-images'
 
 type Ctx = { params: Promise<Record<string, string>>; user: import('@/lib/auth').TokenPayload }
 
@@ -72,6 +73,7 @@ export const DELETE = withAuth(
       return apiError('Seules les sessions en brouillon peuvent être supprimées')
     }
 
+    deleteSessionImagesDir(id)
     await session.destroy()
     return NextResponse.json({ ok: true })
   })

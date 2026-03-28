@@ -26,7 +26,7 @@ export async function listSessions(user: TokenPayload): Promise<SessionRow[]> {
   const raw = await db.Session.findAll({
     where:      scope,
     attributes: ['id', 'name', 'date', 'status', 'max_cartons', 'description'],
-    order:      [['date', 'DESC']],
+    order:      [['date', 'ASC']],
     raw:        true,
   }) as unknown as Array<{
     id: string; name: string; date: string | null
@@ -78,24 +78,34 @@ export async function resolveRefSession(
 ): Promise<{ id: string; name: string; status: string; max_cartons: number | null } | null> {
   const scope = assocScope(user)
 
+  const toISO = (d: unknown): string => {
+    if (!d) return ''
+    if (d instanceof Date) return d.toISOString().slice(0, 10)
+    return String(d).slice(0, 10)
+  }
+
   const sessions = await db.Session.findAll({
     where:      { ...scope, status: { [Op.in]: ['running', 'open', 'draft'] } },
     attributes: ['id', 'name', 'status', 'max_cartons', 'date'],
-    order:      [['date', 'DESC']],
+    order:      [['date', 'ASC']],
     raw:        true,
   }) as unknown as Array<{ id: string; name: string; status: string; max_cartons: number | null; date: string | null }>
 
   if (sessions.length > 0) {
-    return sessions.sort((a, b) =>
-      (STATUS_PRIORITY[a.status] ?? 99) - (STATUS_PRIORITY[b.status] ?? 99)
-    )[0]
+    return sessions.sort((a, b) => {
+      const pDiff = (STATUS_PRIORITY[a.status] ?? 99) - (STATUS_PRIORITY[b.status] ?? 99)
+      if (pDiff !== 0) return pDiff
+      const aISO = toISO(a.date)
+      const bISO = toISO(b.date)
+      return aISO < bISO ? -1 : aISO > bISO ? 1 : 0
+    })[0]
   }
 
-  // Aucune session active : prendre la plus récente quelle que soit son statut
+  // Aucune session active : prendre la prochaine quelle que soit son statut
   return db.Session.findOne({
     where:      scope,
     attributes: ['id', 'name', 'status', 'max_cartons'],
-    order:      [['date', 'DESC']],
+    order:      [['date', 'ASC']],
     raw:        true,
   }) as Promise<{ id: string; name: string; status: string; max_cartons: number | null } | null>
 }

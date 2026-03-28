@@ -76,8 +76,14 @@ export function RapportsClient({
           <Select value={year} onChange={(e) => setYear(e.target.value)}
             aria-label="Année" style={{ width: 100 }}
             options={availableYears.map(y => ({ value: y, label: y }))} />
-          <Button variant="secondary" size="sm">Exporter PDF</Button>
-          <Button variant="primary" size="sm">Exporter CSV</Button>
+          <Button variant="secondary" size="sm"
+            onClick={() => window.open(`/api/rapports/export?format=pdf&year=${year}`, '_blank')}>
+            Exporter PDF
+          </Button>
+          <Button variant="primary" size="sm"
+            onClick={() => { window.location.href = `/api/rapports/export?format=csv&year=${year}` }}>
+            Exporter CSV
+          </Button>
         </div>
       </div>
 

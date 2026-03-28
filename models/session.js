@@ -46,6 +46,11 @@ module.exports = (sequelize, DataTypes) => {
     description: {
       type: DataTypes.TEXT,
     },
+    display_code: {
+      type:      DataTypes.STRING(4),
+      allowNull: true,
+      unique:    true,
+    },
   }, {
     sequelize,
     modelName: 'Session',

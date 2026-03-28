@@ -10,6 +10,7 @@ import {
   ClipboardDocumentListIcon,
   UserIcon,
   CreditCardIcon,
+  BanknotesIcon,
   ChartBarIcon,
   Cog6ToothIcon,
   UsersIcon,
@@ -43,17 +44,18 @@ const NAV_ADMIN: NavSection[] = [
   {
     title: 'Navigation',
     items: [
-      { label: 'Dashboard',      href: '/dashboard',  icon: Squares2X2Icon },
-      { label: 'Sessions',       href: '/sessions',   icon: CalendarDaysIcon },
-      { label: 'Lots',     href: '/lots',     icon: SquaresPlusIcon },
-      { label: 'Tirages',  href: '/tirages',  icon: TrophyIcon },
-      { label: 'Cartons',  href: '/cartons',  icon: ClipboardDocumentListIcon },
+      { label: 'Dashboard', href: '/dashboard', icon: Squares2X2Icon },
+      { label: 'Sessions',  href: '/sessions',  icon: CalendarDaysIcon },
+      { label: 'Lots',      href: '/lots',      icon: SquaresPlusIcon },
+      { label: 'Tirages',   href: '/tirages',   icon: TrophyIcon },
+      { label: 'Cartons',   href: '/cartons',   icon: ClipboardDocumentListIcon },
     ],
   },
   {
-    title: 'Finances',
+    title: 'Ventes',
     items: [
-      { label: 'Paiements', href: '/paiements', icon: CreditCardIcon },
+      { label: 'Caisse',    href: '/caisse',    icon: CreditCardIcon },
+      { label: 'Paiements', href: '/paiements', icon: BanknotesIcon },
       { label: 'Rapports',  href: '/rapports',  icon: ChartBarIcon },
     ],
   },

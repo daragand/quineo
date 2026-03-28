@@ -8,24 +8,24 @@ import { Stepper }     from '@/components/ui/Stepper'
 // ─────────────────────────────────────────
 
 export interface PublicPack {
-  id: number
-  qty: number
-  label: string
-  price: number
+  id:        string
+  qty:       number
+  label:     string
+  price:     number
   unitPrice: number
-  eco?: string
-  maxPer: number | null
+  eco?:      string
+  maxPer:    number | null
   /** true = carton déjà utilisé/épuisé pour ce participant */
-  sold?: boolean
+  sold?:     boolean
   featured?: boolean
 }
 
 interface PackGridProps {
-  packs: PublicPack[]
-  quantities: Record<number, number>
+  packs:         PublicPack[]
+  quantities:    Record<string, number>
   alreadyBought: number
-  quotaMax: number
-  onChange: (packId: number, qty: number) => void
+  quotaMax:      number
+  onChange:      (packId: string, qty: number) => void
 }
 
 // ─────────────────────────────────────────
@@ -35,28 +35,6 @@ interface PackGridProps {
 function packMaxQty(pack: PublicPack, alreadyBought: number, quotaMax: number): number {
   let m = Math.floor((quotaMax - alreadyBought) / pack.qty)
   if (pack.maxPer !== null) m = Math.min(m, pack.maxPer)
-  return Math.max(0, m)
-}
-
-function packRemainingAllowed(
-  pack: PublicPack,
-  quantities: Record<number, number>,
-  alreadyBought: number,
-  quotaMax: number
-): number {
-  const already = quantities[pack.id] ?? 0
-  const cartonsUsedByOthers =
-    Object.entries(quantities).reduce((s, [id, q]) => {
-      if (Number(id) === pack.id) return s
-      const p = { qty: 1 } // placeholder; recalc not needed for limit
-      return s + (q ?? 0)
-    }, 0)
-  // Simpler: globalLeft minus cart total except this pack
-  const totalInCart = Object.values(quantities).reduce((s, q) => s + q, 0)
-  const otherCartonsInCart = totalInCart - already * pack.qty // rough approximation
-  const globalLeft = quotaMax - alreadyBought - otherCartonsInCart * pack.qty
-  let m = Math.floor(globalLeft / pack.qty)
-  if (pack.maxPer !== null) m = Math.min(m, pack.maxPer - already)
   return Math.max(0, m)
 }
 
@@ -127,9 +105,9 @@ export function PackGrid({ packs, quantities, alreadyBought, quotaMax, onChange 
               key={pack.id}
               className="relative rounded-[10px] px-[14px] py-[12px] flex items-center gap-[12px] transition-colors duration-[150ms]"
               style={{
-                background:   'var(--color-card)',
-                border:       `.5px solid ${pack.featured ? 'var(--color-amber)' : 'var(--color-sep)'}`,
-                opacity:      isDisabled ? 0.45 : 1,
+                background:    'var(--color-card)',
+                border:        `.5px solid ${pack.featured ? 'var(--color-amber)' : 'var(--color-sep)'}`,
+                opacity:       isDisabled ? 0.45 : 1,
                 pointerEvents: isDisabled ? 'none' : 'auto',
               }}
               aria-disabled={isDisabled}

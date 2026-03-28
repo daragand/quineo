@@ -47,7 +47,7 @@ const SESSION_STATS_SQL = (assocClause: string) => `
   LEFT JOIN paiements p ON p.id = pc.paiement_id
   ${assocClause}
   GROUP BY s.id
-  ORDER BY s.date DESC NULLS LAST`
+  ORDER BY s.date ASC NULLS LAST`
 
 const MONTHLY_SQL = (assocClause: string) => `
   SELECT

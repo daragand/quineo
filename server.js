@@ -25,6 +25,9 @@ app.prepare().then(() => {
     socket.on('join:tirage', (tirageId) => {
       socket.join(`tirage:${tirageId}`)
     })
+    socket.on('join:session', (sessionId) => {
+      socket.join(`session:${sessionId}`)
+    })
   })
 
   httpServer.listen(port, () => {

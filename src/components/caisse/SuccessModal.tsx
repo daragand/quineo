@@ -8,12 +8,13 @@ import type { PayMode } from './PaymentMode'
 // ─────────────────────────────────────────
 
 interface SuccessData {
-  participantName: string
+  participantName:  string
   participantEmail: string
-  cartonsCount: number
-  totalPaid: number
-  payMode: PayMode
-  serials: string[]
+  cartonsCount:     number
+  totalPaid:        number
+  payMode:          PayMode
+  serials:          string[]
+  emailSent:        boolean
 }
 
 interface SuccessModalProps {
@@ -109,11 +110,18 @@ export function SuccessModal({ data, onClose }: SuccessModalProps) {
 
           <div
             className="rounded-[6px] px-[10px] py-[6px] mb-[10px]"
-            style={{ background: 'var(--color-qgreen-bg)', fontSize: 11, color: 'var(--color-qgreen-text)' }}
+            style={{
+              background: data.emailSent ? 'var(--color-qgreen-bg)' : 'var(--color-bg)',
+              fontSize: 11,
+              color: data.emailSent ? 'var(--color-qgreen-text)' : 'var(--color-text-hint)',
+              border: `.5px solid ${data.emailSent ? 'transparent' : 'var(--color-sep)'}`,
+            }}
           >
-            {data.participantEmail !== '(sans compte)'
-              ? `✓ Reçu envoyé à ${data.participantEmail}`
-              : 'Participant sans compte — pas d\'envoi email'}
+            {data.emailSent
+              ? `✓ Cartons envoyés par email à ${data.participantEmail}`
+              : data.participantEmail !== '(sans compte)'
+                ? `${data.participantEmail} — email non configuré`
+                : 'Participant sans email — pas d\'envoi'}
           </div>
 
           <button

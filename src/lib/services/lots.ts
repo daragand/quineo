@@ -17,6 +17,7 @@ export interface LotRow {
   order:       number
   value:       number | undefined
   status:      LotStatus
+  image_url:   string | undefined
 }
 
 export interface LotsData {
@@ -32,12 +33,12 @@ export async function listLots(user: TokenPayload): Promise<LotsData> {
 
   const raw = await db.Lot.findAll({
     where:      { session_id: session.id },
-    attributes: ['id', 'name', 'description', 'order', 'value', 'status'],
+    attributes: ['id', 'name', 'description', 'order', 'value', 'status', 'image_url'],
     order:      [['order', 'ASC']],
     raw:        true,
   }) as unknown as Array<{
     id: string; name: string; description: string | null
-    order: number; value: string | null; status: string
+    order: number; value: string | null; status: string; image_url: string | null
   }>
 
   return {
@@ -49,6 +50,7 @@ export async function listLots(user: TokenPayload): Promise<LotsData> {
       order:       l.order,
       value:       l.value != null ? parseFloat(l.value) : undefined,
       status:      l.status as LotStatus,
+      image_url:   l.image_url ?? undefined,
     })),
   }
 }

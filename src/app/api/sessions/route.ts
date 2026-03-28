@@ -4,6 +4,17 @@ import { withAuth, withRole, apiError } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { assocScope } from '@/lib/services/scope'
 
+// Génère un code de diffusion à 4 chiffres unique parmi les sessions existantes
+async function generateDisplayCode(): Promise<string> {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const code = String(Math.floor(1000 + Math.random() * 9000))
+    const exists = await db.Session.findOne({ where: { display_code: code }, attributes: ['id'], raw: true })
+    if (!exists) return code
+  }
+  // Fallback déterministe si toutes les tentatives échouent (très improbable)
+  return String(Math.floor(1000 + Math.random() * 9000))
+}
+
 // ─────────────────────────────────────────
 // GET /api/sessions
 // ─────────────────────────────────────────
@@ -44,9 +55,11 @@ export const POST = withAuth(
       const parsed = CreateSchema.safeParse(body)
       if (!parsed.success) return apiError(parsed.error.issues[0].message)
 
+      const display_code = await generateDisplayCode()
       const session = await db.Session.create({
         ...parsed.data,
         association_id: user.association_id,
+        display_code,
       })
       return NextResponse.json({ session }, { status: 201 })
     } catch (err) {

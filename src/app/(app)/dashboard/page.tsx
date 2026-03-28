@@ -66,10 +66,22 @@ export default async function DashboardPage() {
               <div style={{ fontSize: 10, color: 'var(--color-text-hint)', marginTop: 4 }}>
                 {activeTirage.drawEventsCount} numéros tirés / 90
               </div>
+              <Link href="/tirage"
+                className="inline-block font-bold mt-[8px] transition-opacity hover:opacity-70"
+                style={{ fontSize: 11, color: 'var(--color-qblue)' }}>
+                Reprendre →
+              </Link>
             </>
           ) : (
-            <div style={{ fontSize: 12, color: 'var(--color-text-hint)', marginTop: 5 }}>
-              Aucun tirage actif
+            <div className="mt-[6px]">
+              <div style={{ fontSize: 12, color: 'var(--color-text-hint)', marginBottom: 8 }}>
+                Aucun tirage actif
+              </div>
+              <Link href="/tirage"
+                className="inline-block font-bold rounded-[7px] px-[14px] py-[6px] transition-opacity hover:opacity-90"
+                style={{ fontSize: 12, background: 'var(--color-amber)', color: '#2C1500' }}>
+                Lancer le jeu →
+              </Link>
             </div>
           )}
         </MetricCard>

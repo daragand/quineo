@@ -12,8 +12,12 @@ export function proxy(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // Public routes (/s/... achat de cartons)
-  if (pathname.startsWith('/s/')) {
+  // Public routes (achat de cartons, display, API publiques)
+  if (
+    pathname.startsWith('/s/') ||
+    pathname.startsWith('/display') ||
+    pathname.startsWith('/api/public/')
+  ) {
     return NextResponse.next()
   }
 

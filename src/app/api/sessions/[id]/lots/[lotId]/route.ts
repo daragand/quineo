@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { withAuth, withRole, apiError } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { deleteLotImage } from '@/lib/lot-images'
 
 type Ctx = { params: Promise<Record<string, string>>; user: import('@/lib/auth').TokenPayload }
 
@@ -21,7 +22,7 @@ const UpdateLotSchema = z.object({
   value:       z.number().nonnegative().optional(),
   order:       z.number().int().nonnegative().optional(),
   status:      z.enum(['pending', 'drawn', 'cancelled']).optional(),
-  image_url:   z.string().url().optional(),
+  image_url:   z.union([z.string().url(), z.null()]).optional(),
 }).strict()
 
 export const PATCH = withAuth(
@@ -50,10 +51,12 @@ export const DELETE = withAuth(
     if (!lot) return apiError('Lot introuvable', 404)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((lot.toJSON() as any).status === 'drawn') {
+    const lotData = lot.toJSON() as any
+    if (lotData.status === 'drawn') {
       return apiError('Un lot déjà tiré ne peut pas être supprimé')
     }
 
+    deleteLotImage(id, lotId, lotData.image_url)
     await lot.destroy()
     return NextResponse.json({ ok: true })
   })

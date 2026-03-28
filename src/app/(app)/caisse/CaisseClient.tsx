@@ -233,46 +233,47 @@ export default function CaisseClient({ session, packs, cartonsAvailable }: Caiss
     if (!selected || !session || cartsTotal === 0) return
     setLoading(true)
     setError('')
-    const allSerials: string[] = []
 
-    for (const [packId, qty] of Object.entries(quantities)) {
-      if (qty <= 0) continue
-      const pack = packs.find(p => p.id === packId)
-      if (!pack) continue
+    const items = Object.entries(quantities)
+      .filter(([, qty]) => qty > 0)
+      .map(([packId, qty]) => ({ carton_pack_id: packId, quantity: qty }))
 
-      const res = await fetch('/api/vente', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          session_id:     session.id,
-          participant_id: selected.id,
-          carton_pack_id: packId,
-          quantity:       qty,
-          method:         METHOD_MAP[payMode],
-          amount:         payMode === 'free' ? 0 : pack.price * qty,
-        }),
-      })
+    const totalAmount = payMode === 'free'
+      ? 0
+      : packs.reduce((s, p) => s + p.price * (quantities[p.id] ?? 0), 0)
 
-      if (!res.ok) {
-        const data = await res.json()
-        setError(data.error ?? 'Erreur lors de la vente')
-        setLoading(false)
-        return
-      }
-
-      const data = await res.json()
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      allSerials.push(...data.cartons.map((c: any) => c.serial_number as string))
-    }
+    const res = await fetch('/api/vente', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        session_id:     session.id,
+        participant_id: selected.id,
+        items,
+        method:    METHOD_MAP[payMode],
+        amount:    totalAmount,
+      }),
+    })
 
     setLoading(false)
+
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Erreur lors de la vente')
+      return
+    }
+
+    const data = await res.json()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const allSerials = data.cartons.map((c: any) => c.serial_number as string)
+
     setSuccessData({
       participantName:  selected.name,
       participantEmail: selected.email,
       cartonsCount:     allSerials.length,
-      totalPaid:        amountDue,
+      totalPaid:        totalAmount,
       payMode,
       serials:          allSerials,
+      emailSent:        data.email_sent as boolean,
     })
   }
 
