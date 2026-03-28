@@ -13,7 +13,7 @@ import { buildReminderHtml }          from './emails/reminder'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-const FROM    = 'Quineo <commandes@quineo.fr>'
+const FROM    = process.env.EMAIL_FROM ?? 'Quineo <commandes@quineo.fr>'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://quineo.fr'
 
 // ─────────────────────────────────────────
