@@ -8,21 +8,26 @@ import { Button } from '@/components/ui/Button'
 export default function RegisterPage() {
   const router = useRouter()
 
-  const [assocName,  setAssocName]  = useState('')
-  const [firstName,  setFirstName]  = useState('')
-  const [lastName,   setLastName]   = useState('')
-  const [email,      setEmail]      = useState('')
-  const [password,   setPassword]   = useState('')
-  const [confirm,    setConfirm]    = useState('')
-  const [error,      setError]      = useState<string | null>(null)
-  const [fieldError, setFieldError] = useState<Record<string, string>>({})
-  const [loading,    setLoading]    = useState(false)
+  const [assocName,    setAssocName]    = useState('')
+  const [firstName,    setFirstName]    = useState('')
+  const [lastName,     setLastName]     = useState('')
+  const [email,        setEmail]        = useState('')
+  const [password,     setPassword]     = useState('')
+  const [confirm,      setConfirm]      = useState('')
+  const [cguAccepted,  setCguAccepted]  = useState(false)
+  const [error,        setError]        = useState<string | null>(null)
+  const [fieldError,   setFieldError]   = useState<Record<string, string>>({})
+  const [loading,      setLoading]      = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
     setFieldError({})
 
+    if (!cguAccepted) {
+      setError("Vous devez accepter les conditions générales d'utilisation pour continuer.")
+      return
+    }
     if (password !== confirm) {
       setFieldError({ confirm: 'Les mots de passe ne correspondent pas' })
       return
@@ -175,6 +180,40 @@ export default function RegisterPage() {
             />
           </div>
 
+          {/* Acceptation CGU */}
+          <label
+            className="flex items-start gap-2 cursor-pointer"
+            style={{ fontSize: 12, color: 'var(--color-text-secondary)', lineHeight: 1.5 }}
+          >
+            <input
+              type="checkbox"
+              checked={cguAccepted}
+              onChange={e => setCguAccepted(e.target.checked)}
+              style={{ marginTop: 2, flexShrink: 0, accentColor: 'var(--color-amber)' }}
+            />
+            <span>
+              J&apos;ai lu et j&apos;accepte les{' '}
+              <a
+                href="/cgu"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--color-amber-deep)', fontWeight: 600, textDecoration: 'underline' }}
+              >
+                conditions générales d&apos;utilisation
+              </a>{' '}
+              et la{' '}
+              <a
+                href="/confidentialite"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--color-amber-deep)', fontWeight: 600, textDecoration: 'underline' }}
+              >
+                politique de confidentialité
+              </a>
+              .
+            </span>
+          </label>
+
           {error && (
             <p
               role="alert"
@@ -185,7 +224,7 @@ export default function RegisterPage() {
             </p>
           )}
 
-          <Button type="submit" fullWidth loading={loading}>
+          <Button type="submit" fullWidth loading={loading} disabled={!cguAccepted}>
             Créer mon compte
           </Button>
         </form>

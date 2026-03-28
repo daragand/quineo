@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken'
 import { db } from '@/lib/db'
 import { signAccessToken, apiError } from '@/lib/auth'
 import type { TokenPayload } from '@/lib/auth'
+import { rateLimit, getClientIp, tooManyRequests, LIMITS } from '@/lib/rate-limit'
 
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret'
 
@@ -11,6 +12,10 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret
 // ─────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
+  const ip    = getClientIp(req)
+  const limit = rateLimit(`refresh:${ip}`, LIMITS.refresh)
+  if (!limit.success) return tooManyRequests(limit)
+
   try {
     const refreshToken = req.cookies.get('refresh_token')?.value
     if (!refreshToken) return apiError('Refresh token manquant', 401)

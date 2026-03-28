@@ -6,6 +6,7 @@ import { createStripeCheckout }    from '@/lib/payment/stripe'
 import { createPayPalOrder }       from '@/lib/payment/paypal'
 import { createSumUpCheckout }     from '@/lib/payment/sumup'
 import { createHelloAssoCheckout } from '@/lib/payment/helloasso'
+import { rateLimit, getClientIp, tooManyRequests, LIMITS } from '@/lib/rate-limit'
 
 type Ctx = { params: Promise<{ slug: string }> }
 
@@ -28,6 +29,10 @@ const OrderSchema = z.object({
 // ─────────────────────────────────────────
 
 export async function POST(req: NextRequest, ctx: Ctx) {
+  const ip    = getClientIp(req)
+  const limit = rateLimit(`order:${ip}`, LIMITS.order)
+  if (!limit.success) return tooManyRequests(limit)
+
   const { slug } = await ctx.params
 
   const session = await db.Session.findOne({

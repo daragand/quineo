@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { comparePassword, signAccessToken, signRefreshToken, apiError } from '@/lib/auth'
+import { rateLimit, getClientIp, tooManyRequests, LIMITS } from '@/lib/rate-limit'
 
 const LoginSchema = z.object({
   email:    z.string().email(),
@@ -9,6 +10,10 @@ const LoginSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  const ip    = getClientIp(req)
+  const limit = rateLimit(`login:${ip}`, LIMITS.auth)
+  if (!limit.success) return tooManyRequests(limit)
+
   try {
     const body   = await req.json()
     const parsed = LoginSchema.safeParse(body)

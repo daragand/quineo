@@ -9,7 +9,7 @@ import { Toggle } from '@/components/ui/Toggle'
 // Types
 // ─────────────────────────────────────────
 
-type Tab = 'association' | 'notifications' | 'paiements' | 'avance'
+type Tab = 'association' | 'notifications' | 'paiements' | 'compte' | 'avance'
 
 export interface AssociationData {
   id:                 string
@@ -776,6 +776,125 @@ function TabPaiements({ providers: initialProviders }: { providers: ProviderData
 }
 
 // ─────────────────────────────────────────
+// Onglet Compte
+// ─────────────────────────────────────────
+
+function TabCompte() {
+  const [current,  setCurrent]  = useState('')
+  const [next,     setNext]     = useState('')
+  const [confirm,  setConfirm]  = useState('')
+  const [loading,  setLoading]  = useState(false)
+  const [success,  setSuccess]  = useState(false)
+  const [error,    setError]    = useState('')
+  const [fieldErr, setFieldErr] = useState<Record<string, string>>({})
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setFieldErr({})
+    setSuccess(false)
+
+    if (next !== confirm) {
+      setFieldErr({ confirm: 'Les mots de passe ne correspondent pas' })
+      return
+    }
+    if (next.length < 8) {
+      setFieldErr({ next: 'Au moins 8 caractères requis' })
+      return
+    }
+
+    setLoading(true)
+    const res = await fetch('/api/auth/change-password', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        current_password: current,
+        new_password:     next,
+        confirm_password: confirm,
+      }),
+    })
+    setLoading(false)
+
+    if (!res.ok) {
+      const data = await res.json()
+      setError(data.error ?? 'Erreur lors du changement de mot de passe')
+      return
+    }
+
+    setSuccess(true)
+    setCurrent('')
+    setNext('')
+    setConfirm('')
+  }
+
+  return (
+    <>
+      <SectionTitle>Sécurité du compte</SectionTitle>
+      <Card>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-[14px]">
+          <Input
+            label="Mot de passe actuel"
+            type="password"
+            autoComplete="current-password"
+            placeholder="••••••••"
+            value={current}
+            onChange={e => setCurrent(e.target.value)}
+            required
+          />
+
+          <div style={{ borderTop: '.5px solid var(--color-sep)', margin: '2px 0' }} />
+
+          <Input
+            label="Nouveau mot de passe"
+            type="password"
+            autoComplete="new-password"
+            placeholder="8 caractères minimum"
+            value={next}
+            onChange={e => setNext(e.target.value)}
+            required
+            error={fieldErr.next}
+          />
+          <Input
+            label="Confirmer le nouveau mot de passe"
+            type="password"
+            autoComplete="new-password"
+            placeholder="••••••••"
+            value={confirm}
+            onChange={e => setConfirm(e.target.value)}
+            required
+            error={fieldErr.confirm}
+          />
+
+          {error && (
+            <p role="alert" className="font-bold" style={{ fontSize: 11, color: 'var(--color-qred)', margin: 0 }}>
+              {error}
+            </p>
+          )}
+
+          {success && (
+            <p role="status" className="font-bold" style={{ fontSize: 11, color: 'var(--color-qgreen-text)', margin: 0 }}>
+              ✓ Mot de passe mis à jour avec succès
+            </p>
+          )}
+
+          <div>
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              loading={loading}
+              disabled={!current || !next || !confirm}
+            >
+              Changer le mot de passe
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </>
+  )
+}
+
+// ─────────────────────────────────────────
 // Onglet Avancé
 // ─────────────────────────────────────────
 
@@ -820,6 +939,7 @@ export default function ParametresClient({
     { id: 'association',   label: 'Association' },
     { id: 'notifications', label: 'Notifications' },
     { id: 'paiements',     label: 'Paiements' },
+    { id: 'compte',        label: 'Compte' },
     { id: 'avance',        label: 'Avancé' },
   ]
 
@@ -848,6 +968,7 @@ export default function ParametresClient({
         {tab === 'association'   && <TabAssociation initial={initialAssociation} />}
         {tab === 'notifications' && <TabNotifications />}
         {tab === 'paiements'     && <TabPaiements providers={initialProviders} />}
+        {tab === 'compte'        && <TabCompte />}
         {tab === 'avance'        && <TabAvance />}
       </div>
     </div>

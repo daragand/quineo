@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { rateLimit, getClientIp, tooManyRequests, LIMITS } from '@/lib/rate-limit'
 
 // ─────────────────────────────────────────
 // GET /api/public/display/find/[code]
@@ -8,9 +9,13 @@ import { db } from '@/lib/db'
 // ─────────────────────────────────────────
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ code: string }> },
 ) {
+  const ip    = getClientIp(req)
+  const limit = rateLimit(`display-find:${ip}`, LIMITS.publicLight)
+  if (!limit.success) return tooManyRequests(limit)
+
   const { code } = await params
 
   if (!/^\d{4}$/.test(code)) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { db } from '@/lib/db'
 import { hashPassword, signAccessToken, signRefreshToken, apiError } from '@/lib/auth'
+import { rateLimit, getClientIp, tooManyRequests, LIMITS } from '@/lib/rate-limit'
 
 const RegisterSchema = z.object({
   // Association
@@ -14,6 +15,10 @@ const RegisterSchema = z.object({
 })
 
 export async function POST(req: NextRequest) {
+  const ip    = getClientIp(req)
+  const limit = rateLimit(`register:${ip}`, LIMITS.register)
+  if (!limit.success) return tooManyRequests(limit)
+
   try {
     const body   = await req.json()
     const parsed = RegisterSchema.safeParse(body)
