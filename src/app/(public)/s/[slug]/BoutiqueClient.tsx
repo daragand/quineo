@@ -11,17 +11,18 @@ import type { Provider, OrderResult } from '@/components/public/CheckoutSummary'
 // ─────────────────────────────────────────
 
 export interface SessionPublicData {
-  id:                string
-  display_code:      string
-  name:              string
-  date?:             string | null
-  description?:      string | null
-  status:            string
-  max_cartons:       number
-  available_cartons: number
-  association:       { name: string }
-  packs:             PublicPack[]
-  providers:         Provider[]
+  id:                  string
+  display_code:        string
+  name:                string
+  date?:               string | null
+  description?:        string | null
+  status:              string
+  max_cartons:         number
+  available_cartons:   number
+  association:         { name: string }
+  packs:               PublicPack[]
+  providers:           Provider[]
+  require_birth_date:  boolean
 }
 
 type View = 'packs' | 'checkout' | 'confirm'
@@ -100,6 +101,7 @@ export function BoutiqueClient({ session }: { session: SessionPublicData }) {
           sessionName={session.name}
           sessionDate={session.date ?? null}
           providers={session.providers}
+          requireBirthDate={session.require_birth_date}
           onBack={() => setView('packs')}
           onSuccess={handleSuccess}
         />

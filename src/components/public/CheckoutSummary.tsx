@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { SmartDateInput } from '@/components/ui/SmartDateInput'
 import type { PublicPack } from './PackGrid'
 
 // ─────────────────────────────────────────
@@ -8,6 +9,7 @@ import type { PublicPack } from './PackGrid'
 // ─────────────────────────────────────────
 
 export interface Provider {
+  id?:  string
   type: string   // 'stripe' | 'sumup' | 'helloasso' | 'other'
   name: string
 }
@@ -18,19 +20,21 @@ interface CartLine {
 }
 
 export interface OrderResult {
+  completed?:  boolean
   paiement_id: string
   cartons:     Array<{ id: string; serial_number: string }>
   amount:      number
 }
 
 interface CheckoutSummaryProps {
-  sessionSlug: string
-  lines:       CartLine[]
-  sessionName: string
-  sessionDate: string | null
-  providers:   Provider[]
-  onBack:      () => void
-  onSuccess:   (result: OrderResult, firstName: string, lastName: string, email: string, payMode: string) => void
+  sessionSlug:      string
+  lines:            CartLine[]
+  sessionName:      string
+  sessionDate:      string | null
+  providers:        Provider[]
+  requireBirthDate: boolean
+  onBack:           () => void
+  onSuccess:        (result: OrderResult, firstName: string, lastName: string, email: string, payMode: string) => void
 }
 
 // ─────────────────────────────────────────
@@ -101,17 +105,19 @@ export function CheckoutSummary({
   sessionName,
   sessionDate,
   providers,
+  requireBirthDate,
   onBack,
   onSuccess,
 }: CheckoutSummaryProps) {
   const availableProviders = providers.length > 0 ? providers : [DEFAULT_PROVIDER]
 
-  const [firstName, setFirstName]  = useState('')
-  const [lastName,  setLastName]   = useState('')
-  const [email,     setEmail]      = useState('')
-  const [payMode,   setPayMode]    = useState<string>(availableProviders[0].type)
-  const [loading,   setLoading]    = useState(false)
-  const [error,     setError]      = useState('')
+  const [firstName,  setFirstName]  = useState('')
+  const [lastName,   setLastName]   = useState('')
+  const [email,      setEmail]      = useState('')
+  const [birthDate,  setBirthDate]  = useState('')
+  const [payMode,    setPayMode]    = useState<string>(availableProviders[0].type)
+  const [loading,    setLoading]    = useState(false)
+  const [error,      setError]      = useState('')
 
   const total        = lines.reduce((s, l) => s + l.pack.price * l.qty, 0)
   const totalCartons = lines.reduce((s, l) => s + l.pack.qty * l.qty, 0)
@@ -120,6 +126,10 @@ export function CheckoutSummary({
     && lastName.trim().length > 0
     && email.includes('@')
     && email.includes('.')
+    && (!requireBirthDate || birthDate.length > 0)
+
+  // Trouver le provider sélectionné
+  const selectedProvider = availableProviders.find(p => p.type === payMode) ?? availableProviders[0]
 
   async function handlePay() {
     if (!canPay || loading) return
@@ -131,24 +141,32 @@ export function CheckoutSummary({
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
-          first_name: firstName.trim(),
-          last_name:  lastName.trim(),
-          email:      email.trim().toLowerCase(),
-          items:      lines.map(l => ({
+          first_name:  firstName.trim(),
+          last_name:   lastName.trim(),
+          email:       email.trim().toLowerCase(),
+          birth_date:  birthDate || undefined,
+          provider_id: selectedProvider.id,
+          items:       lines.map(l => ({
             carton_pack_id: l.pack.id,
             quantity:       l.qty,
           })),
-          method: 'ONLINE',
         }),
       })
 
-      const data = await res.json()
+      const data = await res.json() as { redirect_url?: string; completed?: boolean; error?: string } & OrderResult
 
       if (!res.ok) {
         setError(data.error ?? 'Une erreur est survenue, veuillez réessayer.')
         return
       }
 
+      // Provider redirige vers un hébergeur externe (Stripe, PayPal, SumUp, HelloAsso)
+      if (data.redirect_url) {
+        window.location.href = data.redirect_url
+        return
+      }
+
+      // Paiement immédiat (gratuit ou provider 'other')
       onSuccess(data as OrderResult, firstName.trim(), lastName.trim(), email.trim().toLowerCase(), payMode)
     } catch {
       setError('Impossible de contacter le serveur. Vérifiez votre connexion.')
@@ -295,6 +313,31 @@ export function CheckoutSummary({
             onFocus={(e) => { e.target.style.borderColor = 'var(--color-qblue)' }}
             onBlur={(e)  => { e.target.style.borderColor = 'var(--color-border)' }}
           />
+
+          {/* Date de naissance */}
+          <div className="mt-[8px]">
+            <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+              Date de naissance
+              {requireBirthDate
+                ? <span style={{ color: 'var(--color-qred)' }}> *</span>
+                : <span style={{ color: 'var(--color-text-hint)' }}> (optionnelle)</span>}
+            </div>
+            <SmartDateInput
+              value={birthDate}
+              onChange={setBirthDate}
+              required={requireBirthDate}
+              className="rounded-[7px]"
+              inputStyle={{
+                padding:    '8px 12px',
+                border:     '.5px solid var(--color-border)',
+                fontFamily: 'var(--font-body)',
+                fontSize:   12,
+                color:      'var(--color-text-primary)',
+                background: 'var(--color-card)',
+                outline:    'none',
+              }}
+            />
+          </div>
         </div>
 
         {/* Colonne droite : mode de paiement */}

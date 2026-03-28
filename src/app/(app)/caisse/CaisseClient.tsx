@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import { SmartDateInput } from '@/components/ui/SmartDateInput'
 import { ParticipantSearch, type Participant } from '@/components/caisse/ParticipantSearch'
 import { ForfaitList, type Pack } from '@/components/caisse/ForfaitList'
 import { PaymentMode, type PayMode } from '@/components/caisse/PaymentMode'
@@ -18,10 +19,11 @@ interface Session {
 }
 
 interface CaisseClientProps {
-  session: Session | null
-  packs: Pack[]
+  session:          Session | null
+  packs:            Pack[]
   cartonsAvailable: number
-  cartonsTotal: number
+  cartonsTotal:     number
+  requireBirthDate: boolean
 }
 
 const AVATAR_COLORS = ['#185FA5', '#3B6D11', '#534AB7', '#854F0B', '#A32D2D', '#0891B2']
@@ -53,20 +55,27 @@ function StepLabel({ n, label }: { n: number; label: string }) {
 function NewParticipantModal({
   onCreated,
   onClose,
+  requireBirthDate,
 }: {
-  onCreated: (p: Participant) => void
-  onClose: () => void
+  onCreated:        (p: Participant) => void
+  onClose:          () => void
+  requireBirthDate: boolean
 }) {
-  const [firstName, setFirstName] = useState('')
-  const [lastName,  setLastName]  = useState('')
-  const [email,     setEmail]     = useState('')
-  const [phone,     setPhone]     = useState('')
-  const [loading,   setLoading]   = useState(false)
-  const [error,     setError]     = useState('')
+  const [firstName,  setFirstName]  = useState('')
+  const [lastName,   setLastName]   = useState('')
+  const [email,      setEmail]      = useState('')
+  const [phone,      setPhone]      = useState('')
+  const [birthDate,  setBirthDate]  = useState('')
+  const [loading,    setLoading]    = useState(false)
+  const [error,      setError]      = useState('')
 
   async function handleCreate() {
     if (!firstName && !lastName && !email) {
       setError('Au moins un nom ou un email est requis')
+      return
+    }
+    if (requireBirthDate && !birthDate) {
+      setError('La date de naissance est obligatoire')
       return
     }
     setLoading(true)
@@ -75,10 +84,11 @@ function NewParticipantModal({
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        first_name: firstName || undefined,
-        last_name:  lastName  || undefined,
-        email:      email     || undefined,
-        phone:      phone     || undefined,
+        first_name:  firstName  || undefined,
+        last_name:   lastName   || undefined,
+        email:       email      || undefined,
+        phone:       phone      || undefined,
+        birth_date:  birthDate  || undefined,
       }),
     })
     setLoading(false)
@@ -94,10 +104,14 @@ function NewParticipantModal({
       id:            p.id,
       name,
       email:         p.email ?? '(sans compte)',
+      birthDate:     p.birth_date ?? undefined,
       color:         avatarColor(name),
       cartonsBought: 0,
     })
   }
+
+  const inputCls = 'w-full rounded-[6px]'
+  const inputStyle = { padding: '7px 9px', border: '.5px solid var(--color-border)', fontFamily: 'var(--font-body)', fontSize: 12, background: 'var(--color-bg)', color: 'var(--color-text-primary)', outline: 'none' }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center"
@@ -120,27 +134,37 @@ function NewParticipantModal({
             <div>
               <label style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>Prénom</label>
               <input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Jean"
-                className="w-full rounded-[6px] mt-[4px]"
-                style={{ padding: '7px 9px', border: '.5px solid var(--color-border)', fontFamily: 'var(--font-body)', fontSize: 12, background: 'var(--color-bg)', color: 'var(--color-text-primary)', outline: 'none' }} />
+                className="w-full rounded-[6px] mt-[4px]" style={inputStyle} />
             </div>
             <div>
               <label style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>Nom</label>
               <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Dupont"
-                className="w-full rounded-[6px] mt-[4px]"
-                style={{ padding: '7px 9px', border: '.5px solid var(--color-border)', fontFamily: 'var(--font-body)', fontSize: 12, background: 'var(--color-bg)', color: 'var(--color-text-primary)', outline: 'none' }} />
+                className="w-full rounded-[6px] mt-[4px]" style={inputStyle} />
+            </div>
+          </div>
+          <div>
+            <label style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>
+              Date de naissance{requireBirthDate ? <span style={{ color: 'var(--color-qred)' }}> *</span> : ' (optionnelle)'}
+            </label>
+            <div className="mt-[4px]">
+              <SmartDateInput
+                value={birthDate}
+                onChange={setBirthDate}
+                required={requireBirthDate}
+                className={inputCls}
+                inputStyle={inputStyle}
+              />
             </div>
           </div>
           <div>
             <label style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>Email (optionnel)</label>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jean@exemple.fr"
-              className="w-full rounded-[6px] mt-[4px]"
-              style={{ padding: '7px 9px', border: '.5px solid var(--color-border)', fontFamily: 'var(--font-body)', fontSize: 12, background: 'var(--color-bg)', color: 'var(--color-text-primary)', outline: 'none' }} />
+              className="w-full rounded-[6px] mt-[4px]" style={inputStyle} />
           </div>
           <div>
             <label style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>Téléphone (optionnel)</label>
             <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 00 00 00 00"
-              className="w-full rounded-[6px] mt-[4px]"
-              style={{ padding: '7px 9px', border: '.5px solid var(--color-border)', fontFamily: 'var(--font-body)', fontSize: 12, background: 'var(--color-bg)', color: 'var(--color-text-primary)', outline: 'none' }} />
+              className="w-full rounded-[6px] mt-[4px]" style={inputStyle} />
           </div>
           {error && <p style={{ fontSize: 11, color: 'var(--color-qred)' }}>{error}</p>}
           <div className="flex gap-[8px] mt-[4px]">
@@ -165,7 +189,7 @@ function NewParticipantModal({
 // Page caisse
 // ─────────────────────────────────────────
 
-export default function CaisseClient({ session, packs, cartonsAvailable }: CaisseClientProps) {
+export default function CaisseClient({ session, packs, cartonsAvailable, requireBirthDate }: CaisseClientProps) {
   const [participants, setParticipants] = useState<Participant[]>([])
   const [selected,     setSelected]     = useState<Participant | null>(null)
   const [quantities,   setQuantities]   = useState<Record<string, number>>({})
@@ -210,6 +234,7 @@ export default function CaisseClient({ session, packs, cartonsAvailable }: Caiss
           id:            p.id,
           name,
           email:         p.email ?? '(sans compte)',
+          birthDate:     p.birth_date ?? undefined,
           color:         avatarColor(name),
           cartonsBought: soldCartons,
         }
@@ -444,6 +469,7 @@ export default function CaisseClient({ session, packs, cartonsAvailable }: Caiss
         <NewParticipantModal
           onCreated={(p) => { setShowNewPart(false); selectParticipant(p) }}
           onClose={() => setShowNewPart(false)}
+          requireBirthDate={requireBirthDate}
         />
       )}
 

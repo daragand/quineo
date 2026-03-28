@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     type: {
-      type: DataTypes.ENUM('stripe', 'paypal', 'sumup', 'other'),
+      type: DataTypes.ENUM('stripe', 'paypal', 'sumup', 'helloasso', 'other'),
       allowNull: false,
     },
     config: {

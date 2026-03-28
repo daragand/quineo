@@ -29,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       validate: { isEmail: true },
     },
+    birth_date: {
+      type: DataTypes.DATEONLY,
+    },
   }, {
     sequelize,
     modelName: 'Participant',

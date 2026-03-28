@@ -12,7 +12,7 @@ type Ctx = { params: Promise<Record<string, string>>; user: import('@/lib/auth')
 export const GET = withAuth(async (_req: NextRequest, ctx: Ctx) => {
   const association = await db.Association.findOne({
     where: { id: ctx.user.association_id },
-    attributes: ['id', 'name', 'siret', 'email', 'phone', 'address', 'logo_url', 'active'],
+    attributes: ['id', 'name', 'siret', 'email', 'phone', 'address', 'logo_url', 'active', 'require_birth_date'],
   })
   if (!association) return apiError('Association introuvable', 404)
   return NextResponse.json({ association })
@@ -23,12 +23,13 @@ export const GET = withAuth(async (_req: NextRequest, ctx: Ctx) => {
 // ─────────────────────────────────────────
 
 const UpdateAssociationSchema = z.object({
-  name:     z.string().min(1).max(200).optional(),
-  siret:    z.string().length(14).optional(),
-  email:    z.email().optional(),
-  phone:    z.string().max(20).optional(),
-  address:  z.string().max(300).optional(),
-  logo_url: z.url().optional(),
+  name:               z.string().min(1).max(200).optional(),
+  siret:              z.string().length(14).optional(),
+  email:              z.email().optional(),
+  phone:              z.string().max(20).optional(),
+  address:            z.string().max(300).optional(),
+  logo_url:           z.url().optional(),
+  require_birth_date: z.boolean().optional(),
 })
 
 export const PATCH = withAuth(

@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
       comment: 'Grille de jeu 3x9 : tableau 2D de nombres (0 = case vide)',
     },
     status: {
-      type: DataTypes.ENUM('available', 'sold', 'cancelled'),
+      type: DataTypes.ENUM('available', 'reserved', 'sold', 'cancelled'),
       allowNull: false,
       defaultValue: 'available',
     },

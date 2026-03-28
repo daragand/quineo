@@ -21,14 +21,14 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
         {
           model:      db.Association,
           as:         'association',
-          attributes: ['id', 'name'],
+          attributes: ['id', 'name', 'require_birth_date'],
           include: [
             {
               model:      db.PaymentProvider,
               as:         'payment_providers',
               where:      { active: true },
               required:   false,
-              attributes: ['id', 'type', 'name'],
+              attributes: ['id', 'type', 'name', 'active'],
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any,
           ],
@@ -78,6 +78,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const providers = (s.association?.payment_providers ?? [] as any[]).map((pp: any) => ({
+    id:   pp.id   as string,
     type: pp.type as string,
     name: pp.name as string,
   }))
@@ -92,6 +93,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
     max_cartons:       (s.max_cartons as number | null) ?? 50,
     available_cartons: availableCount,
     association:       { name: (s.association?.name as string) ?? '' },
+    require_birth_date: (s.association?.require_birth_date as boolean) ?? false,
     packs,
     providers,
   })

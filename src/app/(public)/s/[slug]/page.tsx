@@ -80,7 +80,7 @@ export default async function SessionBoutiquePage({ params }: Props) {
         {
           model:      db.Association,
           as:         'association',
-          attributes: ['id', 'name'],
+          attributes: ['id', 'name', 'require_birth_date'],
           include: [
             {
               model:      db.PaymentProvider,
@@ -144,9 +144,10 @@ export default async function SessionBoutiquePage({ params }: Props) {
           status:            s.status       as string,
           max_cartons:       (s.max_cartons as number | null) ?? 50,
           available_cartons: availableCount,
-          association:       { name: (s.association?.name as string) ?? '' },
+          association:        { name: (s.association?.name as string) ?? '' },
           packs,
           providers,
+          require_birth_date: (s.association?.require_birth_date as boolean) ?? false,
         }
       }
     }

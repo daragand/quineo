@@ -44,10 +44,11 @@ export const GET = withAuth(async (req: NextRequest) => {
 // ─────────────────────────────────────────
 
 const CreateSchema = z.object({
-  first_name: z.string().min(1).optional(),
-  last_name:  z.string().min(1).optional(),
-  email:      z.string().email().optional(),
-  phone:      z.string().optional(),
+  first_name:  z.string().min(1).optional(),
+  last_name:   z.string().min(1).optional(),
+  email:       z.string().email().optional(),
+  phone:       z.string().optional(),
+  birth_date:  z.string().date().optional(),  // YYYY-MM-DD
 })
 
 export const POST = withAuth(async (req: NextRequest) => {

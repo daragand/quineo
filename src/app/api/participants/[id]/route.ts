@@ -16,7 +16,7 @@ export const GET = withAuth(async (req: NextRequest, ctx: Ctx) => {
   const sessionId = searchParams.get('session_id')
 
   const participant = await db.Participant.findByPk(id, {
-    attributes: ['id', 'first_name', 'last_name', 'email', 'phone'],
+    attributes: ['id', 'first_name', 'last_name', 'email', 'phone', 'birth_date'],
   })
   if (!participant) return apiError('Participant introuvable', 404)
 
@@ -41,10 +41,11 @@ export const GET = withAuth(async (req: NextRequest, ctx: Ctx) => {
 // ─────────────────────────────────────────
 
 const UpdateParticipantSchema = z.object({
-  first_name: z.string().min(1).max(100).optional(),
-  last_name:  z.string().min(1).max(100).optional(),
-  email:      z.string().email().optional(),
-  phone:      z.string().max(20).optional().nullable(),
+  first_name:  z.string().min(1).max(100).optional(),
+  last_name:   z.string().min(1).max(100).optional(),
+  email:       z.string().email().optional(),
+  phone:       z.string().max(20).optional().nullable(),
+  birth_date:  z.string().date().optional().nullable(),
 })
 
 export const PATCH = withAuth(

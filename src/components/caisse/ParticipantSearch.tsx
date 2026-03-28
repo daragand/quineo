@@ -8,11 +8,17 @@ import { cn } from '@/lib/cn'
 // ─────────────────────────────────────────
 
 export interface Participant {
-  id: string
-  name: string
-  email: string
-  color: string
+  id:            string
+  name:          string
+  email:         string
+  birthDate?:    string   // YYYY-MM-DD
+  color:         string
   cartonsBought: number
+}
+
+function formatBirthDate(d: string): string {
+  const [y, m, day] = d.split('-')
+  return `${day}/${m}/${y}`
 }
 
 interface ParticipantSearchProps {
@@ -128,7 +134,7 @@ export function ParticipantSearch({
                     {p.name}
                   </div>
                   <div className="truncate" style={{ fontSize: 10, color: 'var(--color-text-secondary)' }}>
-                    {p.email}
+                    {p.birthDate ? `${formatBirthDate(p.birthDate)} · ${p.email}` : p.email}
                   </div>
                 </div>
 
