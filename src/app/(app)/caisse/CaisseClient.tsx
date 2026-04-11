@@ -336,11 +336,10 @@ export default function CaisseClient({ session, packs, cartonsAvailable, require
   }
 
   return (
-    <div className="flex flex-1 min-h-0 overflow-hidden" style={{ margin: '-16px -20px' }}>
+    <div className="flex flex-col md:flex-row md:flex-1 md:min-h-0 md:overflow-hidden md:-mx-[20px] md:-my-[16px]">
 
       {/* ── Panneau gauche ── */}
-      <div className="flex flex-col overflow-hidden"
-        style={{ width: '55%', borderRight: '.5px solid var(--color-sep)' }}>
+      <div className="caisse-panel-left flex flex-col md:overflow-hidden md:w-[55%]">
 
         {/* En-tête session */}
         <div className="flex items-center justify-between flex-shrink-0 px-[12px] py-[8px]"
@@ -368,7 +367,7 @@ export default function CaisseClient({ session, packs, cartonsAvailable, require
         </div>
 
         {/* Forfaits */}
-        <div className="flex-1 overflow-y-auto px-[12px] py-[10px]">
+        <div className="px-[12px] py-[10px] md:flex-1 md:overflow-y-auto">
           <StepLabel n={2} label="Forfait & quantité" />
           {selected ? (
             <ForfaitList
@@ -385,16 +384,17 @@ export default function CaisseClient({ session, packs, cartonsAvailable, require
             </p>
           )}
         </div>
+
       </div>
 
       {/* ── Panneau droit ── */}
-      <div className="flex flex-col overflow-hidden flex-1" style={{ background: 'var(--color-card)' }}>
+      <div className="flex flex-col md:overflow-hidden md:flex-1" style={{ background: 'var(--color-card)' }}>
         <div className="flex-shrink-0 px-[12px] py-[10px]"
           style={{ borderBottom: '.5px solid var(--color-sep)' }}>
           <StepLabel n={3} label="Paiement & validation" />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-[12px] py-[10px]">
+        <div className="px-[12px] py-[10px] md:flex-1 md:overflow-y-auto">
           {!hasSelection ? (
             <p className="text-center"
               style={{ padding: '28px 10px', fontSize: 12, color: 'var(--color-text-hint)', lineHeight: 1.8 }}>

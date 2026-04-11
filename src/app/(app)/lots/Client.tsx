@@ -331,7 +331,7 @@ function LotItem({
 
           <Badge variant={lot.status === 'drawn' ? 'won' : lot.status === 'pending' ? 'pending' : 'cancelled'} />
 
-          <div className="flex items-center gap-[4px] opacity-0 group-hover:opacity-100 transition-opacity duration-[150ms] flex-shrink-0">
+          <div className="flex items-center gap-[4px] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-[150ms] flex-shrink-0">
             <button
               type="button" onClick={onMoveUp}
               disabled={isFirst || lot.status === 'drawn'} aria-label="Monter"
@@ -515,7 +515,7 @@ export function LotsClient({
     <div className="flex flex-col gap-[14px]">
 
       {/* Métriques */}
-      <div className="grid gap-[10px]" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-[10px]">
         {[
           { label: 'Lots total',    value: String(lots.length)   },
           { label: 'Tirés',         value: String(drawnCount)    },
@@ -548,7 +548,7 @@ export function LotsClient({
       <Card
         title={`Lots — ${sessionName}`}
         headerRight={
-          <div className="flex items-center gap-[8px]">
+          <div className="flex items-center gap-[8px] flex-wrap justify-end">
             <Select
               options={STATUS_FILTER_OPTIONS}
               value={filter}

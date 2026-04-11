@@ -91,7 +91,7 @@ export function EditSessionClient({ session }: { session: SessionData }) {
   }
 
   return (
-    <div className="max-w-[640px]">
+    <div className="w-full md:max-w-[640px]">
 
       {/* En-tête */}
       <div className="flex items-center gap-[10px] mb-[24px]">
@@ -118,7 +118,7 @@ export function EditSessionClient({ session }: { session: SessionData }) {
       >
         <div className="mb-[24px]">
           <SectionTitle>Informations générales</SectionTitle>
-          <div className="grid gap-[12px] mb-[12px]" style={{ gridTemplateColumns: '1fr 1fr' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[12px] mb-[12px]">
             <div style={{ gridColumn: '1 / -1' }}>
               <Input
                 label="Nom de la session"
@@ -142,7 +142,7 @@ export function EditSessionClient({ session }: { session: SessionData }) {
 
         <div className="mb-[24px]">
           <SectionTitle>Date &amp; capacité</SectionTitle>
-          <div className="grid gap-[12px]" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-[12px]">
             <Input
               label="Date de l'événement"
               type="date"
@@ -205,7 +205,7 @@ export function EditSessionClient({ session }: { session: SessionData }) {
       )}
 
       {/* Actions */}
-      <div className="flex justify-end gap-[8px]">
+      <div className="flex flex-wrap justify-end gap-[8px]">
         <Link href="/sessions">
           <Button variant="secondary">Annuler</Button>
         </Link>

@@ -121,13 +121,28 @@ function SectionDesc({ children }: { children: React.ReactNode }) {
 
 export default function NewSessionPage() {
   const router = useRouter()
-  const [tab,      setTab]      = useState(0)
-  const [form,     setForm]     = useState<FormState>(INITIAL)
-  const [loading,  setLoading]  = useState(false)
-  const [error,    setError]    = useState('')
+  const [tab,         setTab]         = useState(0)
+  const [form,        setForm]        = useState<FormState>(INITIAL)
+  const [loading,     setLoading]     = useState(false)
+  const [error,       setError]       = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+
+  function validateTab(tabIndex: number): Record<string, string> {
+    const errors: Record<string, string> = {}
+    if (tabIndex === 0) {
+      if (!form.name.trim()) errors.name = 'Le nom de la session est obligatoire'
+      if (!form.date)        errors.date = 'La date de l\'événement est obligatoire'
+    }
+    return errors
+  }
 
   async function handleSubmit() {
-    if (!form.name.trim()) { setError('Le nom de la session est obligatoire'); setTab(0); return }
+    const errors = validateTab(0)
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      setTab(0)
+      return
+    }
     setLoading(true)
     setError('')
     const res = await fetch('/api/sessions', {
@@ -154,9 +169,14 @@ export default function NewSessionPage() {
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
+  function clearFieldError(key: string) {
+    if (fieldErrors[key]) setFieldErrors((prev) => { const n = { ...prev }; delete n[key]; return n })
+  }
+
   function handleNameChange(name: string) {
     set('name', name)
     if (!form.slugManual) set('slug', toSlug(name))
+    clearFieldError('name')
   }
 
   // ── Pane 0 : Informations ──────────────────────────────────
@@ -165,10 +185,11 @@ export default function NewSessionPage() {
     <div>
       <div className="mb-[24px]">
         <SectionTitle>Informations générales</SectionTitle>
-        <div className="grid gap-[12px] mb-[12px]" style={{ gridTemplateColumns: '1fr 1fr' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-[12px] mb-[12px]">
           <Input
             label="Nom de la session"
-            hint="obligatoire"
+            hint={fieldErrors.name ? undefined : 'obligatoire'}
+            error={fieldErrors.name}
             placeholder="Grand Loto de Printemps 2025"
             value={form.name}
             onChange={(e) => handleNameChange(e.target.value)}
@@ -210,12 +231,13 @@ export default function NewSessionPage() {
 
       <div className="mb-[24px]">
         <SectionTitle>Date &amp; capacité</SectionTitle>
-        <div className="grid gap-[12px]" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-[12px]">
           <Input
             label="Date de l'événement"
             type="date"
+            error={fieldErrors.date}
             value={form.date}
-            onChange={(e) => set('date', e.target.value)}
+            onChange={(e) => { set('date', e.target.value); clearFieldError('date') }}
           />
           <Input
             label="Heure de début"
@@ -289,7 +311,7 @@ export default function NewSessionPage() {
     <div>
       <div className="mb-[24px]">
         <SectionTitle>Logo &amp; bannière</SectionTitle>
-        <div className="grid gap-[12px]" style={{ gridTemplateColumns: '1fr 1fr' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-[12px]">
           {[
             { label: 'Logo de l\'association', hint: 'PNG, SVG — max 2 Mo', height: 80 },
             { label: 'Bannière session',       hint: '1200×675 px — 16:9 recommandé', height: 80 },
@@ -331,7 +353,7 @@ export default function NewSessionPage() {
         <SectionDesc>
           Utilisées sur la page publique, l&apos;écran de diffusion et les cartons PDF.
         </SectionDesc>
-        <div className="grid gap-[12px] mb-[10px]" style={{ gridTemplateColumns: '1fr 1fr' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-[12px] mb-[10px]">
           {([
             { key: 'colorPrimary',   label: 'Couleur primaire' },
             { key: 'colorSecondary', label: 'Couleur secondaire' },
@@ -450,7 +472,7 @@ export default function NewSessionPage() {
                 {badge}
               </span>
             </div>
-            <div className="grid gap-[12px]" style={{ gridTemplateColumns: '1fr 1fr' }}>
+            <div className="grid grid-cols-2 gap-[12px]">
               <Input label="Date limite" type="date" value={form[dateKey]} onChange={(e) => set(dateKey, e.target.value)} />
               <Input label="Heure limite" type="time" value={form[timeKey]} onChange={(e) => set(timeKey, e.target.value)} />
             </div>
@@ -628,10 +650,10 @@ export default function NewSessionPage() {
   // ─────────────────────────────────────────
 
   return (
-    <div className="flex flex-1 min-h-0 overflow-hidden" style={{ margin: '-16px -20px' }}>
+    <div className="flex md:flex-1 md:min-h-0 md:overflow-hidden md:-mx-[20px] md:-my-[16px]">
 
       {/* Zone formulaire */}
-      <div className="flex-1 min-w-0 overflow-y-auto px-[20px] py-[18px] pb-[32px]">
+      <div className="flex-1 min-w-0 md:overflow-y-auto px-[20px] py-[18px] pb-[32px]">
 
         <SessionFormTabs
           tabs={TABS}
@@ -666,7 +688,14 @@ export default function NewSessionPage() {
             variant={tab === 3 ? 'primary' : 'secondary'}
             disabled={loading}
             onClick={() => {
-              if (tab < 3) { setTab(tab + 1) } else { handleSubmit() }
+              if (tab < 3) {
+                const errors = validateTab(tab)
+                if (Object.keys(errors).length > 0) { setFieldErrors(errors); return }
+                setFieldErrors({})
+                setTab(tab + 1)
+              } else {
+                handleSubmit()
+              }
             }}
           >
             {tab === 3 && loading ? 'Création en cours…' : NEXT_LABELS[tab]}
@@ -674,20 +703,22 @@ export default function NewSessionPage() {
         </div>
       </div>
 
-      {/* Panel récapitulatif */}
-      <SessionSummaryPanel
-        draft={{
-          name: form.name,
-          date: form.date,
-          lieu: form.lieu,
-          maxCartons: form.maxCartons,
-          slug: form.slug,
-          providers: form.providers,
-          maxCartonsPerPerson: form.maxCartonsPerPerson,
-          maxFreeCartons: form.maxFreeCartons,
-          rules: form.rules,
-        }}
-      />
+      {/* Panel récapitulatif — masqué sur mobile */}
+      <div className="hidden md:block">
+        <SessionSummaryPanel
+          draft={{
+            name: form.name,
+            date: form.date,
+            lieu: form.lieu,
+            maxCartons: form.maxCartons,
+            slug: form.slug,
+            providers: form.providers,
+            maxCartonsPerPerson: form.maxCartonsPerPerson,
+            maxFreeCartons: form.maxFreeCartons,
+            rules: form.rules,
+          }}
+        />
+      </div>
     </div>
   )
 }

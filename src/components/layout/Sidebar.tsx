@@ -127,7 +127,7 @@ export function Sidebar({
 
   return (
     <aside
-      className="w-sidebar flex-shrink-0 flex flex-col h-full overflow-y-auto"
+      className="hidden md:flex w-sidebar flex-shrink-0 flex-col h-full overflow-y-auto"
       style={{ background: 'var(--color-navy)' }}
       aria-label="Navigation principale"
     >

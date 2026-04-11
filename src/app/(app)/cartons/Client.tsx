@@ -527,7 +527,7 @@ export function CartonsClient({
   return (
     <div>
       {/* ── En-tête ── */}
-      <div className="flex items-center justify-between mb-[20px]">
+      <div className="flex items-start justify-between gap-[10px] flex-wrap mb-[20px]">
         <div>
           <h1 className="font-display leading-none"
             style={{ fontSize: 28, color: 'var(--color-text-primary)' }}>
@@ -537,11 +537,11 @@ export function CartonsClient({
             {activeSession?.name ?? sessionName}
           </p>
         </div>
-        <div className="flex gap-[8px]">
+        <div className="flex gap-[8px] flex-wrap">
           {selected.size > 0 && (
             <>
               <Button variant="ghost" size="sm" onClick={() => handleExportCsv(Array.from(selected))}>
-                Exporter sélection ({selected.size})
+                Exporter ({selected.size})
               </Button>
               <Button variant="secondary" size="sm" onClick={() => handlePrint(Array.from(selected))}>
                 🖨 Imprimer ({selected.size})
@@ -559,7 +559,7 @@ export function CartonsClient({
           ) : activeSessionId && (
             <span className="rounded-[6px] px-[10px] py-[6px] font-bold"
               style={{ fontSize: 11, background: 'var(--color-bg)', color: 'var(--color-text-hint)', border: '.5px solid var(--color-sep)' }}>
-              Génération indisponible ({activeSession?.status ?? '—'})
+              Indisponible ({activeSession?.status ?? '—'})
             </span>
           )}
         </div>
@@ -578,7 +578,7 @@ export function CartonsClient({
       )}
 
       {/* ── Métriques ── */}
-      <div className="grid gap-[10px] mb-[20px]" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-[10px] mb-[20px]">
         {[
           { label: 'Total',        value: total,           color: 'var(--color-text-primary)', sub: 'cartons' },
           { label: 'Vendus',       value: counts.sold,     color: 'var(--color-amber)',        sub: total > 0 ? `${Math.round((counts.sold / total) * 100)} %` : '—' },
@@ -596,11 +596,11 @@ export function CartonsClient({
       </div>
 
       {/* ── Filtres ── */}
-      <div className="flex gap-[8px] mb-[14px]">
-        <div style={{ flex: 1, maxWidth: 260 }}>
+      <div className="flex flex-wrap gap-[8px] mb-[14px]">
+        <div style={{ flex: '1 1 180px', minWidth: 0 }}>
           <Input
             type="text"
-            placeholder="Numéro de série ou nom du participant…"
+            placeholder="Série ou participant…"
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
             aria-label="Rechercher par numéro de série ou nom du participant"
@@ -610,7 +610,7 @@ export function CartonsClient({
           value={statusFilter}
           onChange={(e) => handleStatusChange(e.target.value)}
           aria-label="Filtrer par statut"
-          style={{ width: 160 }}
+          style={{ width: 150 }}
           options={[
             { value: 'all',       label: 'Tous les statuts' },
             { value: 'sold',      label: 'Vendus' },
@@ -618,8 +618,8 @@ export function CartonsClient({
             { value: 'cancelled', label: 'Annulés' },
           ]}
         />
-        <Button variant="ghost" size="sm" onClick={() => handleExportCsv([])}>Exporter CSV</Button>
-        <Button variant="ghost" size="sm" onClick={() => handlePrint([])}>🖨 Imprimer tout</Button>
+        <Button variant="ghost" size="sm" onClick={() => handleExportCsv([])}>CSV</Button>
+        <Button variant="ghost" size="sm" onClick={() => handlePrint([])}>🖨 PDF</Button>
       </div>
 
       {/* ── Tableau ── */}
@@ -631,8 +631,8 @@ export function CartonsClient({
           transition: 'opacity 150ms ease',
         }}>
 
-        {/* Header */}
-        <div className="grid items-center px-[16px] py-[8px]"
+        {/* Header — desktop uniquement */}
+        <div className="hidden md:grid items-center px-[16px] py-[8px]"
           style={{
             gridTemplateColumns: '32px 80px 1fr 200px 100px 80px',
             borderBottom: '.5px solid var(--color-sep)',
@@ -669,68 +669,93 @@ export function CartonsClient({
         )}
 
         {/* Lignes */}
-        {cartons.map((c, i) => (
-          <div
-            key={c.id}
-            className="grid items-center px-[16px] py-[9px] transition-colors duration-[150ms] hover:bg-[var(--color-bg)]"
-            style={{
-              gridTemplateColumns: '32px 80px 1fr 200px 100px 80px',
-              borderBottom: i < cartons.length - 1 ? '.5px solid var(--color-sep)' : undefined,
-              background: selected.has(c.id) ? 'var(--color-qblue-bg)' : undefined,
-            }}
-          >
-            <input
-              type="checkbox"
-              aria-label={`Sélectionner carton ${c.serial}`}
-              checked={selected.has(c.id)}
-              onChange={() => toggleSelect(c.id)}
-              style={{ cursor: 'pointer', accentColor: 'var(--color-qblue)', width: 13, height: 13 }}
-            />
+        {cartons.map((c, i) => {
+          const borderBottom = i < cartons.length - 1 ? '.5px solid var(--color-sep)' : undefined
+          const bgSelected   = selected.has(c.id) ? 'var(--color-qblue-bg)' : undefined
+          const badgeVariant = c.status === 'sold' ? 'active' as const : c.status === 'cancelled' ? 'cancelled' as const : 'draft' as const
+          return (
+            <div key={c.id} style={{ borderBottom, background: bgSelected }}>
 
-            <span
-              className="font-bold rounded-[4px] px-[7px] py-[2px] inline-block"
-              style={{
-                fontSize: 11,
-                background: 'var(--color-qblue-bg)',
-                color: 'var(--color-qblue-text)',
-                fontFamily: 'monospace',
-              }}
-            >
-              {c.serial}
-            </span>
+              {/* ── Card mobile (md:hidden) ── */}
+              <div
+                className="md:hidden flex items-center gap-[10px] px-[12px] py-[10px] transition-colors duration-[150ms] hover:bg-[var(--color-bg)]"
+                onClick={() => toggleSelect(c.id)}
+                style={{ cursor: 'pointer' }}
+              >
+                <input
+                  type="checkbox"
+                  aria-label={`Sélectionner carton ${c.serial}`}
+                  checked={selected.has(c.id)}
+                  onChange={() => toggleSelect(c.id)}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ cursor: 'pointer', accentColor: 'var(--color-qblue)', width: 13, height: 13, flexShrink: 0 }}
+                />
+                <span
+                  className="font-bold rounded-[4px] px-[7px] py-[2px] flex-shrink-0"
+                  style={{ fontSize: 11, background: 'var(--color-qblue-bg)', color: 'var(--color-qblue-text)', fontFamily: 'monospace' }}
+                >
+                  {c.serial}
+                </span>
+                <div className="flex-1 min-w-0">
+                  {c.participant ? (
+                    <div className="font-bold truncate" style={{ fontSize: 12, color: 'var(--color-text-primary)' }}>
+                      {c.participant}
+                    </div>
+                  ) : (
+                    <span style={{ fontSize: 12, color: 'var(--color-text-hint)' }}>Disponible</span>
+                  )}
+                </div>
+                <Badge variant={badgeVariant}>{STATUS_LABELS[c.status]}</Badge>
+                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setViewCarton(c) }}>Voir</Button>
+              </div>
 
-            <span className="truncate" style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
-              {c.sessionName}
-            </span>
-
-            <div className="flex items-center gap-[7px]">
-              {c.participant ? (
-                <>
-                  <div
-                    className="rounded-full flex items-center justify-center flex-shrink-0 font-bold"
-                    style={{ width: 22, height: 22, background: avatarColor(c.participant), fontSize: 9, color: 'white' }}
-                    aria-hidden="true"
-                  >
-                    {initials(c.participant)}
-                  </div>
-                  <span style={{ fontSize: 12, color: 'var(--color-text-primary)' }}>{c.participant}</span>
-                </>
-              ) : (
-                <span style={{ fontSize: 12, color: 'var(--color-text-hint)' }}>—</span>
-              )}
+              {/* ── Ligne desktop (hidden md:grid) ── */}
+              <div
+                className="hidden md:grid items-center px-[16px] py-[9px] transition-colors duration-[150ms] hover:bg-[var(--color-bg)]"
+                style={{ gridTemplateColumns: '32px 80px 1fr 200px 100px 80px' }}
+              >
+                <input
+                  type="checkbox"
+                  aria-label={`Sélectionner carton ${c.serial}`}
+                  checked={selected.has(c.id)}
+                  onChange={() => toggleSelect(c.id)}
+                  style={{ cursor: 'pointer', accentColor: 'var(--color-qblue)', width: 13, height: 13 }}
+                />
+                <span
+                  className="font-bold rounded-[4px] px-[7px] py-[2px] inline-block"
+                  style={{ fontSize: 11, background: 'var(--color-qblue-bg)', color: 'var(--color-qblue-text)', fontFamily: 'monospace' }}
+                >
+                  {c.serial}
+                </span>
+                <span className="truncate" style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}>
+                  {c.sessionName}
+                </span>
+                <div className="flex items-center gap-[7px]">
+                  {c.participant ? (
+                    <>
+                      <div
+                        className="rounded-full flex items-center justify-center flex-shrink-0 font-bold"
+                        style={{ width: 22, height: 22, background: avatarColor(c.participant), fontSize: 9, color: 'white' }}
+                        aria-hidden="true"
+                      >
+                        {initials(c.participant)}
+                      </div>
+                      <span style={{ fontSize: 12, color: 'var(--color-text-primary)' }}>{c.participant}</span>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: 12, color: 'var(--color-text-hint)' }}>—</span>
+                  )}
+                </div>
+                <div>
+                  <Badge variant={badgeVariant}>{STATUS_LABELS[c.status]}</Badge>
+                </div>
+                <div className="flex gap-[4px]">
+                  <Button variant="ghost" size="sm" onClick={() => setViewCarton(c)}>Voir</Button>
+                </div>
+              </div>
             </div>
-
-            <div>
-              <Badge variant={c.status === 'sold' ? 'active' : c.status === 'cancelled' ? 'cancelled' : 'draft'}>
-                {STATUS_LABELS[c.status]}
-              </Badge>
-            </div>
-
-            <div className="flex gap-[4px]">
-              <Button variant="ghost" size="sm" onClick={() => setViewCarton(c)}>Voir</Button>
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {/* ── Pagination ── */}

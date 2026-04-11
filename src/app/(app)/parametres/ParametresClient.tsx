@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input }  from '@/components/ui/Input'
 import { Toggle } from '@/components/ui/Toggle'
@@ -78,13 +78,13 @@ function FieldRow({ label, hint, children }: {
   label: string; hint?: string; children: React.ReactNode
 }) {
   return (
-    <div className="flex items-start justify-between gap-[24px] py-[10px]"
+    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-[8px] md:gap-[24px] py-[10px]"
       style={{ borderBottom: '.5px solid var(--color-sep)' }}>
-      <div style={{ minWidth: 180 }}>
+      <div style={{ minWidth: 0 }} className="md:min-w-[180px] md:flex-shrink-0">
         <div className="font-bold" style={{ fontSize: 12, color: 'var(--color-text-primary)' }}>{label}</div>
         {hint && <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginTop: 2 }}>{hint}</div>}
       </div>
-      <div style={{ flex: 1, maxWidth: 320 }}>{children}</div>
+      <div style={{ flex: 1 }}>{children}</div>
     </div>
   )
 }
@@ -933,7 +933,9 @@ export default function ParametresClient({
   initialAssociation: AssociationData | null
   initialProviders: ProviderData[]
 }) {
-  const [tab, setTab] = useState<Tab>('association')
+  const [tab,      setTab]      = useState<Tab>('association')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const TABS: Array<{ id: Tab; label: string }> = [
     { id: 'association',   label: 'Association' },
@@ -942,6 +944,25 @@ export default function ParametresClient({
     { id: 'compte',        label: 'Compte' },
     { id: 'avance',        label: 'Avancé' },
   ]
+
+  const activeLabel = TABS.find(t => t.id === tab)?.label ?? ''
+
+  // Fermer le dropdown au clic extérieur
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [menuOpen])
+
+  function switchTab(id: Tab) {
+    setTab(id)
+    setMenuOpen(false)
+  }
 
   return (
     <div>
@@ -954,17 +975,99 @@ export default function ParametresClient({
         </p>
       </div>
 
-      <div className="flex gap-[4px] p-[4px] rounded-[10px] mb-[20px] inline-flex"
-        role="tablist" aria-label="Sections des paramètres"
-        style={{ background: 'var(--color-bg)', border: '.5px solid var(--color-sep)' }}>
+      {/* ── Navigation onglets ── */}
+
+      {/* Mobile : dropdown (md:hidden) */}
+      <div ref={menuRef} className="md:hidden relative z-50 mb-[20px]">
+        <button
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(o => !o)}
+          className="w-full flex items-center justify-between rounded-[10px] px-[14px] py-[10px] font-bold transition-colors duration-[150ms]"
+          style={{
+            background: 'var(--color-bg)',
+            border: '.5px solid var(--color-sep)',
+            fontSize: 13,
+            color: 'var(--color-text-primary)',
+            fontFamily: 'var(--font-body)',
+            cursor: 'pointer',
+          }}
+        >
+          <span>{activeLabel}</span>
+          {/* Chevron */}
+          <svg
+            width="16" height="16" viewBox="0 0 24 24" fill="none"
+            aria-hidden="true"
+            style={{
+              flexShrink: 0,
+              transform: menuOpen ? 'rotate(180deg)' : 'none',
+              transition: 'transform 150ms ease',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
+            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        {menuOpen && (
+          <div
+            role="listbox"
+            aria-label="Sections des paramètres"
+            className="absolute left-0 right-0 z-50 rounded-[10px] overflow-hidden"
+            style={{
+              top: 'calc(100% + 6px)',
+              background: 'var(--color-card)',
+              border: '.5px solid var(--color-sep)',
+              boxShadow: '0 8px 24px rgba(0,0,0,.12)',
+            }}
+          >
+            {TABS.map((t, i) => (
+              <button
+                key={t.id}
+                type="button"
+                role="option"
+                aria-selected={tab === t.id}
+                onClick={() => switchTab(t.id)}
+                className="w-full flex items-center justify-between px-[14px] py-[11px] font-bold transition-colors duration-[150ms] hover:bg-[var(--color-bg)]"
+                style={{
+                  fontSize: 13,
+                  color: tab === t.id ? 'var(--color-amber)' : 'var(--color-text-primary)',
+                  background: tab === t.id ? 'var(--color-amber-bg)' : undefined,
+                  borderBottom: i < TABS.length - 1 ? '.5px solid var(--color-sep)' : undefined,
+                  fontFamily: 'var(--font-body)',
+                  cursor: 'pointer',
+                  border: 'none',
+                  textAlign: 'left',
+                }}
+              >
+                {t.label}
+                {tab === t.id && (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M5 12l5 5L20 7" stroke="var(--color-amber)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop : barre d'onglets (hidden md:flex) */}
+      <div
+        className="hidden md:flex gap-[4px] p-[4px] rounded-[10px] mb-[20px]"
+        role="tablist"
+        aria-label="Sections des paramètres"
+        style={{ background: 'var(--color-bg)', border: '.5px solid var(--color-sep)' }}
+      >
         {TABS.map((t) => (
-          <TabButton key={t.id} active={tab === t.id} onClick={() => setTab(t.id)}>
+          <TabButton key={t.id} active={tab === t.id} onClick={() => switchTab(t.id)}>
             {t.label}
           </TabButton>
         ))}
       </div>
 
-      <div style={{ maxWidth: 640 }}>
+      <div className="w-full md:max-w-[640px]">
         {tab === 'association'   && <TabAssociation initial={initialAssociation} />}
         {tab === 'notifications' && <TabNotifications />}
         {tab === 'paiements'     && <TabPaiements providers={initialProviders} />}

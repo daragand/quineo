@@ -30,7 +30,7 @@ export default async function DashboardPage() {
     <div className="flex flex-col gap-[14px]">
 
       {/* ── Métriques ── */}
-      <div className="grid gap-[10px]" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-[10px]">
 
         <MetricCard
           label="Cartons vendus"
@@ -91,19 +91,60 @@ export default async function DashboardPage() {
       </div>
 
       {/* ── Deux colonnes ── */}
-      <div className="grid gap-[12px]" style={{ gridTemplateColumns: '1.5fr 1fr' }}>
+      <div className="grid gap-[12px] grid-cols-1 md:grid-cols-[1.5fr_1fr]">
 
         <Card
           title="Sessions récentes"
           headerRight={
-            <Link href="/sessions" className="font-bold hover:opacity-70 transition-opacity duration-[100ms]"
-              style={{ fontSize: 11, color: 'var(--color-qblue)' }}>
-              Voir tout →
-            </Link>
+            <div className="flex items-center gap-[10px]">
+              <Link href="/sessions/new"
+                className="font-bold rounded-[6px] px-[10px] py-[5px] transition-opacity hover:opacity-80"
+                style={{ fontSize: 11, background: 'var(--color-amber)', color: '#2C1500' }}>
+                + Nouvelle
+              </Link>
+              <Link href="/sessions" className="font-bold hover:opacity-70 transition-opacity duration-[100ms]"
+                style={{ fontSize: 11, color: 'var(--color-qblue)' }}>
+                Voir tout →
+              </Link>
+            </div>
           }
         >
           {sessions.length > 0
-            ? <SessionTable rows={sessions} />
+            ? (
+              <>
+                {/* Tableau desktop */}
+                <div className="hidden md:block">
+                  <SessionTable rows={sessions} />
+                </div>
+                {/* Liste mobile */}
+                <ul className="md:hidden list-none m-0 p-0">
+                  {sessions.map((s, i) => (
+                    <li
+                      key={s.id}
+                      className="flex items-center justify-between gap-[10px] py-[10px]"
+                      style={{ borderTop: i > 0 ? '.5px solid var(--color-sep)' : undefined }}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold truncate" style={{ fontSize: 13, color: 'var(--color-text-primary)' }}>
+                          {s.name}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginTop: 2 }}>
+                          {s.cartonsSold} / {s.cartonsMax} cartons
+                          {s.date ? ` · ${new Date(s.date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}` : ''}
+                        </div>
+                      </div>
+                      <Link
+                        href={s.status === 'draft' ? `/sessions/${s.id}/edit` : `/sessions/${s.id}`}
+                        className="font-bold flex-shrink-0 hover:opacity-70 transition-opacity"
+                        style={{ fontSize: 11, color: 'var(--color-qblue)' }}
+                      >
+                        {s.status === 'draft' ? 'Éditer' : 'Gérer'} →
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )
             : <p style={{ fontSize: 11, color: 'var(--color-text-hint)', padding: '8px 0' }}>Aucune session.</p>
           }
         </Card>
