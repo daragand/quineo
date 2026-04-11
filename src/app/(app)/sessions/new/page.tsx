@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Input, Textarea } from '@/components/ui/Input'
@@ -127,6 +127,11 @@ export default function NewSessionPage() {
   const [error,       setError]       = useState('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
+  // Fichiers en attente pour les logos partenaires (slot.id → File)
+  const pendingFiles  = useRef(new Map<string, File>())
+  const fileInputRef  = useRef<HTMLInputElement>(null)
+  const activeSlotIdx = useRef(-1)
+
   function validateTab(tabIndex: number): Record<string, string> {
     const errors: Record<string, string> = {}
     if (tabIndex === 0) {
@@ -156,12 +161,44 @@ export default function NewSessionPage() {
         status:      form.status,
       }),
     })
-    setLoading(false)
     if (!res.ok) {
+      setLoading(false)
       const data = await res.json()
       setError(data.error ?? 'Erreur lors de la création')
       return
     }
+
+    const { session } = await res.json()
+
+    // Uploader les logos partenaires en attente
+    const partnersWithFile = form.partners.filter((p) => p.imageUrl?.startsWith('blob:'))
+    for (let i = 0; i < partnersWithFile.length; i++) {
+      const slot = partnersWithFile[i]
+      const file = pendingFiles.current.get(slot.id)
+      if (!file) continue
+
+      // Créer l'enregistrement partenaire
+      const pRes = await fetch(`/api/sessions/${session.id}/partners`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({
+          name:  slot.name || `Partenaire ${i + 1}`,
+          order: form.partners.indexOf(slot),
+        }),
+      })
+      if (!pRes.ok) continue
+      const { partner } = await pRes.json()
+
+      // Uploader le logo
+      const fd = new FormData()
+      fd.append('file', file)
+      await fetch(`/api/sessions/${session.id}/partners/${partner.id}/logo`, {
+        method: 'POST',
+        body:   fd,
+      })
+    }
+
+    setLoading(false)
     router.push('/sessions')
   }
 
@@ -171,6 +208,34 @@ export default function NewSessionPage() {
 
   function clearFieldError(key: string) {
     if (fieldErrors[key]) setFieldErrors((prev) => { const n = { ...prev }; delete n[key]; return n })
+  }
+
+  function handleAddPartner(i: number) {
+    activeSlotIdx.current = i
+    fileInputRef.current?.click()
+  }
+
+  function handlePartnerFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    const i    = activeSlotIdx.current
+    if (!file || i < 0) return
+
+    const slot = form.partners[i]
+    if (!slot) return
+
+    // Révoquer le blob précédent si existant
+    if (slot.imageUrl?.startsWith('blob:')) URL.revokeObjectURL(slot.imageUrl)
+
+    const blobUrl = URL.createObjectURL(file)
+    pendingFiles.current.set(slot.id, file)
+
+    const next = [...form.partners]
+    next[i] = { ...next[i], imageUrl: blobUrl, name: file.name.replace(/\.[^.]+$/, '') }
+    set('partners', next)
+
+    // Réinitialiser pour permettre de re-sélectionner le même fichier
+    e.target.value = ''
+    activeSlotIdx.current = -1
   }
 
   function handleNameChange(name: string) {
@@ -294,12 +359,24 @@ export default function NewSessionPage() {
         </SectionDesc>
         <PartnerSlots
           slots={form.partners}
-          onAdd={() => { /* TODO: open file picker */ }}
+          onAdd={handleAddPartner}
           onRemove={(i) => {
+            const slot = form.partners[i]
+            if (slot?.imageUrl?.startsWith('blob:')) URL.revokeObjectURL(slot.imageUrl)
+            pendingFiles.current.delete(slot.id)
             const next = [...form.partners]
             next[i] = { ...next[i], imageUrl: undefined, name: undefined }
             set('partners', next)
           }}
+        />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+          className="sr-only"
+          aria-hidden="true"
+          tabIndex={-1}
+          onChange={handlePartnerFileChange}
         />
       </div>
     </div>
