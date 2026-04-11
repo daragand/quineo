@@ -10,6 +10,7 @@ import { renderToBuffer } from '@react-pdf/renderer'
 import { CartonsPdfDocument, type CartonPdfData } from './cartonPdf'
 import { buildOrderConfirmationHtml } from './emails/orderConfirmation'
 import { buildReminderHtml }          from './emails/reminder'
+import { buildPasswordResetHtml }     from './emails/passwordReset'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -105,6 +106,30 @@ export async function sendReminderEmail(opts: ReminderMailOptions): Promise<void
     from:    FROM,
     to,
     subject: `C'est demain ! Votre loto "${sessionName}" — Réf. ${ref}`,
+    html,
+  })
+}
+
+// ─────────────────────────────────────────
+// Réinitialisation de mot de passe
+// ─────────────────────────────────────────
+
+export interface PasswordResetMailOptions {
+  to:        string
+  firstName: string
+  resetUrl:  string
+}
+
+export async function sendPasswordResetEmail(opts: PasswordResetMailOptions): Promise<void> {
+  const html = buildPasswordResetHtml({
+    firstName: opts.firstName,
+    resetUrl:  opts.resetUrl,
+  })
+
+  await resend.emails.send({
+    from:    FROM,
+    to:      opts.to,
+    subject: 'Réinitialisation de votre mot de passe Quineo',
     html,
   })
 }

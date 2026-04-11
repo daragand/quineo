@@ -14,6 +14,7 @@ const JWT_SECRET         = process.env.JWT_SECRET         ?? 'dev-secret-change-
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret'
 const ACCESS_TTL  = '8h'
 const REFRESH_TTL = '30d'
+const RESET_TTL   = '1h'
 
 // ─────────────────────────────────────────
 // Types
@@ -44,6 +45,21 @@ export function signRefreshToken(payload: Pick<TokenPayload, 'sub'>): string {
 
 export function verifyAccessToken(token: string): TokenPayload {
   return jwt.verify(token, JWT_SECRET) as TokenPayload
+}
+
+/**
+ * Token de réinitialisation de mot de passe.
+ * Signé avec JWT_SECRET + hash du mot de passe actuel → usage unique automatique :
+ * une fois le mot de passe changé, l'ancien token est invalidé.
+ */
+export function signResetToken(userId: string, passwordHash: string): string {
+  const secret = JWT_SECRET + passwordHash
+  return jwt.sign({ sub: userId, type: 'reset' }, secret, { expiresIn: RESET_TTL })
+}
+
+export function verifyResetToken(token: string, passwordHash: string): { sub: string } {
+  const secret = JWT_SECRET + passwordHash
+  return jwt.verify(token, secret) as { sub: string }
 }
 
 // ─────────────────────────────────────────

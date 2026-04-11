@@ -42,8 +42,14 @@ const DANGEROUS_URL: RegExp[] = [
   /javascript\s*:/i,
 ]
 
-const PUBLIC_PATHS = ['/login', '/register']
-const API_AUTH_PATHS = ['/api/auth/login', '/api/auth/register', '/api/auth/refresh']
+const PUBLIC_PATHS = [
+  '/login', '/register', '/forgot-password', '/reset-password',
+  '/mentions-legales', '/confidentialite', '/cgu', '/contact',
+]
+const API_AUTH_PATHS = [
+  '/api/auth/login', '/api/auth/register', '/api/auth/refresh',
+  '/api/auth/forgot-password', '/api/auth/reset-password',
+]
 
 // ─────────────────────────────────────────
 // Helpers

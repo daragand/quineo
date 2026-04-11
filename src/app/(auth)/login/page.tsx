@@ -94,16 +94,26 @@ function LoginForm() {
             required
           />
 
-          <Input
-            label="Mot de passe"
-            type="password"
-            autoComplete="current-password"
-            placeholder="••••••••"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-            error={error ?? undefined}
-          />
+          <div>
+            <Input
+              label="Mot de passe"
+              type="password"
+              autoComplete="current-password"
+              placeholder="••••••••"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
+              error={error ?? undefined}
+            />
+            <div className="text-right mt-1">
+              <a
+                href="/forgot-password"
+                style={{ fontSize: 11, color: 'var(--color-amber-dark)', fontWeight: 600 }}
+              >
+                Mot de passe oublié ?
+              </a>
+            </div>
+          </div>
 
           <Button type="submit" fullWidth loading={loading} style={{ marginTop: 4 }}>
             Se connecter
