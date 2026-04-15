@@ -56,7 +56,7 @@ export function SuccessModal({ data, onClose }: SuccessModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* En-tête foncé */}
-        <div className="px-[18px] py-[15px]" style={{ background: '#0b1220' }}>
+        <div className="px-[18px] py-[15px]" style={{ background: '#0D1E2C' }}>
           <div className="flex items-center gap-[7px] mb-[5px]">
             <div
               aria-hidden="true"
@@ -131,7 +131,7 @@ export function SuccessModal({ data, onClose }: SuccessModalProps) {
             style={{
               padding: '9px 0',
               background: 'var(--color-amber)',
-              color: '#2C1500',
+              color: '#5C3A00',
               border: 'none',
               fontFamily: 'var(--font-body)',
               fontSize: 13,

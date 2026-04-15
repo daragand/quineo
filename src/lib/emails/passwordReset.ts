@@ -31,7 +31,7 @@ export function buildPasswordResetHtml({ firstName, resetUrl }: PasswordResetEma
     <tr>
       <td style="padding:20px 28px 24px;">
         <a href="${resetUrl}"
-           style="display:inline-block;background:#EF9F27;color:#2C1500;font-weight:700;font-size:13px;padding:12px 24px;border-radius:8px;text-decoration:none;">
+           style="display:inline-block;background:#FFD84D;color:#5C3A00;font-weight:700;font-size:13px;padding:12px 24px;border-radius:8px;text-decoration:none;">
           Réinitialiser mon mot de passe →
         </a>
       </td>

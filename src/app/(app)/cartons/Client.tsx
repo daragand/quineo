@@ -54,7 +54,7 @@ function initials(name: string) {
   return name.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()
 }
 
-const AVATAR_COLORS = ['#185FA5', '#3B6D11', '#534AB7', '#854F0B', '#A32D2D']
+const AVATAR_COLORS = ['#4A90B8', '#2BBFA4', '#534AB7', '#B84000', '#A32D2D']
 function avatarColor(name: string) {
   let h = 0
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % AVATAR_COLORS.length

@@ -118,7 +118,7 @@ export function PackGrid({ packs, quantities, alreadyBought, quotaMax, onChange 
                   className="absolute font-bold"
                   style={{
                     top: -1, right: 14,
-                    background: 'var(--color-amber)', color: '#2C1500',
+                    background: 'var(--color-amber)', color: '#5C3A00',
                     fontSize: 9, padding: '2px 9px',
                     borderRadius: '0 0 5px 5px', letterSpacing: '.07em',
                   }}

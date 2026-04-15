@@ -187,7 +187,7 @@ export default function DisplayLandingPage() {
             style={{
               fontSize:   14,
               background: 'var(--color-amber)',
-              color:      '#2C1500',
+              color:      '#5C3A00',
               border:     'none',
               fontFamily: 'var(--font-body)',
               cursor:     code.length < 4 ? 'not-allowed' : 'pointer',

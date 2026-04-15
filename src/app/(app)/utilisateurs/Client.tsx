@@ -38,12 +38,12 @@ const ROLE_DESC: Record<UserRole, string> = {
 }
 
 const ROLE_COLORS: Record<UserRole, { bg: string; color: string }> = {
-  admin:    { bg: '#FFF8EE', color: '#633806' },
-  operator: { bg: '#EEF4FC', color: '#0C447C' },
+  admin:    { bg: '#FFF7D6', color: '#7A5000' },
+  operator: { bg: '#E5F3FA', color: '#2F72A0' },
   viewer:   { bg: '#f0f2f5', color: '#4a5568' },
 }
 
-const AVATAR_COLORS = ['#185FA5', '#3B6D11', '#534AB7', '#854F0B', '#EF9F27']
+const AVATAR_COLORS = ['#4A90B8', '#2BBFA4', '#534AB7', '#B84000', '#FFD84D']
 function avatarColor(name: string) {
   let h = 0
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % AVATAR_COLORS.length

@@ -223,7 +223,7 @@ export function PaymentMode({ mode, totalDue, onModeChange, onCashChange }: Paym
             <div className="font-bold" style={{ fontSize: 12, color: 'var(--color-qblue-text)' }}>
               Faites payer sur le terminal
             </div>
-            <div style={{ fontSize: 11, color: '#378ADD', marginTop: 2 }}>
+            <div style={{ fontSize: 11, color: '#78AED0', marginTop: 2 }}>
               Présentez le terminal au participant, puis confirmez ici après acceptation.
             </div>
           </div>

@@ -20,7 +20,7 @@ interface RulesTableProps {
 
 const TIRAGE_TYPES: Array<{ id: TirageType; label: string; style: { bg: string; color: string } }> = [
   { id: 'quine',        label: 'Quine',        style: { bg: 'var(--color-qblue-bg)',  color: 'var(--color-qblue-text)' } },
-  { id: 'double_quine', label: 'Double Quine', style: { bg: 'var(--color-orange-bg)', color: '#633806' } },
+  { id: 'double_quine', label: 'Double Quine', style: { bg: 'var(--color-purple-bg)', color: 'var(--color-purple-text)' } },
   { id: 'carton_plein', label: 'Carton Plein', style: { bg: 'var(--color-qgreen-bg)', color: 'var(--color-qgreen-text)' } },
 ]
 
@@ -113,7 +113,7 @@ export function RulesTable({ rules, onChange }: RulesTableProps) {
                     )}
                     style={{
                       fontSize: 10,
-                      background: isOn ? '#0b1220' : 'var(--color-bg)',
+                      background: isOn ? '#0D1E2C' : 'var(--color-bg)',
                       color: isOn ? 'var(--color-amber)' : 'var(--color-text-secondary)',
                       border: isOn ? '.5px solid transparent' : '.5px solid var(--color-border)',
                     }}

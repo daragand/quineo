@@ -103,7 +103,7 @@ export function MobileTopbar({ userInitiales = 'U', actions }: MobileTopbarProps
             border: '2px solid transparent',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 12, fontWeight: 800,
-            color: '#85B7EB',
+            color: '#78AED0',
             flexShrink: 0,
           }}
         >

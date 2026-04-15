@@ -4,39 +4,39 @@
  */
 
 export const colors = {
-  navy:         '#0b1220',
-  navyLight:    '#111c31',
-  navyMid:      '#1a2e4a',
+  navy:         '#0D1E2C',
+  navyLight:    '#1A3045',
+  navyMid:      '#243858',
 
-  bg:           '#f4f5f9',
+  bg:           '#F4FAFD',
   card:         '#ffffff',
 
-  amber:        '#EF9F27',
-  amberDark:    '#2C1500',
-  amberBg:      '#FFF8EE',
+  amber:        '#FFD84D',
+  amberDark:    '#5C3A00',
+  amberBg:      '#FFF7D6',
 
-  qblue:        '#185FA5',
-  qblueBg:      '#EEF4FC',
-  qblueText:    '#0C447C',
+  qblue:        '#4A90B8',
+  qblueBg:      '#E5F3FA',
+  qblueText:    '#2F72A0',
 
-  qgreen:       '#3B6D11',
-  qgreenBg:     '#EAF3DE',
-  qgreenText:   '#27500A',
-  qgreenLive:   '#48BB78',
+  qgreen:       '#0F6E56',
+  qgreenBg:     '#D8F6F1',
+  qgreenText:   '#0A4D3B',
+  qgreenLive:   '#2BBFA4',
 
   qred:         '#A32D2D',
   qredBg:       '#FCEBEB',
 
-  orange:       '#854F0B',
-  orangeBg:     '#FAEEDA',
+  orange:       '#B84000',
+  orangeBg:     '#FFF0EA',
 
   purple:       '#534AB7',
   purpleBg:     '#EEEDFE',
 
-  textPrimary:   '#0b1220',
-  textSecondary: '#4a5568',
-  textMuted:     '#8a95a3',
-  textHint:      '#b0bcc8',
+  textPrimary:   '#0D1E2C',
+  textSecondary: '#4A6880',
+  textMuted:     '#9AB5C8',
+  textHint:      '#C8DFF0',
 } as const
 
 export const layout = {

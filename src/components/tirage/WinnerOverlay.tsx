@@ -81,7 +81,7 @@ export function WinnerOverlay({
         {/* Lot */}
         <div
           className="inline-block font-bold rounded-[5px] px-[18px] py-[5px] mb-[14px]"
-          style={{ fontSize: 12, background: 'var(--color-amber)', color: '#2C1500' }}
+          style={{ fontSize: 12, background: 'var(--color-amber)', color: '#5C3A00' }}
         >
           {TYPE_LABELS[tirageType]} — {lotName}{lotValue ? ` · ${lotValue} €` : ''}
         </div>
@@ -101,7 +101,7 @@ export function WinnerOverlay({
           className="font-bold rounded-[8px] px-[24px] py-[9px] cursor-pointer transition-opacity duration-[150ms] hover:opacity-90"
           style={{
             background:  'var(--color-amber)',
-            color:       '#2C1500',
+            color:       '#5C3A00',
             border:      'none',
             fontFamily:  'var(--font-body)',
             fontSize:    13,

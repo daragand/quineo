@@ -94,7 +94,7 @@ export function Topbar({
             width: 30, height: 30, borderRadius: '50%',
             background: 'var(--color-navy-mid)',
             fontSize: 11,
-            color: '#85B7EB',
+            color: '#78AED0',
           }}
           aria-label={`Utilisateur connecté : ${userInitiales}`}
           role="img"

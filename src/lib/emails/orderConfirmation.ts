@@ -75,7 +75,7 @@ export function buildOrderConfirmationHtml(p: OrderConfirmationParams): string {
               </tr>
               <tr>
                 <td style="font-size:13px;color:#475569;padding:10px 0 3px;border-top:1px solid #e2e8f0;">Total payé</td>
-                <td align="right" style="font-size:20px;font-weight:800;color:#EF9F27;padding-top:8px;border-top:1px solid #e2e8f0;">${amountStr}</td>
+                <td align="right" style="font-size:20px;font-weight:800;color:#FFD84D;padding-top:8px;border-top:1px solid #e2e8f0;">${amountStr}</td>
               </tr>
             </table>
           </td></tr>

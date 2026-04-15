@@ -60,7 +60,7 @@ function toSlug(s: string): string {
 const INITIAL: FormState = {
   name: '', lieu: '', description: '', slug: '', slugManual: false,
   date: '', time: '14:00', maxCartons: 500, status: 'draft',
-  colorPrimary: '#0b1220', colorSecondary: '#EF9F27',
+  colorPrimary: '#0D1E2C', colorSecondary: '#FFD84D',
   providers: { cash: true, cb: true, stripe: true, sumup: true, helloasso: false, free: false },
   saleDeadlineOnlineDate: '', saleDeadlineOnlineTime: '23:59',
   saleDeadlinePlaceDate: '',  saleDeadlinePlaceTime:  '16:00',
@@ -491,7 +491,7 @@ export default function NewSessionPage() {
             </div>
             <div
               className="inline-block font-bold rounded-[4px] px-[10px] py-[3px] mt-[8px]"
-              style={{ fontSize: 9, background: form.colorSecondary, color: '#2C1500' }}
+              style={{ fontSize: 9, background: form.colorSecondary, color: '#5C3A00' }}
             >
               Session {form.status === 'open' ? 'active' : 'brouillon'}
             </div>
@@ -679,7 +679,7 @@ export default function NewSessionPage() {
           >
             <div
               className="rounded-full flex items-center justify-center font-bold flex-shrink-0"
-              style={{ width: 26, height: 26, background: '#1a2e4a', fontSize: 10, color: '#85B7EB' }}
+              style={{ width: 26, height: 26, background: '#1A3045', fontSize: 10, color: '#78AED0' }}
               aria-hidden="true"
             >
               AL
@@ -694,7 +694,7 @@ export default function NewSessionPage() {
             </div>
             <span
               className="font-bold rounded-[4px] px-[8px] py-[2px]"
-              style={{ fontSize: 9, background: '#0b1220', color: 'var(--color-amber)' }}
+              style={{ fontSize: 9, background: '#0D1E2C', color: 'var(--color-amber)' }}
             >
               Admin
             </span>

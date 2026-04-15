@@ -81,7 +81,7 @@ export default async function DashboardPage() {
               </div>
               <Link href="/tirage"
                 className="inline-block font-bold rounded-[7px] px-[14px] py-[6px] transition-opacity hover:opacity-90"
-                style={{ fontSize: 12, background: 'var(--color-amber)', color: '#2C1500' }}>
+                style={{ fontSize: 12, background: 'var(--color-amber)', color: '#5C3A00' }}>
                 Lancer le jeu →
               </Link>
             </div>
@@ -99,7 +99,7 @@ export default async function DashboardPage() {
             <div className="flex items-center gap-[10px]">
               <Link href="/sessions/new"
                 className="font-bold rounded-[6px] px-[10px] py-[5px] transition-opacity hover:opacity-80"
-                style={{ fontSize: 11, background: 'var(--color-amber)', color: '#2C1500' }}>
+                style={{ fontSize: 11, background: 'var(--color-amber)', color: '#5C3A00' }}>
                 + Nouvelle
               </Link>
               <Link href="/sessions" className="font-bold hover:opacity-70 transition-opacity duration-[100ms]"

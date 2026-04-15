@@ -30,7 +30,7 @@ export function buildReminderHtml(p: ReminderParams): string {
   const displayLine = displayCode
     ? `<p style="margin:8px 0 0;font-size:12px;color:rgba(255,255,255,.6);">
         Code de session pour l&apos;écran de suivi :
-        <strong style="color:#EF9F27;letter-spacing:.12em;">${displayCode}</strong>
+        <strong style="color:#FFD84D;letter-spacing:.12em;">${displayCode}</strong>
        </p>`
     : ''
 
@@ -38,7 +38,7 @@ export function buildReminderHtml(p: ReminderParams): string {
     <table cellpadding="0" cellspacing="0" style="margin-top:20px;">
       <tr>
         <td style="vertical-align:middle;padding-right:12px;">
-          <div style="width:34px;height:34px;background:#854F0B;border-radius:50%;text-align:center;line-height:34px;font-size:18px;">⏰</div>
+          <div style="width:34px;height:34px;background:#4A90B8;border-radius:50%;text-align:center;line-height:34px;font-size:18px;">⏰</div>
         </td>
         <td style="vertical-align:middle;">
           <div style="color:#fff;font-size:22px;font-weight:800;letter-spacing:-.02em;">C&apos;est demain !</div>
@@ -76,7 +76,7 @@ export function buildReminderHtml(p: ReminderParams): string {
     <!-- Cartons interactifs + code display -->
     <tr>
       <td style="padding:0 28px 24px;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background:#0b1220;border-radius:8px;padding:16px 20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#0D1E2C;border-radius:8px;padding:16px 20px;">
           <tr><td>
             <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.45);margin-bottom:6px;">
               Suivez votre carton en direct
@@ -85,7 +85,7 @@ export function buildReminderHtml(p: ReminderParams): string {
               Pendant le tirage, ouvrez ce lien : les numéros s&apos;afficheront automatiquement sur vos cartons.
             </div>
             <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://quineo.fr'}/play/${paiementId}"
-               style="display:inline-block;background:#EF9F27;color:#2C1500;font-weight:700;font-size:12px;padding:8px 18px;border-radius:7px;text-decoration:none;">
+               style="display:inline-block;background:#FFD84D;color:#5C3A00;font-weight:700;font-size:12px;padding:8px 18px;border-radius:7px;text-decoration:none;">
               Ouvrir mes cartons interactifs →
             </a>
             ${displayLine}

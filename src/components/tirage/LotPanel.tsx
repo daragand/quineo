@@ -91,9 +91,9 @@ export function LotPanel({ name, value, order, total, tirageType, imageUrl }: Lo
         className="font-bold uppercase tracking-[.14em] rounded-[4px] px-[12px] py-[2px] text-center"
         style={{
           fontSize: 11,
-          background: '#1a2e4a',
-          color: '#85B7EB',
-          border: '1.5px solid #378ADD',
+          background: '#1A3045',
+          color: '#78AED0',
+          border: '1.5px solid #4A90B8',
         }}
       >
         {TYPE_LABELS[tirageType]}

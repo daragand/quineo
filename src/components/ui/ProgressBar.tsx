@@ -35,7 +35,7 @@ const STATE_STYLES: Record<ProgressState, {
 }> = {
   ok: {
     dot:    '#48BB78',
-    fill:   '#639922',
+    fill:   '#2BBFA4',
     label:  'var(--color-qgreen-text)',
     nums:   'var(--color-qgreen-text)',
     bg:     'var(--color-qgreen-bg)',

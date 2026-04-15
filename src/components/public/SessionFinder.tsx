@@ -126,7 +126,7 @@ export function SessionFinder({
             className="rounded-[8px] font-bold cursor-pointer transition-opacity duration-[150ms] hover:opacity-80 whitespace-nowrap"
             style={{
               padding:    '10px 18px',
-              background: '#0b1220',
+              background: '#0D1E2C',
               color:      'var(--color-amber)',
               border:     'none',
               fontFamily: 'var(--font-body)',

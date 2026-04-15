@@ -26,10 +26,10 @@ const TYPE_CONFIG: Record<TirageType, {
   bg: string; color: string; border: string
   sideBg: string; sideColor: string
 }> = {
-  quine:        { label: 'QUINE',        short: 'Q',  bg: '#1a2e4a', color: '#85B7EB', border: '#378ADD', sideBg: 'rgba(246,185,82,.12)',  sideColor: '#F6B952' },
+  quine:        { label: 'QUINE',        short: 'Q',  bg: '#1A3045', color: '#78AED0', border: '#4A90B8', sideBg: 'rgba(74,144,184,.15)',  sideColor: '#4A90B8' },
   double_quine: { label: 'DOUBLE QUINE', short: 'DQ', bg: '#2d1b6e', color: '#b8a6f5', border: '#7C3AED', sideBg: 'rgba(156,107,245,.15)', sideColor: '#9C6BF5' },
-  carton_plein: { label: 'CARTON PLEIN', short: 'CP', bg: '#0b2211', color: '#7BC77A', border: '#3a9e49', sideBg: 'rgba(133,235,158,.12)', sideColor: '#7BC77A' },
-  pause:        { label: 'PAUSE',        short: '⏸',  bg: '#1e2733', color: '#8a95a3', border: '#4a5568', sideBg: 'rgba(138,149,163,.1)',  sideColor: '#8a95a3' },
+  carton_plein: { label: 'CARTON PLEIN', short: 'CP', bg: '#0A2F28', color: '#2BBFA4', border: '#2BBFA4', sideBg: 'rgba(43,191,164,.12)',  sideColor: '#2BBFA4' },
+  pause:        { label: 'PAUSE',        short: '⏸',  bg: '#1e2733', color: '#9AB5C8', border: '#4A6880', sideBg: 'rgba(74,104,128,.1)',   sideColor: '#9AB5C8' },
 }
 
 // ─────────────────────────────────────────
@@ -264,7 +264,7 @@ function WinnerDialog({
           <div className="flex gap-[8px] mt-[14px]">
             <button type="button" onClick={confirm} disabled={!found || loading}
               className="flex-1 rounded-[8px] font-bold cursor-pointer transition-opacity duration-[150ms] hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ padding: '9px 0', background: 'var(--color-amber)', color: '#2C1500', border: 'none', fontFamily: 'var(--font-body)', fontSize: 13 }}>
+              style={{ padding: '9px 0', background: 'var(--color-amber)', color: '#5C3A00', border: 'none', fontFamily: 'var(--font-body)', fontSize: 13 }}>
               {loading ? 'Confirmation…' : 'Confirmer le gagnant'}
             </button>
             <button type="button" onClick={onClose}
@@ -535,7 +535,7 @@ function SessionPlanView({ sessions }: { sessions: AvailableSession[] }) {
           )}
           <button type="button" onClick={handleLaunch} disabled={loading}
             className="w-full font-bold rounded-[10px] py-[11px] cursor-pointer transition-opacity duration-[150ms] hover:opacity-90 disabled:opacity-50"
-            style={{ background: 'var(--color-amber)', color: '#2C1500', border: 'none', fontFamily: 'var(--font-body)', fontSize: 14 }}>
+            style={{ background: 'var(--color-amber)', color: '#5C3A00', border: 'none', fontFamily: 'var(--font-body)', fontSize: 14 }}>
             {loading ? 'Démarrage…' : 'Lancer le jeu →'}
           </button>
         </div>
@@ -671,7 +671,7 @@ function PauseView({ tirage }: { tirage: TirageData }) {
 
         <button type="button" onClick={handleResume} disabled={loading || !nextInSeq}
           className="font-bold rounded-[10px] px-[32px] py-[12px] cursor-pointer transition-opacity hover:opacity-90 disabled:opacity-50"
-          style={{ background: 'var(--color-amber)', color: '#2C1500', border: 'none', fontFamily: 'var(--font-body)', fontSize: 15 }}>
+          style={{ background: 'var(--color-amber)', color: '#5C3A00', border: 'none', fontFamily: 'var(--font-body)', fontSize: 15 }}>
           {loading ? 'Démarrage…' : nextInSeq ? 'Reprendre le jeu →' : 'Fin des tirages'}
         </button>
       </div>
@@ -885,7 +885,7 @@ function LiveTirage({ tirage, associationName }: { tirage: TirageData; associati
 
             <button type="button" onClick={drawNumber} disabled={drawLoading || drawn.length >= 90}
               className="font-bold rounded-[8px] px-[22px] py-[9px] cursor-pointer transition-opacity duration-[150ms] hover:opacity-90 disabled:opacity-50"
-              style={{ background: 'var(--color-amber)', color: '#2C1500', border: 'none', fontFamily: 'var(--font-body)', fontSize: 13 }}>
+              style={{ background: 'var(--color-amber)', color: '#5C3A00', border: 'none', fontFamily: 'var(--font-body)', fontSize: 13 }}>
               {drawLoading ? 'Tirage…' : 'Tirer un numéro'}
             </button>
           </div>

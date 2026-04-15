@@ -18,17 +18,17 @@ type BadgeVariant =
   | 'carton'      // carton plein — navy
 
 const STYLES: Record<BadgeVariant, { bg: string; color: string }> = {
-  active:    { bg: '#EAF3DE', color: '#27500A' },
-  running:   { bg: '#EAF3DE', color: '#27500A' },
-  draft:     { bg: '#f0f2f5', color: '#8a95a3' },
-  closed:    { bg: '#f0f2f5', color: '#4a5568' },
+  active:    { bg: '#D8F6F1', color: '#0A4D3B' },
+  running:   { bg: '#D8F6F1', color: '#0A4D3B' },
+  draft:     { bg: '#f0f2f5', color: '#9AB5C8' },
+  closed:    { bg: '#f0f2f5', color: '#4A6880' },
   cancelled: { bg: '#FCEBEB', color: '#501313' },
-  won:       { bg: '#FFF8EE', color: '#633806' },
-  pending:   { bg: '#EEF4FC', color: '#0C447C' },
-  sold:      { bg: '#EAF3DE', color: '#27500A' },
-  quine:     { bg: '#FFF8EE', color: '#633806' },
+  won:       { bg: '#FFF7D6', color: '#7A5000' },
+  pending:   { bg: '#E5F3FA', color: '#2F72A0' },
+  sold:      { bg: '#D8F6F1', color: '#0A4D3B' },
+  quine:     { bg: '#E5F3FA', color: '#2F72A0' },
   dquine:    { bg: '#EEEDFE', color: '#26215C' },
-  carton:    { bg: '#e8eaf0', color: '#0b1220' },
+  carton:    { bg: '#E5F3FA', color: '#0D1E2C' },
 }
 
 const LABELS: Record<BadgeVariant, string> = {

@@ -82,7 +82,7 @@ const PROVIDER_ICONS: Record<string, IconSpec> = {
 
 const DEFAULT_PROVIDER: Provider = { type: 'online', name: 'Paiement en ligne sécurisé' }
 const DEFAULT_ICON: IconSpec = {
-  bg: '#0b1220',
+  bg: '#0D1E2C',
   icon: (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <rect x="3" y="11" width="18" height="11" rx="2" stroke="white" strokeWidth="1.8" />
@@ -419,7 +419,7 @@ export function CheckoutSummary({
             style={{
               padding:    '11px 0',
               background: 'var(--color-amber)',
-              color:      '#2C1500',
+              color:      '#5C3A00',
               border:     'none',
               fontFamily: 'var(--font-body)',
               fontSize:   14,

@@ -189,7 +189,7 @@ export default async function SessionBoutiquePage({ params }: Props) {
             <a
               href="/display"
               className="inline-block rounded-[8px] font-bold transition-opacity hover:opacity-80"
-              style={{ padding: '9px 20px', background: 'var(--color-amber)', color: '#2C1500', fontSize: 13, textDecoration: 'none' }}
+              style={{ padding: '9px 20px', background: 'var(--color-amber)', color: '#5C3A00', fontSize: 13, textDecoration: 'none' }}
             >
               Trouver une session →
             </a>

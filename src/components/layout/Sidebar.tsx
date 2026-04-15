@@ -268,7 +268,7 @@ export function Sidebar({
               style={{
                 width: 24, height: 24, borderRadius: '50%',
                 background: 'var(--color-navy-mid)',
-                fontSize: 10, color: '#85B7EB',
+                fontSize: 10, color: '#78AED0',
               }}
               aria-hidden="true"
             >

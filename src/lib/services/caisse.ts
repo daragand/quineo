@@ -9,7 +9,7 @@ import { assocScope } from './scope'
 import type { TokenPayload } from '@/lib/auth'
 import type { Pack } from '@/components/caisse/ForfaitList'
 
-const PACK_COLORS = ['#185FA5', '#3B6D11', '#534AB7', '#854F0B', '#A32D2D', '#0891B2']
+const PACK_COLORS = ['#4A90B8', '#2BBFA4', '#534AB7', '#B84000', '#A32D2D', '#0891B2']
 
 export interface CaisseSession {
   id:          string

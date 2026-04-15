@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
       subject: `[Contact Quineo] ${subject}`,
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;">
-          <h2 style="color:#0b1220;margin-bottom:16px;">Nouveau message via le formulaire de contact</h2>
+          <h2 style="color:#0D1E2C;margin-bottom:16px;">Nouveau message via le formulaire de contact</h2>
           <table style="width:100%;border-collapse:collapse;font-size:13px;">
             <tr>
               <td style="padding:8px 12px;background:#f8fafc;font-weight:700;color:#64748b;width:30%;">Nom</td>

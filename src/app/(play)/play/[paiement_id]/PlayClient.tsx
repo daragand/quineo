@@ -98,7 +98,7 @@ function CartonGrid({
         boxShadow:     isWinner
           ? '0 0 24px rgba(72,187,120,.25)'
           : '0 2px 12px rgba(0,0,0,.4)',
-        background:    '#111c31',
+        background:    '#1A3045',
       }}
     >
       {/* Header carton */}
@@ -149,19 +149,19 @@ function CartonGrid({
                         : isCalled
                           ? rowComplete
                             ? 'rgba(72,187,120,.25)'
-                            : 'rgba(239,159,39,.22)'
+                            : 'rgba(255,216,77,.22)'
                           : 'rgba(255,255,255,.07)',
                       color: isEmpty
                         ? 'transparent'
                         : isCalled
-                          ? rowComplete ? '#48BB78' : '#EF9F27'
+                          ? rowComplete ? '#48BB78' : '#FFD84D'
                           : 'rgba(255,255,255,.55)',
                       boxShadow: isNew
-                        ? '0 0 0 1.5px #EF9F27, 0 0 10px rgba(239,159,39,.5)'
+                        ? '0 0 0 1.5px #FFD84D, 0 0 10px rgba(255,216,77,.5)'
                         : isCalled && !isEmpty
                           ? rowComplete
                             ? '0 0 0 1px rgba(72,187,120,.4)'
-                            : '0 0 0 1px rgba(239,159,39,.3)'
+                            : '0 0 0 1px rgba(255,216,77,.3)'
                           : 'none',
                       // Animation bounce sur le nouveau numéro
                       animation: isNew ? `cell-pop 0.4s ease-out` : undefined,
@@ -218,7 +218,7 @@ function WinnerOverlay({
               width:     `${6 + Math.random() * 8}px`,
               height:    `${6 + Math.random() * 8}px`,
               borderRadius: Math.random() > 0.5 ? '50%' : '2px',
-              background: ['#EF9F27', '#48BB78', '#378ADD', '#E879F9', '#F97316', '#FBBF24'][i % 6],
+              background: ['#FFD84D', '#48BB78', '#78AED0', '#E879F9', '#F97316', '#FBBF24'][i % 6],
               animation: `confetti-fall ${1.5 + Math.random() * 2}s ${Math.random() * 0.8}s ease-in forwards`,
               transform: `rotate(${Math.random() * 360}deg)`,
             }}
@@ -230,7 +230,7 @@ function WinnerOverlay({
       <div
         style={{
           position:     'relative',
-          background:   '#111c31',
+          background:   '#1A3045',
           border:       '1px solid rgba(72,187,120,.5)',
           borderRadius: 20,
           padding:      '40px 32px',
@@ -436,7 +436,7 @@ export default function PlayClient({ paiementId, session, cartons, initialTirage
       <div
         style={{
           minHeight:   '100vh',
-          background:  '#0b1220',
+          background:  '#0D1E2C',
           display:     'flex',
           flexDirection: 'column',
         }}
@@ -444,7 +444,7 @@ export default function PlayClient({ paiementId, session, cartons, initialTirage
         {/* ── Header ── */}
         <header
           style={{
-            background:     '#111c31',
+            background:     '#1A3045',
             borderBottom:   '1px solid rgba(255,255,255,.06)',
             padding:        '12px 16px',
             display:        'flex',
@@ -461,11 +461,11 @@ export default function PlayClient({ paiementId, session, cartons, initialTirage
                   alignItems:     'center',
                   justifyContent: 'center',
                   width:          22, height: 22,
-                  background:     '#EF9F27',
+                  background:     '#FFD84D',
                   borderRadius:   5,
                   fontWeight:     900,
                   fontSize:       12,
-                  color:          '#2C1500',
+                  color:          '#5C3A00',
                 }}
               >Q</span>
               <span style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>quineo</span>
@@ -493,8 +493,8 @@ export default function PlayClient({ paiementId, session, cartons, initialTirage
             <div
               style={{
                 marginBottom:   16,
-                background:     'rgba(239,159,39,.08)',
-                border:         '1px solid rgba(239,159,39,.2)',
+                background:     'rgba(255,216,77,.08)',
+                border:         '1px solid rgba(255,216,77,.2)',
                 borderRadius:   10,
                 padding:        '14px 16px',
                 display:        'flex',
@@ -504,7 +504,7 @@ export default function PlayClient({ paiementId, session, cartons, initialTirage
             >
               <span style={{ fontSize: 18, flexShrink: 0 }}>⏳</span>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#EF9F27', marginBottom: 3 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#FFD84D', marginBottom: 3 }}>
                   Partie pas encore commencée
                 </div>
                 <div style={{ fontSize: 12, color: 'rgba(255,255,255,.5)', lineHeight: 1.5 }}>
@@ -556,7 +556,7 @@ export default function PlayClient({ paiementId, session, cartons, initialTirage
                 <div style={{ fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,.3)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 2 }}>
                   Objectif
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#EF9F27' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#FFD84D' }}>
                   {TIRAGE_LABELS[tirageType] ?? tirageType}
                 </div>
                 {lotName && (
@@ -577,13 +577,13 @@ export default function PlayClient({ paiementId, session, cartons, initialTirage
                     style={{
                       width:          44, height: 44,
                       borderRadius:   '50%',
-                      background:     '#EF9F27',
+                      background:     '#FFD84D',
                       display:        'flex',
                       alignItems:     'center',
                       justifyContent: 'center',
                       fontSize:       18,
                       fontWeight:     900,
-                      color:          '#2C1500',
+                      color:          '#5C3A00',
                       animation:      'pulse-ring 0.6s ease-out',
                     }}
                   >
@@ -632,7 +632,7 @@ export default function PlayClient({ paiementId, session, cartons, initialTirage
           >
             {[
               { color: 'rgba(255,255,255,.07)', border: 'none',                     label: 'Non tiré' },
-              { color: 'rgba(239,159,39,.22)',  border: '1px solid rgba(239,159,39,.3)', label: 'Tiré' },
+              { color: 'rgba(255,216,77,.22)',  border: '1px solid rgba(255,216,77,.3)', label: 'Tiré' },
               { color: 'rgba(72,187,120,.25)',  border: '1px solid rgba(72,187,120,.4)', label: 'Ligne complète' },
             ].map(({ color, border, label }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

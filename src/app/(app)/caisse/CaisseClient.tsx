@@ -26,7 +26,7 @@ interface CaisseClientProps {
   requireBirthDate: boolean
 }
 
-const AVATAR_COLORS = ['#185FA5', '#3B6D11', '#534AB7', '#854F0B', '#A32D2D', '#0891B2']
+const AVATAR_COLORS = ['#4A90B8', '#2BBFA4', '#534AB7', '#B84000', '#A32D2D', '#0891B2']
 function avatarColor(name: string) {
   let h = 0
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % AVATAR_COLORS.length
@@ -170,7 +170,7 @@ function NewParticipantModal({
           <div className="flex gap-[8px] mt-[4px]">
             <button type="button" onClick={handleCreate} disabled={loading}
               className="flex-1 rounded-[8px] font-bold cursor-pointer transition-opacity duration-[150ms] hover:opacity-90 disabled:opacity-50"
-              style={{ padding: '9px 0', background: 'var(--color-amber)', color: '#2C1500', border: 'none', fontFamily: 'var(--font-body)', fontSize: 13 }}>
+              style={{ padding: '9px 0', background: 'var(--color-amber)', color: '#5C3A00', border: 'none', fontFamily: 'var(--font-body)', fontSize: 13 }}>
               {loading ? 'Création…' : 'Créer le participant'}
             </button>
             <button type="button" onClick={onClose}
@@ -454,7 +454,7 @@ export default function CaisseClient({ session, packs, cartonsAvailable, require
               </button>
               <button type="button" onClick={validate} disabled={!hasSelection || loading}
                 className="flex-1 rounded-[8px] font-bold cursor-pointer transition-opacity duration-[150ms] hover:opacity-90 disabled:opacity-35 disabled:cursor-not-allowed"
-                style={{ padding: '9px 0', background: 'var(--color-amber)', color: '#2C1500', border: 'none', fontFamily: 'var(--font-body)', fontSize: 13 }}>
+                style={{ padding: '9px 0', background: 'var(--color-amber)', color: '#5C3A00', border: 'none', fontFamily: 'var(--font-body)', fontSize: 13 }}>
                 {loading ? 'Traitement…' : 'Valider la vente'}
               </button>
             </div>

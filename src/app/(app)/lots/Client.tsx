@@ -196,10 +196,10 @@ function LotImageManager({
             style={{ background: 'var(--color-amber)', display: 'inline-flex' }}
           >
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M8 1v10M4 5l4-4 4 4" stroke="#2C1500" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <rect x="1" y="12" width="14" height="2.5" rx="1" fill="#2C1500" opacity=".5"/>
+              <path d="M8 1v10M4 5l4-4 4 4" stroke="#5C3A00" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <rect x="1" y="12" width="14" height="2.5" rx="1" fill="#5C3A00" opacity=".5"/>
             </svg>
-            <span className="font-bold" style={{ fontSize: 11, color: '#2C1500' }}>
+            <span className="font-bold" style={{ fontSize: 11, color: '#5C3A00' }}>
               {uploading ? 'Envoi…' : 'Choisir un fichier'}
             </span>
             <input
@@ -228,7 +228,7 @@ function LotImageManager({
           <button
             onClick={handleSaveUrl}
             className="rounded-[6px] px-[9px] py-[5px] font-bold hover:opacity-90 transition-opacity"
-            style={{ fontSize: 11, background: 'var(--color-amber)', color: '#2C1500', border: 'none', cursor: 'pointer' }}
+            style={{ fontSize: 11, background: 'var(--color-amber)', color: '#5C3A00', border: 'none', cursor: 'pointer' }}
           >
             Sauvegarder
           </button>

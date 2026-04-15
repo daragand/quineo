@@ -16,7 +16,7 @@ export function Grid90({ drawn, current }: Grid90Props) {
         </span>
         <div className="flex items-center gap-[5px] ml-[8px]">
           {[
-            { bg: '#EF9F27',                        label: 'Tiré',     border: 'none' },
+            { bg: 'var(--tirage-cell-drawn-bg)',       label: 'Tiré',     border: 'none' },
             { bg: 'var(--tirage-cell-curr-bg)',      label: 'Dernier',  border: 'none' },
             { bg: 'var(--tirage-cell-empty-bg)',     label: 'Non tiré', border: '1px solid var(--tirage-cell-empty-border)' },
           ].map(({ bg, label, border }) => (

@@ -186,7 +186,7 @@ function RetourContent() {
         {/* Header succès */}
         <div
           className="rounded-t-[14px] px-[24px] py-[20px]"
-          style={{ background: '#0b1220' }}
+          style={{ background: '#0D1E2C' }}
         >
           <div className="flex items-center gap-[10px] mb-[4px]">
             <div
@@ -275,7 +275,7 @@ function RetourContent() {
             <a
               href="/display"
               className="inline-block rounded-[7px] font-bold transition-opacity duration-[150ms] hover:opacity-80"
-              style={{ padding: '8px 18px', background: '#0b1220', color: 'var(--color-amber)', fontSize: 12, textDecoration: 'none' }}
+              style={{ padding: '8px 18px', background: '#0D1E2C', color: 'var(--color-amber)', fontSize: 12, textDecoration: 'none' }}
             >
               Suivre le tirage en direct →
             </a>

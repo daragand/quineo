@@ -80,7 +80,7 @@ export function BoutiqueClient({ session }: { session: SessionPublicData }) {
             style={{
               padding:    '12px 0',
               background: 'var(--color-amber)',
-              color:      '#2C1500',
+              color:      '#5C3A00',
               border:     'none',
               fontFamily: 'var(--font-body)',
               fontSize:   14,
@@ -146,7 +146,7 @@ function ConfirmView({
       {/* Card header */}
       <div
         className="rounded-t-[12px] px-[20px] py-[18px]"
-        style={{ background: '#0b1220' }}
+        style={{ background: '#0D1E2C' }}
       >
         <div className="flex items-center gap-[10px] mb-[4px]">
           <div
@@ -250,7 +250,7 @@ function ConfirmView({
             className="inline-block rounded-[7px] font-bold transition-opacity duration-[150ms] hover:opacity-80"
             style={{
               padding:    '8px 18px',
-              background: '#0b1220',
+              background: '#0D1E2C',
               color:      'var(--color-amber)',
               fontSize:   12,
               textDecoration: 'none',

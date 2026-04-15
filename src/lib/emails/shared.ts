@@ -14,7 +14,7 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://quineo.fr'
 export function cartonBadgesHtml(cartons: CartonPdfData[]): string {
   return cartons
     .map(c =>
-      `<span style="display:inline-block;background:#1e293b;color:#EF9F27;font-weight:700;` +
+      `<span style="display:inline-block;background:#1A3045;color:#FFD84D;font-weight:700;` +
       `font-size:13px;padding:4px 10px;border-radius:4px;margin:3px;font-family:monospace,sans-serif;` +
       `letter-spacing:.08em;">${c.serial}</span>`
     )
@@ -24,7 +24,7 @@ export function cartonBadgesHtml(cartons: CartonPdfData[]): string {
 /** Bloc "Suivez votre carton en direct" (lien /play). */
 export function playBlockHtml(paiementId: string): string {
   return `<tr><td style="padding:0 28px 24px;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0b1220;border-radius:8px;padding:16px 20px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0D1E2C;border-radius:8px;padding:16px 20px;">
     <tr><td>
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.45);margin-bottom:6px;">
         Suivez votre carton en direct
@@ -33,7 +33,7 @@ export function playBlockHtml(paiementId: string): string {
         Pendant le tirage, ouvrez ce lien sur votre téléphone : les numéros appelés s&apos;afficheront automatiquement sur vos cartons.
       </div>
       <a href="${APP_URL}/play/${paiementId}"
-         style="display:inline-block;background:#EF9F27;color:#2C1500;font-weight:700;font-size:12px;padding:8px 18px;border-radius:7px;text-decoration:none;">
+         style="display:inline-block;background:#FFD84D;color:#5C3A00;font-weight:700;font-size:12px;padding:8px 18px;border-radius:7px;text-decoration:none;">
         Ouvrir mes cartons interactifs →
       </a>
     </td></tr>
@@ -45,17 +45,17 @@ export function playBlockHtml(paiementId: string): string {
 export function displayBlockHtml(displayCode: string | null | undefined): string {
   if (!displayCode) return ''
   return `<tr><td style="padding:0 28px 24px;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0b1220;border-radius:8px;padding:16px 20px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0D1E2C;border-radius:8px;padding:16px 20px;">
     <tr><td>
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.45);margin-bottom:6px;">
         Le jour du loto
       </div>
       <div style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:12px;">
         Suivez le tirage en direct depuis chez vous — code de session :
-        <strong style="color:#EF9F27;font-size:15px;letter-spacing:.12em;">${displayCode}</strong>
+        <strong style="color:#FFD84D;font-size:15px;letter-spacing:.12em;">${displayCode}</strong>
       </div>
       <a href="${APP_URL}/display"
-         style="display:inline-block;background:#EF9F27;color:#2C1500;font-weight:700;font-size:12px;padding:8px 18px;border-radius:7px;text-decoration:none;">
+         style="display:inline-block;background:#FFD84D;color:#5C3A00;font-weight:700;font-size:12px;padding:8px 18px;border-radius:7px;text-decoration:none;">
         Ouvrir l&apos;écran de suivi →
       </a>
     </td></tr>
@@ -97,12 +97,12 @@ export function emailLayout(p: LayoutParams): string {
 
   <!-- Header navy -->
   <tr>
-    <td style="background:#0b1220;border-radius:12px 12px 0 0;padding:24px 28px;">
+    <td style="background:#0D1E2C;border-radius:12px 12px 0 0;padding:24px 28px;">
       <!-- Logo + ref -->
       <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td>
-            <span style="display:inline-block;background:#EF9F27;color:#412402;font-weight:900;font-size:15px;width:30px;height:30px;line-height:30px;text-align:center;border-radius:6px;vertical-align:middle;">Q</span>
+            <span style="display:inline-block;background:#FFD84D;color:#5C3A00;font-weight:900;font-size:15px;width:30px;height:30px;line-height:30px;text-align:center;border-radius:6px;vertical-align:middle;">Q</span>
             <span style="color:#fff;font-size:14px;font-weight:700;margin-left:9px;vertical-align:middle;letter-spacing:.04em;">Quineo</span>
           </td>
           <td align="right">

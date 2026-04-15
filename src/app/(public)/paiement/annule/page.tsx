@@ -39,7 +39,7 @@ function AnnuleContent() {
           style={{
             padding:    '10px 28px',
             background: 'var(--color-amber)',
-            color:      '#2C1500',
+            color:      '#5C3A00',
             border:     'none',
             fontFamily: 'var(--font-body)',
             fontSize:   14,

@@ -534,7 +534,7 @@ export function ManageSessionClient({ session }: { session: SessionManageData })
                   onClick={handleGenerateCode}
                   disabled={codeLoading}
                   className="rounded-[7px] px-[12px] py-[7px] font-bold transition-opacity hover:opacity-90 disabled:opacity-40"
-                  style={{ fontSize: 12, background: 'var(--color-amber)', color: '#2C1500', border: 'none', cursor: codeLoading ? 'wait' : 'pointer', alignSelf: 'flex-start' }}
+                  style={{ fontSize: 12, background: 'var(--color-amber)', color: '#5C3A00', border: 'none', cursor: codeLoading ? 'wait' : 'pointer', alignSelf: 'flex-start' }}
                 >
                   {codeLoading ? 'Génération…' : 'Générer un code →'}
                 </button>
@@ -608,7 +608,7 @@ export function ManageSessionClient({ session }: { session: SessionManageData })
                     onClick={handleSavePack}
                     disabled={packSaving}
                     className="rounded-[6px] px-[10px] py-[5px] font-bold transition-opacity hover:opacity-90 disabled:opacity-40"
-                    style={{ fontSize: 11, background: 'var(--color-amber)', color: '#2C1500', border: 'none', cursor: packSaving ? 'wait' : 'pointer' }}
+                    style={{ fontSize: 11, background: 'var(--color-amber)', color: '#5C3A00', border: 'none', cursor: packSaving ? 'wait' : 'pointer' }}
                   >
                     {packSaving ? 'Enregistrement…' : 'Enregistrer'}
                   </button>

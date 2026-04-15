@@ -688,7 +688,7 @@ function TabPaiements({ providers: initialProviders }: { providers: ProviderData
                               onClick={confirmUnlock}
                               disabled={unlockLoading}
                               className="rounded-[6px] px-[10px] font-bold transition-opacity hover:opacity-90 disabled:opacity-40"
-                              style={{ fontSize: 11, background: 'var(--color-amber)', color: '#2C1500', border: 'none', cursor: unlockLoading ? 'wait' : 'pointer', flexShrink: 0 }}
+                              style={{ fontSize: 11, background: 'var(--color-amber)', color: '#5C3A00', border: 'none', cursor: unlockLoading ? 'wait' : 'pointer', flexShrink: 0 }}
                             >
                               {unlockLoading ? '…' : 'Confirmer'}
                             </button>
@@ -750,7 +750,7 @@ function TabPaiements({ providers: initialProviders }: { providers: ProviderData
               onClick={handleSave}
               disabled={saving}
               className="rounded-[7px] px-[12px] py-[6px] font-bold transition-opacity hover:opacity-90 disabled:opacity-40"
-              style={{ fontSize: 12, background: 'var(--color-amber)', color: '#2C1500', border: 'none', cursor: saving ? 'wait' : 'pointer' }}
+              style={{ fontSize: 12, background: 'var(--color-amber)', color: '#5C3A00', border: 'none', cursor: saving ? 'wait' : 'pointer' }}
             >
               {saving ? 'Enregistrement…' : editingId ? 'Mettre à jour' : 'Ajouter le prestataire'}
             </button>
