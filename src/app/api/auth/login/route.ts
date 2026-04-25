@@ -11,7 +11,7 @@ const LoginSchema = z.object({
 
 export async function POST(req: NextRequest) {
   const ip    = getClientIp(req)
-  const limit = rateLimit(`login:${ip}`, LIMITS.auth)
+  const limit = await rateLimit(`login:${ip}`, LIMITS.auth)
   if (!limit.success) return tooManyRequests(limit)
 
   try {

@@ -1,16 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { timingSafeEqual }          from 'crypto'
 import { db }                        from '@/lib/db'
 import { confirmPayment }            from '@/lib/payment/confirm'
 import { capturePayPalOrder }        from '@/lib/payment/paypal'
 
-// ─────────────────────────────────────────
-// POST /api/webhooks/paypal
-// Reçoit les événements PayPal IPN / Webhooks v2
-//
-// Configuration dans PayPal Developer Dashboard :
-//   Endpoint URL : https://votreapp.com/api/webhooks/paypal
-//   Événements   : CHECKOUT.ORDER.APPROVED, PAYMENT.CAPTURE.COMPLETED
-// ─────────────────────────────────────────
+function verifyToken(provided: string, expected: string): boolean {
+  try {
+    const a = Buffer.from(provided)
+    const b = Buffer.from(expected)
+    if (a.length !== b.length) return false
+    return timingSafeEqual(a, b)
+  } catch {
+    return false
+  }
+}
 
 export async function POST(req: NextRequest) {
   let body: Record<string, unknown>
@@ -23,7 +26,6 @@ export async function POST(req: NextRequest) {
   const eventType    = body.event_type as string
   const resource     = (body.resource ?? {}) as Record<string, unknown>
 
-  // Extraire le paiement_id depuis purchase_units[0].reference_id
   const purchaseUnits = (resource.purchase_units ?? []) as Array<{ reference_id?: string }>
   const paiementId    = purchaseUnits[0]?.reference_id
 
@@ -34,8 +36,26 @@ export async function POST(req: NextRequest) {
   const p = paiement?.toJSON() as any
   if (!p || p.status !== 'pending') return NextResponse.json({ received: true })
 
+  // Authentification par token dans l'URL (?token=...) — stocké dans config.webhook_token
+  // L'URL à configurer dans PayPal Dashboard est : https://app.example.com/api/webhooks/paypal?token=<webhook_token>
+  if (p.provider_id) {
+    const provider = await db.PaymentProvider.findOne({ where: { id: p.provider_id } })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const prov         = provider?.toJSON() as any
+    const webhookToken = prov?.config?.webhook_token as string | undefined
+
+    if (!webhookToken) {
+      console.error('[webhook/paypal] webhook_token absent pour le provider', p.provider_id)
+      return NextResponse.json({ error: 'Webhook non configuré' }, { status: 500 })
+    }
+
+    const urlToken = req.nextUrl.searchParams.get('token') ?? ''
+    if (!urlToken || !verifyToken(urlToken, webhookToken)) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    }
+  }
+
   if (eventType === 'CHECKOUT.ORDER.APPROVED') {
-    // Charger le provider pour capturer via API
     const provider = await db.PaymentProvider.findOne({ where: { id: p.provider_id } })
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const prov   = provider?.toJSON() as any

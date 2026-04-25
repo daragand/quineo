@@ -5,6 +5,7 @@ import { verifyStripeCheckout }      from '@/lib/payment/stripe'
 import { capturePayPalOrder }        from '@/lib/payment/paypal'
 import { getSumUpCheckoutStatus }    from '@/lib/payment/sumup'
 import { getHelloAssoCheckoutStatus } from '@/lib/payment/helloasso'
+import { verifyViewToken }           from '@/lib/auth'
 
 // ─────────────────────────────────────────
 // GET /api/public/payment/verify
@@ -23,9 +24,14 @@ export async function GET(req: NextRequest) {
 
   const paiementId = sp.get('paiement_id')
   const provider   = sp.get('provider')
+  const viewToken  = sp.get('view_token')
 
   if (!paiementId) {
     return NextResponse.json({ error: 'Paramètre paiement_id manquant' }, { status: 400 })
+  }
+
+  if (!viewToken || !verifyViewToken(paiementId, viewToken)) {
+    return NextResponse.json({ error: 'Lien invalide' }, { status: 403 })
   }
 
   // Charger le paiement

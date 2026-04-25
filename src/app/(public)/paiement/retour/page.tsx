@@ -31,16 +31,19 @@ function RetourContent() {
   const provider   = params.get('provider')
   const sessionId  = params.get('session_id')   // Stripe
   const token      = params.get('token')         // PayPal
+  const viewToken  = params.get('view_token')
 
   useEffect(() => {
-    if (!paiementId) {
-      setErrorMsg('Paramètre de paiement manquant.')
+    // Validation côté client : les deux paramètres sont obligatoires
+    if (!paiementId || !viewToken) {
+      setErrorMsg('Lien de confirmation invalide.')
       setState('error')
       return
     }
 
     const url = new URL('/api/public/payment/verify', window.location.origin)
     url.searchParams.set('paiement_id', paiementId)
+    url.searchParams.set('view_token',  viewToken)
     if (provider)  url.searchParams.set('provider',   provider)
     if (sessionId) url.searchParams.set('session_id', sessionId)
     if (token)     url.searchParams.set('token',      token)

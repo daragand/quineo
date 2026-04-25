@@ -14,7 +14,7 @@ const ContactSchema = z.object({
 
 export async function POST(req: NextRequest) {
   const ip    = getClientIp(req)
-  const limit = rateLimit(`contact:${ip}`, LIMITS.contact)
+  const limit = await rateLimit(`contact:${ip}`, LIMITS.contact)
   if (!limit.success) return tooManyRequests(limit)
 
   let body: unknown

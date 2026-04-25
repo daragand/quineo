@@ -8,11 +8,10 @@ import path from 'path'
 const UPLOADS_ROOT = path.join(process.cwd(), 'public', 'uploads', 'sessions')
 
 const ALLOWED: Record<string, string> = {
-  'image/png':     'png',
-  'image/jpeg':    'jpg',
-  'image/gif':     'gif',
-  'image/webp':    'webp',
-  'image/svg+xml': 'svg',
+  'image/png':  'png',
+  'image/jpeg': 'jpg',
+  'image/gif':  'gif',
+  'image/webp': 'webp',
 }
 
 const MAX_BYTES = 2 * 1024 * 1024 // 2 Mo

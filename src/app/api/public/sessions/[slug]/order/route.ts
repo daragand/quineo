@@ -7,6 +7,7 @@ import { createPayPalOrder }       from '@/lib/payment/paypal'
 import { createSumUpCheckout }     from '@/lib/payment/sumup'
 import { createHelloAssoCheckout } from '@/lib/payment/helloasso'
 import { rateLimit, getClientIp, tooManyRequests, LIMITS } from '@/lib/rate-limit'
+import { signViewToken } from '@/lib/auth'
 
 type Ctx = { params: Promise<{ slug: string }> }
 
@@ -30,7 +31,7 @@ const OrderSchema = z.object({
 
 export async function POST(req: NextRequest, ctx: Ctx) {
   const ip    = getClientIp(req)
-  const limit = rateLimit(`order:${ip}`, LIMITS.order)
+  const limit = await rateLimit(`order:${ip}`, LIMITS.order)
   if (!limit.success) return tooManyRequests(limit)
 
   const { slug } = await ctx.params
@@ -195,12 +196,15 @@ export async function POST(req: NextRequest, ctx: Ctx) {
 
   // ── Cas gratuit (amount = 0) ou provider 'other' ──────────────────────
 
+  const viewToken = signViewToken(result.paiementId)
+
   if (totalAmount === 0 || !providerData) {
     await confirmPayment(result.paiementId)
 
     return NextResponse.json({
       completed:   true,
       paiement_id: result.paiementId,
+      view_token:  viewToken,
       cartons:     result.assignedCartons,
       amount:      totalAmount,
     }, { status: 201 })
@@ -209,7 +213,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   // ── Initier le paiement auprès du provider ────────────────────────────
 
   const sessionDescription = `Loto ${s.name} — ${totalCartons} carton${totalCartons > 1 ? 's' : ''}`
-  const returnBase  = `${APP_URL}/paiement/retour?paiement_id=${result.paiementId}`
+  const returnBase  = `${APP_URL}/paiement/retour?paiement_id=${result.paiementId}&view_token=${viewToken}`
   const cancelUrl   = `${APP_URL}/paiement/annule?paiement_id=${result.paiementId}`
   const errorUrl    = `${APP_URL}/paiement/annule?paiement_id=${result.paiementId}&error=1`
 
@@ -286,11 +290,11 @@ export async function POST(req: NextRequest, ctx: Ctx) {
         break
       }
       default:
-        // Provider 'other' — ne devrait pas arriver ici, mais par sécurité
         await confirmPayment(result.paiementId)
         return NextResponse.json({
           completed:   true,
           paiement_id: result.paiementId,
+          view_token:  viewToken,
           cartons:     result.assignedCartons,
           amount:      totalAmount,
         }, { status: 201 })

@@ -17,7 +17,7 @@ const Schema = z.object({
 export const POST = withAuth(async (req: NextRequest, { user }) => {
   // Rate limit : 5 tentatives / 15 min par IP
   const ip    = getClientIp(req)
-  const limit = rateLimit(`change-pwd:${ip}`, { limit: 5, window: 900 })
+  const limit = await rateLimit(`change-pwd:${ip}`, { limit: 5, window: 900 })
   if (!limit.success) return tooManyRequests(limit)
 
   let body: unknown

@@ -12,7 +12,7 @@ const Schema = z.object({
 
 export async function POST(req: NextRequest) {
   const ip    = getClientIp(req)
-  const limit = rateLimit(`reset-pwd:${ip}`, LIMITS.auth)
+  const limit = await rateLimit(`reset-pwd:${ip}`, LIMITS.auth)
   if (!limit.success) return tooManyRequests(limit)
 
   try {

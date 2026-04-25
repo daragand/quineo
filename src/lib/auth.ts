@@ -4,6 +4,7 @@
 
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
+import { createHmac, timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 
 // ─────────────────────────────────────────
@@ -12,9 +13,23 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const JWT_SECRET         = process.env.JWT_SECRET         ?? 'dev-secret-change-me'
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret'
+const VIEW_SECRET        = process.env.PAYMENT_VIEW_SECRET ?? 'dev-view-secret'
 const ACCESS_TTL  = '8h'
 const REFRESH_TTL = '30d'
 const RESET_TTL   = '1h'
+
+// Fail fast en production si les secrets ne sont pas définis
+if (process.env.NODE_ENV === 'production') {
+  const missing: string[] = []
+  if (JWT_SECRET         === 'dev-secret-change-me') missing.push('JWT_SECRET')
+  if (JWT_REFRESH_SECRET === 'dev-refresh-secret')   missing.push('JWT_REFRESH_SECRET')
+  if (VIEW_SECRET        === 'dev-view-secret')      missing.push('PAYMENT_VIEW_SECRET')
+  if (missing.length > 0) {
+    throw new Error(
+      `[SECURITY] Variables d'environnement obligatoires manquantes en production : ${missing.join(', ')}`
+    )
+  }
+}
 
 // ─────────────────────────────────────────
 // Types
@@ -134,6 +149,27 @@ export function withRole(
       return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
     }
     return handler(req, ctx)
+  }
+}
+
+// ─────────────────────────────────────────
+// View token — protège les endpoints publics PII
+// ─────────────────────────────────────────
+
+/** Génère un HMAC-SHA256 du paiementId pour autoriser la consultation des données. */
+export function signViewToken(paiementId: string): string {
+  return createHmac('sha256', VIEW_SECRET).update(paiementId).digest('hex')
+}
+
+/** Vérifie le view_token de façon timing-safe. */
+export function verifyViewToken(paiementId: string, token: string): boolean {
+  try {
+    const expected = Buffer.from(signViewToken(paiementId), 'hex')
+    const provided  = Buffer.from(token, 'hex')
+    if (expected.length !== provided.length) return false
+    return timingSafeEqual(expected, provided)
+  } catch {
+    return false
   }
 }
 

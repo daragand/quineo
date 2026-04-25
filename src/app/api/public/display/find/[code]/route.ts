@@ -13,7 +13,7 @@ export async function GET(
   { params }: { params: Promise<{ code: string }> },
 ) {
   const ip    = getClientIp(req)
-  const limit = rateLimit(`display-find:${ip}`, LIMITS.publicLight)
+  const limit = await rateLimit(`display-find:${ip}`, LIMITS.publicLight)
   if (!limit.success) return tooManyRequests(limit)
 
   const { code } = await params

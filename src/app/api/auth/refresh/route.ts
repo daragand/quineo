@@ -13,7 +13,7 @@ const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET ?? 'dev-refresh-secret
 
 export async function POST(req: NextRequest) {
   const ip    = getClientIp(req)
-  const limit = rateLimit(`refresh:${ip}`, LIMITS.refresh)
+  const limit = await rateLimit(`refresh:${ip}`, LIMITS.refresh)
   if (!limit.success) return tooManyRequests(limit)
 
   try {

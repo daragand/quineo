@@ -14,7 +14,7 @@ export async function GET(
   { params }: { params: Promise<{ paiement_id: string }> },
 ) {
   const ip    = getClientIp(req)
-  const limit = rateLimit(`play:${ip}`, { limit: 60, window: 60 })
+  const limit = await rateLimit(`play:${ip}`, { limit: 60, window: 60 })
   if (!limit.success) return tooManyRequests(limit)
 
   const { paiement_id } = await params

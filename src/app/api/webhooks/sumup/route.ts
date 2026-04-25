@@ -1,25 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db }                        from '@/lib/db'
-import { confirmPayment }            from '@/lib/payment/confirm'
+import { createHmac, timingSafeEqual } from 'crypto'
+import { db }                          from '@/lib/db'
+import { confirmPayment }              from '@/lib/payment/confirm'
 
-// ─────────────────────────────────────────
-// POST /api/webhooks/sumup
-// Reçoit les notifications SumUp après paiement
-//
-// Configuration dans SumUp Dashboard → Intégrations → Webhooks :
-//   Endpoint URL : https://votreapp.com/api/webhooks/sumup
-//   Événement    : checkout.status.changed
-// ─────────────────────────────────────────
+function verifySumUpSignature(rawBody: string, sigHeader: string, secret: string): boolean {
+  try {
+    const sig = sigHeader.startsWith('sha256=') ? sigHeader.slice(7) : sigHeader
+    const expected = createHmac('sha256', secret).update(rawBody).digest('hex')
+    const expBuf   = Buffer.from(expected, 'hex')
+    const sigBuf   = Buffer.from(sig, 'hex')
+    if (expBuf.length !== sigBuf.length) return false
+    return timingSafeEqual(expBuf, sigBuf)
+  } catch {
+    return false
+  }
+}
 
 export async function POST(req: NextRequest) {
+  const rawBody = await req.text()
+
+  // Vérification de la signature HMAC-SHA256 (X-Payload-Signature)
+  const secret = process.env.SUMUP_WEBHOOK_SECRET
+  if (!secret) {
+    console.error('[webhook/sumup] SUMUP_WEBHOOK_SECRET non configuré')
+    return NextResponse.json({ error: 'Webhook non configuré' }, { status: 500 })
+  }
+  const sigHeader = req.headers.get('x-payload-signature') ?? ''
+  if (!sigHeader || !verifySumUpSignature(rawBody, sigHeader, secret)) {
+    return NextResponse.json({ error: 'Signature invalide' }, { status: 401 })
+  }
+
   let body: Record<string, unknown>
   try {
-    body = await req.json()
+    body = JSON.parse(rawBody)
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  // SumUp envoie : { id, checkout_reference, status, ... }
   const checkoutId  = body.id                 as string | undefined
   const paiementId  = body.checkout_reference as string | undefined
   const status      = body.status             as string | undefined
