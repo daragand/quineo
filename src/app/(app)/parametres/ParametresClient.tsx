@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Input }  from '@/components/ui/Input'
 import { Toggle } from '@/components/ui/Toggle'
@@ -206,6 +207,52 @@ function TabNotifications() {
 }
 
 // ─────────────────────────────────────────
+// ─────────────────────────────────────────
+// HelpTip — icône ? avec tooltip au survol
+// ─────────────────────────────────────────
+
+function HelpTip({ title, children }: { title: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function close(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [open])
+
+  return (
+    <div ref={ref} style={{ position: 'relative', display: 'inline-flex', verticalAlign: 'middle', marginLeft: 5 }}>
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-label={`Aide : ${title}`}
+        style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: 14, height: 14, borderRadius: '50%',
+          border: '.5px solid var(--color-qblue)', background: open ? 'var(--color-qblue)' : 'var(--color-qblue-bg)',
+          color: open ? '#fff' : 'var(--color-qblue)', fontSize: 9, fontWeight: 700,
+          cursor: 'pointer', flexShrink: 0, lineHeight: 1, padding: 0,
+        }}
+      >?</button>
+      {open && (
+        <div style={{
+          position: 'absolute', bottom: 'calc(100% + 6px)', left: 0,
+          background: 'var(--color-card)', border: '.5px solid var(--color-qblue)',
+          borderRadius: 8, padding: '10px 12px', minWidth: 220, maxWidth: 290,
+          zIndex: 50, boxShadow: '0 4px 20px rgba(0,0,0,.14)',
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-qblue)', marginBottom: 5 }}>{title}</div>
+          <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', lineHeight: 1.55 }}>{children}</div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Onglet Paiements — config providers
 // ─────────────────────────────────────────
 
@@ -226,52 +273,100 @@ interface FieldSpec {
   required?:   boolean
   type?:       'text' | 'select'
   options?:    Array<{ value: string; label: string }>
+  fieldHelp?:  string
 }
 
-const PROVIDER_SPECS: Record<string, { helpUrl: string; helpText: string; fields: FieldSpec[] }> = {
+const PROVIDER_SPECS: Record<string, { helpUrl: string; helpText: string; tutorial: string[]; fields: FieldSpec[] }> = {
   helloasso: {
     helpUrl:  'https://dev.helloasso.com',
     helpText: 'Espace partenaires → Mes applications → Créer une application',
+    tutorial: [
+      'Connectez-vous sur helloasso.com avec votre compte association.',
+      'Dans le menu, cliquez sur Espace partenaires → Mes applications.',
+      'Cliquez sur « Créer une application » et donnez-lui un nom (ex : Quinova).',
+      "Copiez le Client ID et le Client Secret affichés — le secret n'est visible qu'une seule fois à la création.",
+      "Le Slug organisation est l'identifiant de votre page HelloAsso, visible dans l'URL : helloasso.com/associations/[votre-slug].",
+      'Dans HelloAsso → Notifications, créez une notification et collez l\'URL webhook affichée ci-dessous.',
+      'Dans l\'en-tête HTTP de la notification, ajoutez : Authorization: Bearer <secret webhook> (valeur libre que vous choisissez).',
+    ],
     fields: [
-      { key: 'client_id',         label: 'Client ID',         hint: "Identifiant de votre application HelloAsso",                                                          sensitive: false, required: true,  placeholder: 'helloasso_xxxxxx' },
-      { key: 'client_secret',     label: 'Client Secret',     hint: "Secret de l'application — ne jamais partager",                                                         sensitive: true,  required: true  },
-      { key: 'organization_slug', label: 'Slug organisation', hint: "Identifiant dans l'URL HelloAsso (ex: mon-association)",                                               sensitive: false, required: true,  placeholder: 'mon-association' },
-      { key: 'webhook_secret',    label: 'Secret webhook',    hint: "Valeur libre — à renseigner aussi dans HelloAsso → Notifications → En-tête Authorization : Bearer <valeur>", sensitive: true, required: true, placeholder: 'générer une valeur aléatoire' },
+      { key: 'client_id',         label: 'Client ID',         hint: "Identifiant de votre application HelloAsso",                                                              sensitive: false, required: true,  placeholder: 'helloasso_xxxxxx' },
+      { key: 'client_secret',     label: 'Client Secret',     hint: "Secret de l'application — ne jamais partager",                                                             sensitive: true,  required: true,
+        fieldHelp: "Le Client Secret est affiché une seule fois lors de la création de l'application. Si vous l'avez perdu, vous devrez recréer l'application dans l'espace partenaires HelloAsso." },
+      { key: 'organization_slug', label: 'Slug organisation', hint: "Identifiant dans l'URL HelloAsso (ex: mon-association)",                                                   sensitive: false, required: true,  placeholder: 'mon-association',
+        fieldHelp: "Trouvez votre slug dans l'URL de votre page HelloAsso : helloasso.com/associations/[votre-slug]. C'est la partie après /associations/." },
+      { key: 'webhook_secret',    label: 'Secret webhook',    hint: "Valeur libre — à renseigner dans HelloAsso → Notifications → En-tête Authorization : Bearer <valeur>",     sensitive: true,  required: true,  placeholder: 'générer une valeur aléatoire',
+        fieldHelp: "Inventez une longue chaîne aléatoire (32+ caractères). Vous la saisirez dans HelloAsso en tant qu'en-tête HTTP : Authorization: Bearer <votre-valeur>. Elle authentifie les appels entrants." },
     ],
   },
   sumup: {
     helpUrl:  'https://developer.sumup.com',
     helpText: 'Developer portal → My Applications → Create App',
+    tutorial: [
+      'Créez un compte développeur sur developer.sumup.com (distinct de votre compte marchand).',
+      'Allez dans My Applications → Create App et donnez un nom à votre application.',
+      'Activez les scopes payments:read et transactions:history puis enregistrez.',
+      'Copiez le Client ID et le Client Secret affichés.',
+      'Le Code marchand est visible dans votre compte SumUp → Profil marchand (commence par MC).',
+      'Dans SumUp Dashboard → Intégrations → Webhooks, ajoutez l\'URL webhook affichée ci-dessous.',
+      'Copiez le Signing secret affiché après création du webhook — c\'est votre Secret webhook.',
+    ],
     fields: [
       { key: 'client_id',      label: 'Client ID',      hint: "Identifiant de l'application SumUp",                                                    sensitive: false, required: true  },
       { key: 'client_secret',  label: 'Client Secret',  hint: "Secret de l'application — ne jamais partager",                                           sensitive: true,  required: true  },
-      { key: 'merchant_code',  label: 'Code marchand',  hint: "Visible dans Compte SumUp → Profil",                                                     sensitive: false, required: false, placeholder: 'MC001' },
-      { key: 'webhook_secret', label: 'Secret webhook', hint: "Clé HMAC configurée dans SumUp Dashboard → Intégrations → Webhooks → Signing secret",    sensitive: true,  required: true  },
+      { key: 'merchant_code',  label: 'Code marchand',  hint: "Visible dans Compte SumUp → Profil",                                                     sensitive: false, required: false, placeholder: 'MC001',
+        fieldHelp: "Le Code marchand commence par 'MC' suivi de chiffres. Vous le trouvez dans SumUp → Compte → Profil marchand. Il est nécessaire pour identifier votre compte lors des paiements." },
+      { key: 'webhook_secret', label: 'Secret webhook', hint: "Clé HMAC — SumUp Dashboard → Intégrations → Webhooks → Signing secret",                  sensitive: true,  required: true,
+        fieldHelp: "Le Signing secret est généré par SumUp lors de la création du webhook. Il permet de vérifier que les notifications reçues proviennent bien de SumUp (signature HMAC-SHA256)." },
     ],
   },
   paypal: {
     helpUrl:  'https://developer.paypal.com/dashboard/applications',
     helpText: 'Dashboard → My Apps & Credentials → Create App',
+    tutorial: [
+      'Connectez-vous sur developer.paypal.com avec votre compte PayPal Business.',
+      'Allez dans Dashboard → My Apps & Credentials.',
+      'Cliquez sur Create App (onglet Live pour la production, Sandbox pour les tests).',
+      'Donnez un nom à l\'application et copiez le Client ID et le Secret.',
+      'Choisissez l\'environnement Sandbox pour vos tests, Production quand vous êtes prêt.',
+      'Dans la section Webhooks de l\'application, ajoutez l\'URL ci-dessous (avec ?token=votre-token).',
+      'Le Token webhook est une valeur libre que vous inventez — il authentifie les appels entrants depuis PayPal.',
+    ],
     fields: [
-      { key: 'client_id',     label: 'Client ID',      hint: "Clé publique de votre application PayPal",                                                                           sensitive: false, required: true  },
-      { key: 'client_secret', label: 'Client Secret',  hint: "Clé secrète PayPal — ne jamais partager",                                                                            sensitive: true,  required: true  },
-      { key: 'environment',   label: 'Environnement',  hint: "sandbox = tests, production = paiements réels",                                                                       sensitive: false, required: true,
-        type: 'select', options: [{ value: 'sandbox', label: 'Sandbox (test)' }, { value: 'production', label: 'Production (réel)' }] },
-      { key: 'webhook_token', label: 'Token webhook',  hint: "Valeur libre — à inclure dans l'URL webhook PayPal : …/api/webhooks/paypal?token=<valeur>", sensitive: true,  required: true,  placeholder: 'générer une valeur aléatoire' },
+      { key: 'client_id',     label: 'Client ID',      hint: "Clé publique de votre application PayPal",                                                sensitive: false, required: true  },
+      { key: 'client_secret', label: 'Client Secret',  hint: "Clé secrète PayPal — ne jamais partager",                                                 sensitive: true,  required: true  },
+      { key: 'environment',   label: 'Environnement',  hint: "sandbox = tests sans argent réel, production = paiements réels",                          sensitive: false, required: true,
+        type: 'select', options: [{ value: 'sandbox', label: 'Sandbox (test)' }, { value: 'production', label: 'Production (réel)' }],
+        fieldHelp: "Sandbox : paiements simulés pour vos tests, aucun argent n'est débité. Production : paiements réels. Commencez toujours par Sandbox et validez l'intégration avant de passer en Production." },
+      { key: 'webhook_token', label: 'Token webhook',  hint: "Valeur libre — incluse dans l'URL : …/api/webhooks/paypal?token=<valeur>",                sensitive: true,  required: true,  placeholder: 'générer une valeur aléatoire',
+        fieldHelp: "Inventez une chaîne aléatoire longue (ex: 32 caractères). Elle sera ajoutée à l'URL webhook pour permettre à Quinova de vérifier que les appels viennent bien de PayPal." },
     ],
   },
   stripe: {
     helpUrl:  'https://dashboard.stripe.com/apikeys',
     helpText: 'Dashboard → Développeurs → Clés API',
+    tutorial: [
+      'Connectez-vous sur dashboard.stripe.com avec votre compte Stripe.',
+      'En haut du tableau de bord, basculez entre mode Test (pk_test_) et mode Live (pk_live_).',
+      'Allez dans Développeurs → Clés API et copiez la Clé publiable et la Clé secrète.',
+      'Allez dans Développeurs → Webhooks → Ajouter un endpoint.',
+      'Collez l\'URL webhook ci-dessous et sélectionnez les événements : payment_intent.succeeded et payment_intent.payment_failed.',
+      'Copiez le Signing secret (whsec_…) affiché après la création du webhook.',
+      'Testez votre webhook avec le bouton "Tester" dans le Dashboard Stripe avant de passer en production.',
+    ],
     fields: [
-      { key: 'publishable_key', label: 'Clé publiable',  hint: "Commence par pk_live_ ou pk_test_ (non secrète)", sensitive: false, required: true,  placeholder: 'pk_live_...' },
-      { key: 'secret_key',      label: 'Clé secrète',    hint: "Commence par sk_live_ — ne jamais partager",      sensitive: true,  required: true,  placeholder: 'sk_live_...' },
-      { key: 'webhook_secret',  label: 'Secret webhook', hint: "Commence par whsec_ — Développeurs → Webhooks → Signing secret", sensitive: true, required: true, placeholder: 'whsec_...' },
+      { key: 'publishable_key', label: 'Clé publiable',  hint: "Commence par pk_live_ ou pk_test_ (non secrète)",                                      sensitive: false, required: true,  placeholder: 'pk_live_...',
+        fieldHelp: "La clé publiable peut être exposée côté client (JavaScript) — elle ne donne accès à rien de sensible. Utilisez pk_test_ pour les tests et pk_live_ en production." },
+      { key: 'secret_key',      label: 'Clé secrète',    hint: "Commence par sk_live_ — ne jamais exposer côté client",                                 sensitive: true,  required: true,  placeholder: 'sk_live_...',
+        fieldHelp: "La clé secrète donne un accès complet à votre compte Stripe. Ne la partagez jamais et ne l'incluez jamais dans du code côté client (navigateur)." },
+      { key: 'webhook_secret',  label: 'Secret webhook', hint: "Commence par whsec_ — Développeurs → Webhooks → Signing secret",                        sensitive: true,  required: true,  placeholder: 'whsec_...',
+        fieldHelp: "Le Signing secret permet de vérifier que les webhooks reçus proviennent bien de Stripe (signature HMAC). Disponible dans Développeurs → Webhooks → votre endpoint → Signing secret." },
     ],
   },
   other: {
     helpUrl:  '',
     helpText: '',
+    tutorial: [],
     fields: [
       { key: 'description', label: 'Description', hint: 'Informations complémentaires sur ce prestataire', sensitive: false },
     ],
@@ -298,6 +393,7 @@ function TabPaiements({ providers: initialProviders }: { providers: ProviderData
   const [unlockPassword, setUnlockPassword] = useState('')
   const [unlockError,    setUnlockError]    = useState('')
   const [unlockLoading,  setUnlockLoading]  = useState(false)
+  const [showTutorial,   setShowTutorial]   = useState(false)
 
   const spec = PROVIDER_SPECS[form.type] ?? PROVIDER_SPECS.other
   const meta = PROVIDER_META[form.type] ?? PROVIDER_META.other
@@ -367,6 +463,7 @@ function TabPaiements({ providers: initialProviders }: { providers: ProviderData
   function changeType(type: string) {
     setForm({ name: form.name, type, config: {} })
     setUnmasked({})
+    setShowTutorial(false)
   }
 
   async function handleSave() {
@@ -612,6 +709,51 @@ function TabPaiements({ providers: initialProviders }: { providers: ProviderData
             </div>
           )}
 
+          {/* ── Guide pas à pas ── */}
+          {spec.tutorial.length > 0 && (
+            <div>
+              <button
+                type="button"
+                onClick={() => setShowTutorial(t => !t)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  fontSize: 11, fontWeight: 700, color: '#059669',
+                  background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <circle cx="8" cy="8" r="6.5" stroke="#059669" strokeWidth="1.3"/>
+                  <path d="M5.5 8h5M8 5.5v5" stroke="#059669" strokeWidth="1.3" strokeLinecap="round"
+                    style={{ display: showTutorial ? 'none' : undefined }}/>
+                  <path d="M5.5 8h5" stroke="#059669" strokeWidth="1.3" strokeLinecap="round"
+                    style={{ display: showTutorial ? undefined : 'none' }}/>
+                </svg>
+                {showTutorial ? 'Masquer le guide' : 'Guide de configuration pas à pas'}
+              </button>
+              {showTutorial && (
+                <div
+                  className="rounded-[8px] px-[14px] py-[12px] mt-[8px] flex flex-col gap-[8px]"
+                  style={{ background: 'rgba(16,185,129,.05)', border: '.5px solid rgba(16,185,129,.2)' }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#059669', marginBottom: 2 }}>
+                    Configuration {PROVIDER_META[form.type]?.label ?? form.type} — étapes
+                  </div>
+                  {spec.tutorial.map((step, i) => (
+                    <div key={i} className="flex gap-[10px] items-start">
+                      <div
+                        className="flex items-center justify-center flex-shrink-0 rounded-full font-bold"
+                        style={{ width: 20, height: 20, background: 'rgba(16,185,129,.15)', color: '#059669', fontSize: 10, marginTop: 1 }}
+                      >
+                        {i + 1}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', lineHeight: 1.55 }}>{step}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Nom du prestataire */}
           <div>
             <label style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>
@@ -637,7 +779,7 @@ function TabPaiements({ providers: initialProviders }: { providers: ProviderData
               return (
                 <div key={field.key}>
                   <div className="flex items-center justify-between mb-[4px]">
-                    <label style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>
+                    <label style={{ fontSize: 11, color: 'var(--color-text-secondary)', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
                       {field.label}
                       {field.required && <span style={{ color: 'var(--color-qred)' }}> *</span>}
                       {field.sensitive && (
@@ -647,6 +789,9 @@ function TabPaiements({ providers: initialProviders }: { providers: ProviderData
                         >
                           Sensible
                         </span>
+                      )}
+                      {field.fieldHelp && (
+                        <HelpTip title={field.label}>{field.fieldHelp}</HelpTip>
                       )}
                     </label>
                     {isMasked && !isUnmasked && pendingUnlock !== field.key && (
@@ -960,7 +1105,9 @@ export default function ParametresClient({
   initialAssociation: AssociationData | null
   initialProviders: ProviderData[]
 }) {
-  const [tab,      setTab]      = useState<Tab>('association')
+  const searchParams = useSearchParams()
+  const initialTab = (searchParams.get('tab') as Tab | null) ?? 'association'
+  const [tab,      setTab]      = useState<Tab>(initialTab)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 

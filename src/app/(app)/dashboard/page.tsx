@@ -172,7 +172,7 @@ export default async function DashboardPage() {
       <Card
         title="Providers de paiement actifs"
         headerRight={
-          <Link href="/parametres/providers" className="font-bold hover:opacity-70 transition-opacity duration-[100ms]"
+          <Link href="/parametres?tab=paiements" className="font-bold hover:opacity-70 transition-opacity duration-[100ms]"
             style={{ fontSize: 11, color: 'var(--color-qblue)' }}>
             Configurer →
           </Link>
@@ -195,7 +195,9 @@ export default async function DashboardPage() {
               </span>
             </div>
           ))}
-          <Button variant="secondary" size="sm">+ Ajouter un provider</Button>
+          <Link href="/parametres?tab=paiements">
+            <Button variant="secondary" size="sm">+ Ajouter un provider</Button>
+          </Link>
         </div>
       </Card>
 
