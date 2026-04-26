@@ -33,7 +33,7 @@ export default function LegalLayout({ children }: { children: React.ReactNode })
             Q
           </span>
           <span style={{ color: '#fff', fontWeight: 700, fontSize: 15, letterSpacing: '-.01em' }}>
-            quineo
+            quinova
           </span>
         </Link>
 

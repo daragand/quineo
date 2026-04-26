@@ -522,7 +522,7 @@ export function ManageSessionClient({ session }: { session: SessionManageData })
                 </div>
                 <p style={{ fontSize: 11, color: 'var(--color-text-hint)', margin: 0 }}>
                   Communiquez ce code aux participants pour qu&apos;ils suivent le loto sur{' '}
-                  <span style={{ color: 'var(--color-text-secondary)' }}>quineo.fr/display</span>
+                  <span style={{ color: 'var(--color-text-secondary)' }}>quinova.fr/display</span>
                 </p>
               </div>
             ) : (

@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Politique de confidentialité — Quineo',
+  title: 'Politique de confidentialité — Quinova',
 }
 
 export default function ConfidentialitePage() {
@@ -20,13 +20,13 @@ export default function ConfidentialitePage() {
       <Section title="1. Responsable du traitement">
         <p>
           Le responsable du traitement des données à caractère personnel collectées sur
-          quineo.fr est : <strong>Quineo</strong>, joignable à l&apos;adresse{' '}
-          <strong>rgpd@quineo.fr</strong>.
+          quinova.fr est : <strong>Quinova</strong>, joignable à l&apos;adresse{' '}
+          <strong>rgpd@quinova.fr</strong>.
         </p>
       </Section>
 
       <Section title="2. Données collectées">
-        <p>Quineo collecte les données suivantes :</p>
+        <p>Quinova collecte les données suivantes :</p>
         <ul>
           <li>
             <strong>Lors de la création de compte :</strong> nom, prénom, adresse e-mail,
@@ -35,7 +35,7 @@ export default function ConfidentialitePage() {
           <li>
             <strong>Lors de l&apos;achat de cartons :</strong> nom, prénom, adresse e-mail
             du participant, données de paiement (traitées par le prestataire de paiement —
-            Quineo ne stocke pas de numéro de carte bancaire).
+            Quinova ne stocke pas de numéro de carte bancaire).
           </li>
           <li>
             <strong>Données de connexion :</strong> adresse IP, logs d&apos;accès, tokens
@@ -96,7 +96,7 @@ export default function ConfidentialitePage() {
 
       <Section title="5. Destinataires des données">
         <p>
-          Les données collectées sont traitées par Quineo et ses sous-traitants dans le
+          Les données collectées sont traitées par Quinova et ses sous-traitants dans le
           cadre strict de la fourniture du service :
         </p>
         <ul>
@@ -108,7 +108,7 @@ export default function ConfidentialitePage() {
           </li>
         </ul>
         <p>
-          Quineo ne vend ni ne loue vos données à des tiers.
+          Quinova ne vend ni ne loue vos données à des tiers.
         </p>
       </Section>
 
@@ -135,14 +135,14 @@ export default function ConfidentialitePage() {
         </ul>
         <p>
           Pour exercer ces droits, contactez-nous à{' '}
-          <strong>rgpd@quineo.fr</strong>. En cas de réponse insatisfaisante, vous pouvez
+          <strong>rgpd@quinova.fr</strong>. En cas de réponse insatisfaisante, vous pouvez
           saisir la <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-amber-deep)', fontWeight: 600 }}>CNIL</a>.
         </p>
       </Section>
 
       <Section title="8. Cookies">
         <p>
-          Quineo utilise uniquement des cookies strictement nécessaires au fonctionnement
+          Quinova utilise uniquement des cookies strictement nécessaires au fonctionnement
           du service : token d&apos;authentification (httpOnly, durée de session ou 30 jours).
           Aucun cookie publicitaire ou de pistage tiers n&apos;est déposé.
         </p>

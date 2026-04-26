@@ -281,7 +281,7 @@ export function RapportPdfDocument({ sessions, monthly, associationName, year }:
   })
 
   return (
-    <Document title={`Rapport ${year} — ${associationName}`} author="Quineo" creator="Quineo">
+    <Document title={`Rapport ${year} — ${associationName}`} author="Quinova" creator="Quinova">
       <Page size="A4" style={s.page}>
 
         {/* ── Header ── */}
@@ -393,7 +393,7 @@ export function RapportPdfDocument({ sessions, monthly, associationName, year }:
 
         {/* ── Footer ── */}
         <View style={s.footer} fixed>
-          <Text style={s.footerText}>Quineo — Gestion de loto associatif</Text>
+          <Text style={s.footerText}>Quinova — Gestion de loto associatif</Text>
           <Text style={s.footerText} render={({ pageNumber, totalPages }) => `Page ${pageNumber} / ${totalPages}`} />
         </View>
 

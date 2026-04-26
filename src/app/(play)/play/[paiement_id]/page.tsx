@@ -29,7 +29,7 @@ interface PageData {
 }
 
 export const metadata: Metadata = {
-  title: 'Mes cartons — Quineo',
+  title: 'Mes cartons — Quinova',
 }
 
 async function fetchData(paiementId: string): Promise<PageData | null> {

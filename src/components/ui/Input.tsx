@@ -8,7 +8,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
   hint?: string
   error?: string
-  /** Texte affiché à gauche dans un bloc séparé (ex: "quineo.fr/s/") */
+  /** Texte affiché à gauche dans un bloc séparé (ex: "quinova.fr/s/") */
   prefix?: string
 }
 

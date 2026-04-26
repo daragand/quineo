@@ -159,7 +159,7 @@ export function SessionFinder({
         <div className="flex gap-[8px]">
           <input
             type="text"
-            placeholder="quineo.fr/s/amis-quartier-mars25"
+            placeholder="quinova.fr/s/amis-quartier-mars25"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleUrlSearch()}

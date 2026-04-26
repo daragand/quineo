@@ -158,8 +158,8 @@ export function CartonsPdfDocument({
   return (
     <Document
       title={`Cartons — ${sessionName}`}
-      author="Quineo"
-      creator="Quineo"
+      author="Quinova"
+      creator="Quinova"
     >
       {pages.map((pair, pi) => (
         <Page key={pi} style={s.page} size="A4">

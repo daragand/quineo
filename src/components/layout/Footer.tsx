@@ -24,7 +24,7 @@ export function Footer() {
       >
         {/* Copyright */}
         <span style={{ color: 'var(--color-text-muted, #8a95a3)' }}>
-          © {year} Quineo — plateforme de gestion de loto associatif
+          © {year} Quinova — plateforme de gestion de loto associatif
         </span>
 
         {/* Liens */}

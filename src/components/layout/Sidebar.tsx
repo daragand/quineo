@@ -153,7 +153,7 @@ export function Sidebar({
             className="font-display text-white leading-none tracking-[.04em]"
             style={{ fontSize: 17 }}
           >
-            Quineo
+            Quinova
           </div>
           <div style={{ fontSize: 9, color: 'rgba(255,255,255,.3)', marginTop: 1 }}>
             {associationName}

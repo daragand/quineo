@@ -5,7 +5,7 @@ import { confirmPayment }              from '@/lib/payment/confirm'
 
 function verifySumUpSignature(rawBody: string, sigHeader: string, secret: string): boolean {
   try {
-    const sig = sigHeader.startsWith('sha256=') ? sigHeader.slice(7) : sigHeader
+    const sig      = sigHeader.startsWith('sha256=') ? sigHeader.slice(7) : sigHeader
     const expected = createHmac('sha256', secret).update(rawBody).digest('hex')
     const expBuf   = Buffer.from(expected, 'hex')
     const sigBuf   = Buffer.from(sig, 'hex')
@@ -18,17 +18,6 @@ function verifySumUpSignature(rawBody: string, sigHeader: string, secret: string
 
 export async function POST(req: NextRequest) {
   const rawBody = await req.text()
-
-  // Vérification de la signature HMAC-SHA256 (X-Payload-Signature)
-  const secret = process.env.SUMUP_WEBHOOK_SECRET
-  if (!secret) {
-    console.error('[webhook/sumup] SUMUP_WEBHOOK_SECRET non configuré')
-    return NextResponse.json({ error: 'Webhook non configuré' }, { status: 500 })
-  }
-  const sigHeader = req.headers.get('x-payload-signature') ?? ''
-  if (!sigHeader || !verifySumUpSignature(rawBody, sigHeader, secret)) {
-    return NextResponse.json({ error: 'Signature invalide' }, { status: 401 })
-  }
 
   let body: Record<string, unknown>
   try {
@@ -47,6 +36,24 @@ export async function POST(req: NextRequest) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = paiement?.toJSON() as any
   if (!p || p.status !== 'pending') return NextResponse.json({ received: true })
+
+  // Vérification HMAC-SHA256 via config.webhook_secret de l'association
+  if (p.provider_id) {
+    const provider = await db.PaymentProvider.findOne({ where: { id: p.provider_id } })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const prov          = provider?.toJSON() as any
+    const webhookSecret = prov?.config?.webhook_secret as string | undefined
+
+    if (!webhookSecret) {
+      console.error('[webhook/sumup] webhook_secret absent pour le provider', p.provider_id)
+      return NextResponse.json({ error: 'Webhook non configuré' }, { status: 500 })
+    }
+
+    const sigHeader = req.headers.get('x-payload-signature') ?? ''
+    if (!sigHeader || !verifySumUpSignature(rawBody, sigHeader, webhookSecret)) {
+      return NextResponse.json({ error: 'Signature invalide' }, { status: 401 })
+    }
+  }
 
   if (status === 'PAID') {
     await confirmPayment(paiementId, checkoutId)

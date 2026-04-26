@@ -279,7 +279,7 @@ export default function NewSessionPage() {
         <Input
           label="URL publique"
           hint="slug unique — généré automatiquement"
-          prefix="quineo.fr/s/"
+          prefix="quinova.fr/s/"
           placeholder="grand-loto-printemps-2025"
           value={form.slug}
           onChange={(e) => { set('slugManual', true); set('slug', e.target.value) }}
@@ -289,7 +289,7 @@ export default function NewSessionPage() {
             className="font-bold mt-[4px]"
             style={{ fontSize: 11, color: 'var(--color-qblue)' }}
           >
-            quineo.fr/s/{form.slug}
+            quinova.fr/s/{form.slug}
           </div>
         )}
       </div>

@@ -84,7 +84,7 @@ export function buildReminderHtml(p: ReminderParams): string {
             <div style="font-size:13px;color:rgba(255,255,255,.75);margin-bottom:12px;">
               Pendant le tirage, ouvrez ce lien : les numéros s&apos;afficheront automatiquement sur vos cartons.
             </div>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://quineo.fr'}/play/${paiementId}"
+            <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://quinova.fr'}/play/${paiementId}"
                style="display:inline-block;background:#FFD84D;color:#5C3A00;font-weight:700;font-size:12px;padding:8px 18px;border-radius:7px;text-decoration:none;">
               Ouvrir mes cartons interactifs →
             </a>

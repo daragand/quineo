@@ -468,7 +468,7 @@ export default function PlayClient({ paiementId, session, cartons, initialTirage
                   color:          '#5C3A00',
                 }}
               >Q</span>
-              <span style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>quineo</span>
+              <span style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>quinova</span>
             </div>
             <div style={{ fontSize: 11, color: 'rgba(255,255,255,.4)', marginTop: 2 }}>
               {session.associationName}

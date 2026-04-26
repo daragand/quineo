@@ -78,7 +78,7 @@ export default function RegisterPage() {
             <text x="14" y="20" textAnchor="middle" fontSize="16" fontWeight="700" fill="var(--color-amber-dark)">Q</text>
           </svg>
           <span className="font-bold tracking-tight" style={{ fontSize: 22, color: 'var(--color-text-primary)' }}>
-            quineo
+            quinova
           </span>
         </div>
         <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 4 }}>

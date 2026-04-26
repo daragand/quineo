@@ -199,13 +199,13 @@ export default function ContactPage() {
           Autres moyens de nous joindre
         </p>
         <a
-          href="mailto:contact@quineo.fr"
+          href="mailto:contact@quinova.fr"
           style={{ fontSize: 13, color: 'var(--color-amber-deep)', fontWeight: 600, textDecoration: 'none' }}
         >
-          contact@quineo.fr
+          contact@quinova.fr
         </a>
         <p style={{ fontSize: 12, color: 'var(--color-text-muted)' }}>
-          Pour les questions RGPD : <strong>rgpd@quineo.fr</strong>
+          Pour les questions RGPD : <strong>rgpd@quinova.fr</strong>
         </p>
       </div>
     </div>

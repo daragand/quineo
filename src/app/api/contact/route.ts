@@ -33,10 +33,10 @@ export async function POST(req: NextRequest) {
 
   try {
     await resend.emails.send({
-      from:    'Quineo <noreply@quineo.fr>',
-      to:      'contact@quineo.fr',
+      from:    'Quinova <noreply@quinova.fr>',
+      to:      'contact@quinova.fr',
       replyTo: email,
-      subject: `[Contact Quineo] ${subject}`,
+      subject: `[Contact Quinova] ${subject}`,
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px;">
           <h2 style="color:#0D1E2C;margin-bottom:16px;">Nouveau message via le formulaire de contact</h2>
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
             <p style="margin:0;font-size:13px;color:#1e293b;line-height:1.6;white-space:pre-wrap;">${message}</p>
           </div>
           <p style="margin-top:20px;font-size:11px;color:#94a3b8;">
-            Ce message a été envoyé depuis le formulaire de contact de quineo.fr
+            Ce message a été envoyé depuis le formulaire de contact de quinova.fr
           </p>
         </div>
       `,

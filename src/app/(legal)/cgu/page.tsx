@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: "Conditions générales d'utilisation — Quineo",
+  title: "Conditions générales d'utilisation — Quinova",
 }
 
 export default function CguPage() {
@@ -20,11 +20,11 @@ export default function CguPage() {
       <Section title="1. Objet">
         <p>
           Les présentes conditions générales d&apos;utilisation (ci-après « CGU ») régissent
-          l&apos;accès et l&apos;utilisation de la plateforme Quineo, disponible à
-          l&apos;adresse <strong>quineo.fr</strong>, éditée par Quineo.
+          l&apos;accès et l&apos;utilisation de la plateforme Quinova, disponible à
+          l&apos;adresse <strong>quinova.fr</strong>, éditée par Quinova.
         </p>
         <p>
-          Quineo est une solution SaaS de gestion de loteries associatives permettant aux
+          Quinova est une solution SaaS de gestion de loteries associatives permettant aux
           associations de créer des sessions de loto, gérer la vente de cartons en ligne
           et animer le tirage au sort.
         </p>
@@ -37,7 +37,7 @@ export default function CguPage() {
           compris et accepté les CGU sans réserve.
         </p>
         <p>
-          Quineo se réserve le droit de modifier les présentes CGU à tout moment. Les
+          Quinova se réserve le droit de modifier les présentes CGU à tout moment. Les
           utilisateurs seront informés des modifications par e-mail ou notification sur
           la plateforme. La poursuite de l&apos;utilisation après modification vaut
           acceptation des nouvelles CGU.
@@ -46,7 +46,7 @@ export default function CguPage() {
 
       <Section title="3. Accès au service">
         <p>
-          L&apos;accès à Quineo est réservé aux associations déclarées (loi 1901 ou
+          L&apos;accès à Quinova est réservé aux associations déclarées (loi 1901 ou
           équivalent) souhaitant organiser des loteries dans le cadre de la réglementation
           française (art. L.322-4 du Code de la sécurité intérieure).
         </p>
@@ -69,13 +69,13 @@ export default function CguPage() {
           <li>de la sécurité des identifiants de connexion.</li>
         </ul>
         <p>
-          Quineo ne constitue pas l&apos;organisateur des loteries et n&apos;endosse aucune
+          Quinova ne constitue pas l&apos;organisateur des loteries et n&apos;endosse aucune
           responsabilité à ce titre.
         </p>
       </Section>
 
       <Section title="5. Description du service">
-        <p>Quineo met à disposition :</p>
+        <p>Quinova met à disposition :</p>
         <ul>
           <li>un espace de gestion des sessions de loto (création, configuration, lots) ;</li>
           <li>un outil de vente en ligne de cartons avec paiement sécurisé ;</li>
@@ -84,7 +84,7 @@ export default function CguPage() {
           <li>un système de diffusion du tirage accessible aux participants.</li>
         </ul>
         <p>
-          Le service est fourni « en l&apos;état ». Quineo s&apos;efforce d&apos;assurer
+          Le service est fourni « en l&apos;état ». Quinova s&apos;efforce d&apos;assurer
           une disponibilité maximale mais ne garantit pas une accessibilité ininterrompue.
         </p>
       </Section>
@@ -95,14 +95,14 @@ export default function CguPage() {
           <li>ne pas utiliser la plateforme à des fins illicites ou frauduleuses ;</li>
           <li>ne pas tenter d&apos;accéder aux données d&apos;autres associations ;</li>
           <li>ne pas perturber le fonctionnement du service ;</li>
-          <li>informer Quineo sans délai de tout accès non autorisé à son compte.</li>
+          <li>informer Quinova sans délai de tout accès non autorisé à son compte.</li>
         </ul>
       </Section>
 
       <Section title="7. Tarification">
         <p>
           Les conditions tarifaires en vigueur sont consultables sur la page de présentation
-          de Quineo. Quineo se réserve le droit de modifier ses tarifs avec un préavis
+          de Quinova. Quinova se réserve le droit de modifier ses tarifs avec un préavis
           d&apos;un mois.
         </p>
       </Section>
@@ -113,13 +113,13 @@ export default function CguPage() {
           <a href="/confidentialite" style={{ color: 'var(--color-amber-deep)', fontWeight: 600 }}>
             politique de confidentialité
           </a>{' '}
-          de Quineo, conforme au RGPD.
+          de Quinova, conforme au RGPD.
         </p>
       </Section>
 
       <Section title="9. Propriété intellectuelle">
         <p>
-          Quineo conserve l&apos;intégralité des droits de propriété intellectuelle sur
+          Quinova conserve l&apos;intégralité des droits de propriété intellectuelle sur
           la plateforme (logiciels, interfaces, marque, logo). Les CGU n&apos;emportent
           aucune cession de ces droits au profit de l&apos;utilisateur.
         </p>
@@ -127,19 +127,19 @@ export default function CguPage() {
 
       <Section title="10. Suspension et résiliation">
         <p>
-          Quineo peut suspendre ou résilier un compte en cas de violation des présentes
+          Quinova peut suspendre ou résilier un compte en cas de violation des présentes
           CGU ou de non-paiement, après mise en demeure restée sans effet pendant 8 jours.
         </p>
         <p>
           L&apos;utilisateur peut résilier son compte à tout moment depuis les paramètres
-          ou en contactant Quineo. Les données sont conservées conformément à la politique
+          ou en contactant Quinova. Les données sont conservées conformément à la politique
           de confidentialité.
         </p>
       </Section>
 
       <Section title="11. Limitation de responsabilité">
         <p>
-          Dans les limites permises par la loi, Quineo ne saurait être tenu responsable
+          Dans les limites permises par la loi, Quinova ne saurait être tenu responsable
           des dommages indirects résultant de l&apos;utilisation de la plateforme,
           notamment la perte de revenus liée à une interruption de service.
         </p>
@@ -150,14 +150,14 @@ export default function CguPage() {
           Les présentes CGU sont soumises au droit français. En cas de litige, les parties
           rechercheront une solution amiable avant tout recours judiciaire. À défaut
           d&apos;accord, les tribunaux compétents seront ceux du ressort du siège social
-          de Quineo.
+          de Quinova.
         </p>
       </Section>
 
       <Section title="13. Contact">
         <p>
           Pour toute question relative aux présentes CGU :{' '}
-          <strong>contact@quineo.fr</strong> ou via notre{' '}
+          <strong>contact@quinova.fr</strong> ou via notre{' '}
           <a href="/contact" style={{ color: 'var(--color-amber-deep)', fontWeight: 600 }}>
             formulaire de contact
           </a>.

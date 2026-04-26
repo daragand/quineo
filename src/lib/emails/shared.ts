@@ -4,7 +4,7 @@
 
 import type { CartonPdfData } from '../cartonPdf'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://quineo.fr'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://quinova.fr'
 
 // ─────────────────────────────────────────
 // Éléments atomiques
@@ -103,7 +103,7 @@ export function emailLayout(p: LayoutParams): string {
         <tr>
           <td>
             <span style="display:inline-block;background:#FFD84D;color:#5C3A00;font-weight:900;font-size:15px;width:30px;height:30px;line-height:30px;text-align:center;border-radius:6px;vertical-align:middle;">Q</span>
-            <span style="color:#fff;font-size:14px;font-weight:700;margin-left:9px;vertical-align:middle;letter-spacing:.04em;">Quineo</span>
+            <span style="color:#fff;font-size:14px;font-weight:700;margin-left:9px;vertical-align:middle;letter-spacing:.04em;">Quinova</span>
           </td>
           <td align="right">
             <span style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.45);font-size:11px;padding:3px 10px;border-radius:4px;font-family:monospace;">Réf.&nbsp;${ref}</span>
@@ -141,10 +141,10 @@ export function emailLayout(p: LayoutParams): string {
     </td>
   </tr>
 
-  <!-- Sub-footer Quineo -->
+  <!-- Sub-footer Quinova -->
   <tr>
     <td style="padding:16px 0;text-align:center;">
-      <span style="font-size:11px;color:#94a3b8;">Propulsé par <strong style="color:#64748b;">Quineo</strong></span>
+      <span style="font-size:11px;color:#94a3b8;">Propulsé par <strong style="color:#64748b;">Quinova</strong></span>
     </td>
   </tr>
 

@@ -14,8 +14,8 @@ import { buildPasswordResetHtml }     from './emails/passwordReset'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
-const FROM    = process.env.EMAIL_FROM ?? 'Quineo <commandes@quineo.fr>'
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://quineo.fr'
+const FROM    = process.env.EMAIL_FROM ?? 'Quinova <commandes@quinova.fr>'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://quinova.fr'
 
 // ─────────────────────────────────────────
 // Types publics
@@ -77,7 +77,7 @@ export async function sendOrderConfirmation(opts: OrderMailOptions): Promise<voi
     html,
     attachments: [
       {
-        filename: `cartons-quineo-${ref}.pdf`,
+        filename: `cartons-quinova-${ref}.pdf`,
         content:  Buffer.from(pdfBuffer),
       },
     ],
@@ -129,7 +129,7 @@ export async function sendPasswordResetEmail(opts: PasswordResetMailOptions): Pr
   await resend.emails.send({
     from:    FROM,
     to:      opts.to,
-    subject: 'Réinitialisation de votre mot de passe Quineo',
+    subject: 'Réinitialisation de votre mot de passe Quinova',
     html,
   })
 }

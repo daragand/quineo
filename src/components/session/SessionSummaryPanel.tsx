@@ -133,7 +133,7 @@ export function SessionSummaryPanel({ draft }: SessionSummaryPanelProps) {
           className="mt-[2px] mb-[4px] font-bold"
           style={{ fontSize: 10, color: 'var(--color-qblue)', wordBreak: 'break-all' }}
         >
-          quineo.fr/s/{draft.slug}
+          quinova.fr/s/{draft.slug}
         </div>
       )}
 

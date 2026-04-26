@@ -13,7 +13,7 @@ interface Props {
 // Composants internes
 // ─────────────────────────────────────────
 
-function QuineoLogo() {
+function QuinovaLogo() {
   return (
     <div className="flex items-center gap-[8px]">
       <div
@@ -27,7 +27,7 @@ function QuineoLogo() {
         className="font-bold uppercase tracking-[.06em]"
         style={{ fontSize: 13, color: 'var(--color-text-primary)' }}
       >
-        Quineo
+        Quinova
       </span>
     </div>
   )
@@ -39,7 +39,7 @@ function TopBar({ name, code }: { name?: string; code?: string }) {
       className="flex items-center justify-between px-[20px] py-[10px] sticky top-0 z-10"
       style={{ background: 'var(--color-card)', borderBottom: '.5px solid var(--color-sep)' }}
     >
-      <QuineoLogo />
+      <QuinovaLogo />
       {name && (
         <div className="flex items-center gap-[8px]">
           {code && (

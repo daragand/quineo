@@ -9,7 +9,7 @@ const Schema = z.object({
   email: z.string().email(),
 })
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://quineo.fr'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://quinova.fr'
 
 export async function POST(req: NextRequest) {
   const ip    = getClientIp(req)

@@ -59,7 +59,7 @@ function LoginForm() {
             className="font-bold tracking-tight"
             style={{ fontSize: 22, color: 'var(--color-text-primary)' }}
           >
-            quineo
+            quinova
           </span>
         </div>
         <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 4 }}>

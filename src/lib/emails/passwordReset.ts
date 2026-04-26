@@ -12,7 +12,7 @@ export function buildPasswordResetHtml({ firstName, resetUrl }: PasswordResetEma
         Réinitialisation du mot de passe
       </div>
       <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.2;">
-        Accès à votre compte Quineo
+        Accès à votre compte Quinova
       </div>
     </div>`
 
@@ -46,10 +46,10 @@ export function buildPasswordResetHtml({ firstName, resetUrl }: PasswordResetEma
     </tr>`
 
   return emailLayout({
-    title:           'Réinitialisation de votre mot de passe — Quineo',
+    title:           'Réinitialisation de votre mot de passe — Quinova',
     ref:             'RESET',
     headerHero,
     bodyRows,
-    associationName: 'Quineo',
+    associationName: 'Quinova',
   })
 }

@@ -1,5 +1,5 @@
 /**
- * Design tokens Quineo — valeurs JS pour les contextes où
+ * Design tokens Quinova — valeurs JS pour les contextes où
  * les classes Tailwind ne suffisent pas (SVG fills, canvas, styles inline dynamiques).
  */
 

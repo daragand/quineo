@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Mentions légales — Quineo',
+  title: 'Mentions légales — Quinova',
 }
 
 export default function MentionsLegalesPage() {
@@ -16,14 +16,14 @@ export default function MentionsLegalesPage() {
 
       <Section title="1. Éditeur du site">
         <p>
-          Le site <strong>quineo.fr</strong> est édité par :
+          Le site <strong>quinova.fr</strong> est édité par :
         </p>
         <ul>
-          <li><strong>Raison sociale :</strong> Quineo [forme juridique à compléter]</li>
+          <li><strong>Raison sociale :</strong> Quinova [forme juridique à compléter]</li>
           <li><strong>Siège social :</strong> [Adresse à compléter]</li>
           <li><strong>SIRET :</strong> [Numéro à compléter]</li>
           <li><strong>Capital social :</strong> [Montant à compléter]</li>
-          <li><strong>Email :</strong> contact@quineo.fr</li>
+          <li><strong>Email :</strong> contact@quinova.fr</li>
         </ul>
         <p>
           Directeur de la publication : [Nom du directeur à compléter]
@@ -42,13 +42,13 @@ export default function MentionsLegalesPage() {
 
       <Section title="3. Activité réglementée">
         <p>
-          Quineo est une plateforme de gestion de loteries associatives, régies par
+          Quinova est une plateforme de gestion de loteries associatives, régies par
           l&apos;article L.322-4 du Code de la sécurité intérieure (CSI). Ces loteries
           sont réservées aux associations déclarées et ne peuvent être organisées qu&apos;à
           des fins sociales, culturelles, scientifiques ou d&apos;animation locale.
         </p>
         <p>
-          Quineo fournit uniquement des outils de gestion et ne constitue pas
+          Quinova fournit uniquement des outils de gestion et ne constitue pas
           l&apos;organisateur des loteries ; cette responsabilité incombe à chaque
           association utilisatrice.
         </p>
@@ -56,21 +56,21 @@ export default function MentionsLegalesPage() {
 
       <Section title="4. Propriété intellectuelle">
         <p>
-          L&apos;ensemble des éléments du site quineo.fr (marque, logo, textes, logiciels,
-          interfaces graphiques) est la propriété exclusive de Quineo ou de ses partenaires,
+          L&apos;ensemble des éléments du site quinova.fr (marque, logo, textes, logiciels,
+          interfaces graphiques) est la propriété exclusive de Quinova ou de ses partenaires,
           et est protégé par les lois françaises et internationales relatives à la propriété
           intellectuelle.
         </p>
         <p>
           Toute reproduction, représentation, modification, publication ou adaptation de
           tout ou partie des éléments du site, quel que soit le moyen ou le procédé utilisé,
-          est interdite sans autorisation écrite préalable de Quineo.
+          est interdite sans autorisation écrite préalable de Quinova.
         </p>
       </Section>
 
       <Section title="5. Limitation de responsabilité">
         <p>
-          Quineo ne saurait être tenu responsable des dommages directs ou indirects causés
+          Quinova ne saurait être tenu responsable des dommages directs ou indirects causés
           au matériel de l&apos;utilisateur lors de l&apos;accès au site, ni des informations
           publiées par les associations utilisatrices.
         </p>
@@ -79,7 +79,7 @@ export default function MentionsLegalesPage() {
       <Section title="6. Contact">
         <p>
           Pour toute question relative aux présentes mentions légales, vous pouvez nous
-          contacter à l&apos;adresse suivante : <strong>contact@quineo.fr</strong> ou via
+          contacter à l&apos;adresse suivante : <strong>contact@quinova.fr</strong> ou via
           notre <a href="/contact" style={{ color: 'var(--color-amber-deep)', fontWeight: 600 }}>formulaire de contact</a>.
         </p>
       </Section>

@@ -233,28 +233,31 @@ const PROVIDER_SPECS: Record<string, { helpUrl: string; helpText: string; fields
     helpUrl:  'https://dev.helloasso.com',
     helpText: 'Espace partenaires → Mes applications → Créer une application',
     fields: [
-      { key: 'client_id',         label: 'Client ID',        hint: "Identifiant de votre application HelloAsso",              sensitive: false, required: true,  placeholder: 'helloasso_xxxxxx' },
-      { key: 'client_secret',     label: 'Client Secret',    hint: "Secret de l'application — ne jamais partager",            sensitive: true,  required: true  },
-      { key: 'organization_slug', label: 'Slug organisation', hint: "Identifiant dans l'URL HelloAsso (ex: mon-association)",  sensitive: false, required: true,  placeholder: 'mon-association' },
+      { key: 'client_id',         label: 'Client ID',         hint: "Identifiant de votre application HelloAsso",                                                          sensitive: false, required: true,  placeholder: 'helloasso_xxxxxx' },
+      { key: 'client_secret',     label: 'Client Secret',     hint: "Secret de l'application — ne jamais partager",                                                         sensitive: true,  required: true  },
+      { key: 'organization_slug', label: 'Slug organisation', hint: "Identifiant dans l'URL HelloAsso (ex: mon-association)",                                               sensitive: false, required: true,  placeholder: 'mon-association' },
+      { key: 'webhook_secret',    label: 'Secret webhook',    hint: "Valeur libre — à renseigner aussi dans HelloAsso → Notifications → En-tête Authorization : Bearer <valeur>", sensitive: true, required: true, placeholder: 'générer une valeur aléatoire' },
     ],
   },
   sumup: {
     helpUrl:  'https://developer.sumup.com',
     helpText: 'Developer portal → My Applications → Create App',
     fields: [
-      { key: 'client_id',     label: 'Client ID',     hint: "Identifiant de l'application SumUp",           sensitive: false, required: true  },
-      { key: 'client_secret', label: 'Client Secret', hint: "Secret de l'application — ne jamais partager", sensitive: true,  required: true  },
-      { key: 'merchant_code', label: 'Code marchand', hint: "Visible dans Compte SumUp → Profil",           sensitive: false, required: false, placeholder: 'MC001' },
+      { key: 'client_id',      label: 'Client ID',      hint: "Identifiant de l'application SumUp",                                                    sensitive: false, required: true  },
+      { key: 'client_secret',  label: 'Client Secret',  hint: "Secret de l'application — ne jamais partager",                                           sensitive: true,  required: true  },
+      { key: 'merchant_code',  label: 'Code marchand',  hint: "Visible dans Compte SumUp → Profil",                                                     sensitive: false, required: false, placeholder: 'MC001' },
+      { key: 'webhook_secret', label: 'Secret webhook', hint: "Clé HMAC configurée dans SumUp Dashboard → Intégrations → Webhooks → Signing secret",    sensitive: true,  required: true  },
     ],
   },
   paypal: {
     helpUrl:  'https://developer.paypal.com/dashboard/applications',
     helpText: 'Dashboard → My Apps & Credentials → Create App',
     fields: [
-      { key: 'client_id',     label: 'Client ID',     hint: "Clé publique de votre application PayPal",    sensitive: false, required: true  },
-      { key: 'client_secret', label: 'Client Secret', hint: "Clé secrète PayPal — ne jamais partager",     sensitive: true,  required: true  },
-      { key: 'environment',   label: 'Environnement', hint: "sandbox = tests, production = paiements réels", sensitive: false, required: true,
+      { key: 'client_id',     label: 'Client ID',      hint: "Clé publique de votre application PayPal",                                                                           sensitive: false, required: true  },
+      { key: 'client_secret', label: 'Client Secret',  hint: "Clé secrète PayPal — ne jamais partager",                                                                            sensitive: true,  required: true  },
+      { key: 'environment',   label: 'Environnement',  hint: "sandbox = tests, production = paiements réels",                                                                       sensitive: false, required: true,
         type: 'select', options: [{ value: 'sandbox', label: 'Sandbox (test)' }, { value: 'production', label: 'Production (réel)' }] },
+      { key: 'webhook_token', label: 'Token webhook',  hint: "Valeur libre — à inclure dans l'URL webhook PayPal : …/api/webhooks/paypal?token=<valeur>", sensitive: true,  required: true,  placeholder: 'générer une valeur aléatoire' },
     ],
   },
   stripe: {
@@ -263,7 +266,7 @@ const PROVIDER_SPECS: Record<string, { helpUrl: string; helpText: string; fields
     fields: [
       { key: 'publishable_key', label: 'Clé publiable',  hint: "Commence par pk_live_ ou pk_test_ (non secrète)", sensitive: false, required: true,  placeholder: 'pk_live_...' },
       { key: 'secret_key',      label: 'Clé secrète',    hint: "Commence par sk_live_ — ne jamais partager",      sensitive: true,  required: true,  placeholder: 'sk_live_...' },
-      { key: 'webhook_secret',  label: 'Secret webhook', hint: "Commence par whsec_ (optionnel)",                 sensitive: true,  required: false, placeholder: 'whsec_...' },
+      { key: 'webhook_secret',  label: 'Secret webhook', hint: "Commence par whsec_ — Développeurs → Webhooks → Signing secret", sensitive: true, required: true, placeholder: 'whsec_...' },
     ],
   },
   other: {
@@ -568,18 +571,42 @@ function TabPaiements({ providers: initialProviders }: { providers: ProviderData
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0, marginTop: 1 }}>
                 <path d="M8 1L9.5 6h5L10.25 9.5l1.5 5L8 12l-3.75 2.5 1.5-5L1.5 6h5L8 1z" stroke="var(--color-qred)" strokeWidth="1.2" fill="none"/>
               </svg>
-              <div>
+              <div style={{ minWidth: 0 }}>
                 <div className="font-bold" style={{ fontSize: 11, color: 'var(--color-qred)', marginBottom: 3 }}>
                   Webhook à configurer chez {PROVIDER_META[form.type]?.label ?? form.type}
                 </div>
-                <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 4 }}>
-                  Pour recevoir la confirmation automatique des paiements, ajoutez cette URL dans votre dashboard :
-                </div>
+                {form.type === 'helloasso' && (
+                  <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+                    Dans HelloAsso → Notifications, ajoutez cette URL et l&apos;en-tête HTTP{' '}
+                    <code style={{ fontSize: 10, background: 'rgba(0,0,0,.1)', padding: '1px 4px', borderRadius: 3 }}>Authorization: Bearer &lt;secret webhook&gt;</code>
+                  </div>
+                )}
+                {form.type === 'paypal' && (
+                  <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+                    Dans PayPal → Webhooks, configurez l&apos;URL ci-dessous (remplacez{' '}
+                    <code style={{ fontSize: 10 }}>&lt;token&gt;</code> par votre valeur) :
+                  </div>
+                )}
+                {form.type === 'sumup' && (
+                  <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+                    Dans SumUp Dashboard → Intégrations → Webhooks, ajoutez cette URL :
+                  </div>
+                )}
+                {form.type === 'stripe' && (
+                  <div style={{ fontSize: 11, color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+                    Dans Stripe Dashboard → Développeurs → Webhooks, ajoutez cette URL :
+                  </div>
+                )}
                 <code
                   className="block rounded-[4px] px-[8px] py-[4px] select-all"
                   style={{ fontSize: 11, background: 'rgba(0,0,0,.15)', color: 'var(--color-text-primary)', wordBreak: 'break-all' }}
                 >
                   {typeof window !== 'undefined' ? window.location.origin : ''}/api/webhooks/{form.type}
+                  {form.type === 'paypal' && (
+                    form.config.webhook_token
+                      ? `?token=${form.config.webhook_token}`
+                      : '?token=<votre_token_webhook>'
+                  )}
                 </code>
               </div>
             </div>
@@ -971,7 +998,7 @@ export default function ParametresClient({
           Paramètres
         </h1>
         <p style={{ fontSize: 12, color: 'var(--color-text-secondary)', marginTop: 3 }}>
-          Configuration de votre espace Quineo
+          Configuration de votre espace Quinova
         </p>
       </div>
 

@@ -96,7 +96,7 @@ export default function DisplayLandingPage() {
           className="font-display"
           style={{ fontSize: 28, color: '#fff', letterSpacing: '.04em' }}
         >
-          Quineo
+          Quinova
         </span>
       </div>
 
@@ -199,7 +199,7 @@ export default function DisplayLandingPage() {
       </div>
 
       <p style={{ marginTop: 24, fontSize: 11, color: 'rgba(255,255,255,.2)' }}>
-        Quineo — Gestion de loto pour associations
+        Quinova — Gestion de loto pour associations
       </p>
     </div>
   )
